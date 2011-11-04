@@ -132,10 +132,6 @@ class HMBackup {
 	 */
 	public function backup() {
 
-		// Make sure it's possible to do a backup
-		if ( ! $this->is_backup_possible() )
-			return false;
-
 		if ( file_exists( $this->path . '/.backup_complete' ) )
 			unlink( $this->path . '/.backup_complete' );
 
@@ -208,23 +204,6 @@ class HMBackup {
 
 		return file_get_contents( $this->path .'/.backup_running' );
 
-	}
-
-	/**
-	 * Check if a backup is possible with regards to file
-	 * permissions etc.
-	 *
-	 * @return bool
-	 */
-	private function is_backup_possible() {
-
-		if ( ! is_writable( $this->path ) || ! is_dir( $this->path ) || $this->is_safe_mode_active() )
-			return false;
-
-		if ( $this->files_only && $this->database_only )
-			return false;
-
-		return true;
 	}
 
 	/**
