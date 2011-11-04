@@ -417,7 +417,7 @@ class HMBackup {
 	 * @param bool $rel. (default: false)
 	 * @return string $dir
 	 */
-	private function conform_dir( $dir, $rel = false ) {
+	public static function conform_dir( $dir, $rel = false ) {
 
 		// Normalise slashes
 		$dir = str_replace( '\\', '/', $dir );
