@@ -162,7 +162,7 @@ class HMBackup {
 	 * @access private
 	 * @return null
 	 */
-	private function mysqldump() {
+	public function mysqldump() {
 
 		do_action( 'hmbkp_mysqldump_started' );
 
@@ -213,7 +213,7 @@ class HMBackup {
 	 *
 	 * @access private
 	 */
-	private function mysqldump_fallback() {
+	public function mysqldump_fallback() {
 
 	    $this->connection = mysql_pconnect( DB_HOST, DB_USER, DB_PASSWORD );
 
@@ -254,7 +254,7 @@ class HMBackup {
 	 * @access private
 	 * @return null
 	 */
-	private function archive() {
+	public function archive() {
 
 		do_action( 'hmbkp_archive_started' );
 
@@ -293,7 +293,7 @@ class HMBackup {
 	 * @access private
 	 * @param string $path
 	 */
-	private function archive_fallback() {
+	public function archive_fallback() {
 
 		require_once( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
 
@@ -301,11 +301,10 @@ class HMBackup {
 
 		// Zip up everything
 		if ( ! $this->database_only )
-			$archive->create( $this->root, PCLZIP_OPT_REMOVE_PATH, $this->root, PCLZIP_CB_PRE_ADD, 'hmbkp_pclzip_callback' );
+			$archive->add( $this->root, PCLZIP_OPT_REMOVE_PATH, $this->root, PCLZIP_CB_PRE_ADD, 'hmbkp_pclzip_callback' );
 
-		// Only zip up the database
-		if ( $this->database_only )
-			$archive->create( $this->database_dump_filepath, PCLZIP_OPT_REMOVE_PATH, $this->path );
+		if ( ! $this->files_only )
+			$archive->add( $this->database_dump_filepath(), PCLZIP_OPT_REMOVE_PATH, $this->path );
 
 	}
 
@@ -777,10 +776,6 @@ function hmbkp_pclzip_callback( $event, &$file ) {
     // Don't try to add unreadable files.
     if ( ! is_readable( $file['filename'] ) )
     	return false;
-
-    // Include the database file
-    if ( strpos( $file['filename'], $hm_backup->database_dump_filename ) !== false )
-    	$file['stored_filename'] = $hm_backup->database_dump_filename;
 
     // Match everything else past the exclude list
     elseif ( preg_match( '(' . $hm_backup->exclude_string( 'pclzip' ) . ')', $file['stored_filename'] ) )
