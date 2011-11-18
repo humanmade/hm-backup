@@ -106,8 +106,6 @@ class HMBackup {
 		$this->database_only = false;
 		$this->files_only = false;
 
-		$this->excludes = $this->excludes();
-
 		$hm_backup = $this;
 
 	}
@@ -381,7 +379,7 @@ class HMBackup {
 	 * @access private
 	 * @return array
 	 */
-	private function excludes() {
+	public function excludes() {
 		return array_unique( array_map( 'trim', array_merge( array( trailingslashit( $this->path ) ), (array) $this->excludes ) ) );
 	}
 
@@ -516,21 +514,18 @@ class HMBackup {
 	 * @param bool $rel. (default: false)
 	 * @return string $dir
 	 */
-	public static function conform_dir( $dir, $rel = false ) {
+	public function conform_dir( $dir, $recursive = false ) {
 
-		// Normalise slashes
+		// Replace single forward slash (looks like double slash because we have to escape it)
 		$dir = str_replace( '\\', '/', $dir );
 		$dir = str_replace( '//', '/', $dir );
 
-		// Remove the trailingslash
+		// Remove the trailing slash
 		$dir = untrailingslashit( $dir );
-
-		// If we're on Windows
-		if ( strpos( $dir, '\\' ) !== false )
-			$dir = str_replace( '\\', '/', $dir );
-
-		if ( $rel == true )
-			$dir = str_replace( $this->conform_dir( $this->root ), '', $dir );
+		
+		// Carry on until completely normalized
+		if ( !$recursive && $this->conform_dir( $dir, true ) != $dir )
+			return $this->conform_dir( $dir );
 
 		return $dir;
 	}

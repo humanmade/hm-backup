@@ -65,7 +65,7 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->archive_filepath(), array( 'test-data.txt', $this->backup->database_dump_filename ) );
-		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 4 );
 
 
 	}
@@ -85,7 +85,7 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->archive_filepath(), array( 'test-data.txt', $this->backup->database_dump_filename ) );
-		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 4 );
 
 	}
 
@@ -106,7 +106,7 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
-		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
+		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 3 );
 
 	}
 
@@ -126,7 +126,7 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
-		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
+		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 3 );
 
 	}
 
@@ -209,7 +209,6 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveContains( $this->backup->archive_filepath(), array( $this->backup->database_dump_filename ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
-
 
 	}
 
