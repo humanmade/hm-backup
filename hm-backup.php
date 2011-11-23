@@ -477,7 +477,7 @@ class HMBackup {
 	 * @access private
 	 * @return bool
 	 */
-	private function is_safe_mode_active() {
+	public function is_safe_mode_active() {
 
 		if ( $safe_mode = ini_get( 'safe_mode' ) && strtolower( $safe_mode ) != 'off' )
 			return true;
