@@ -86,6 +86,9 @@ class HMBackup {
 	public function __construct() {
 
 		global $hm_backup;
+		
+		if ( isset( $hm_backup ) )
+			return $hm_backup;
 
 		// Raise the memory limit and max_execution_time time
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
@@ -108,6 +111,10 @@ class HMBackup {
 
 		$hm_backup = $this;
 
+	}
+	
+	public function __destruct() {
+		unset( $GLOBALS['hm_backup'] );
 	}
 
 	/**
