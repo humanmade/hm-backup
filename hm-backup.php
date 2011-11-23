@@ -76,6 +76,14 @@ class HMBackup {
 	 * @access public
 	 */
 	public $root;
+	
+	/**
+	 * Holds the current db connection
+	 * 
+	 * @var resource
+	 * @access private
+	 */
+	private $db;
 
 	/**
 	 * Sets up the default properties
@@ -220,9 +228,10 @@ class HMBackup {
 	 */
 	public function mysqldump_fallback() {
 
-	    $this->connection = mysql_pconnect( DB_HOST, DB_USER, DB_PASSWORD );
+	    $this->db = mysql_pconnect( DB_HOST, DB_USER, DB_PASSWORD );
 
-	    mysql_select_db( DB_NAME, $this->connection );
+	    mysql_select_db( DB_NAME, $this->db );
+	    mysql_set_charset( DB_CHARSET, $this->db );
 
 	    // Begin new backup of MySql
 	    $tables = mysql_list_tables( DB_NAME );
@@ -606,7 +615,7 @@ class HMBackup {
 
 	    // Get table structure
 	    $query = 'SHOW CREATE TABLE ' . $this->sql_backquote( $table );
-	    $result = mysql_query( $query, $this->connection );
+	    $result = mysql_query( $query, $this->db );
 
 	    if ( $result ) {
 
@@ -624,7 +633,7 @@ class HMBackup {
 
 	    // Get table contents
 	    $query = 'SELECT * FROM ' . $this->sql_backquote( $table );
-	    $result = mysql_query( $query, $this->connection );
+	    $result = mysql_query( $query, $this->db );
 
 	    if ( $result ) {
 	    	$fields_cnt = mysql_num_fields( $result );
