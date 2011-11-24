@@ -95,7 +95,7 @@ class HMBackup {
 
 		global $hm_backup;
 		
-		if ( isset( $hm_backup ) )
+		if ( !empty( $hm_backup ) )
 			return $hm_backup;
 
 		// Raise the memory limit and max_execution_time time
@@ -530,7 +530,7 @@ class HMBackup {
 	 * @param bool $rel. (default: false)
 	 * @return string $dir
 	 */
-	public function conform_dir( $dir, $recursive = false ) {
+	public static function conform_dir( $dir, $recursive = false ) {
 
 		// Replace single forward slash (looks like double slash because we have to escape it)
 		$dir = str_replace( '\\', '/', $dir );
@@ -540,8 +540,8 @@ class HMBackup {
 		$dir = untrailingslashit( $dir );
 		
 		// Carry on until completely normalized
-		if ( !$recursive && $this->conform_dir( $dir, true ) != $dir )
-			return $this->conform_dir( $dir );
+		if ( !$recursive && HMBackup::conform_dir( $dir, true ) != $dir )
+			return HMBackup::conform_dir( $dir );
 
 		return $dir;
 	}
