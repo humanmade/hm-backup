@@ -26,7 +26,7 @@ class testConformDirTestCase extends WP_UnitTestCase {
 
 	function setUp() {
 		
-		$this->backup = new HMBackup;
+		$this->backup = new HM_Backup;
 		$this->dir = '/one/two/three';
 		
 	}

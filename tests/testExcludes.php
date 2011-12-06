@@ -32,7 +32,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 	 */
 	function setUp() {
 
-		$this->backup = new HMBackup();
+		$this->backup = new HM_Backup();
 		$this->backup->root = dirname( __FILE__ ) . '/test-data/';
 		$this->backup->path = $this->tmp = dirname( __FILE__ ) . '/tmp';
 

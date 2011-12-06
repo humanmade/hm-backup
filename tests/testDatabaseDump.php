@@ -24,7 +24,7 @@ class testDatabaseDumpTestCase extends WP_UnitTestCase {
 	 */
 	function setUp() {
 
-		$this->backup = new HMBackup();
+		$this->backup = new HM_Backup();
 		$this->backup->path = $this->tmp = dirname( __FILE__ ) . '/tmp';
 
 		mkdir( $this->tmp );

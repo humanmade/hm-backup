@@ -2,8 +2,10 @@
 
 /**
  * Runs the backup process
+ * 
+ * @todo make proper singleton, or come up with a better way to handle pclzip callback
  */
-class HMBackup {
+class HM_Backup {
 
 	/**
 	 * The path where the backup file should be saved
@@ -84,6 +86,8 @@ class HMBackup {
 	 * @access private
 	 */
 	private $db;
+	
+	static $instance;
 
 	/**
 	 * Sets up the default properties
@@ -92,11 +96,6 @@ class HMBackup {
 	 * @return null
 	 */
 	public function __construct() {
-
-		global $hm_backup;
-		
-		if ( !empty( $hm_backup ) )
-			return $hm_backup;
 
 		// Raise the memory limit and max_execution_time time
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
@@ -117,8 +116,15 @@ class HMBackup {
 		$this->database_only = false;
 		$this->files_only = false;
 
-		$hm_backup = $this;
-
+	}
+	
+	public static function get_instance() {
+		
+		if ( empty( self::$instance ) )
+			self::$instance = new HM_Backup();
+			
+		return self::$instance;
+		
 	}
 	
 	public function __destruct() {
@@ -172,7 +178,7 @@ class HMBackup {
 	 * Uses mysqldump if available, falls back to PHP
 	 * if not.
 	 *
-	 * @access private
+	 * @access public
 	 * @return null
 	 */
 	public function mysqldump() {
@@ -224,7 +230,8 @@ class HMBackup {
 	/**
 	 * PHP mysqldump fallback functions, exports the database to a .sql file
 	 *
-	 * @access private
+	 * @access public
+	 * @return null
 	 */
 	public function mysqldump_fallback() {
 
@@ -265,7 +272,7 @@ class HMBackup {
 	 * thats not available then it fallsback on
 	 * PHP zip classes.
 	 *
-	 * @access private
+	 * @access public
 	 * @return null
 	 */
 	public function archive() {
@@ -304,10 +311,14 @@ class HMBackup {
 	 * Uses the PCLZIP library that ships with WordPress
 	 *
 	 * @todo support zipArchive
-	 * @access private
+	 * @access public
 	 * @param string $path
 	 */
 	public function archive_fallback() {
+	
+		global $_hmbkp_exclude_string;
+		
+		$_hmbkp_exclude_string = $this->exclude_string( 'pclzip' );
 
 		require_once( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
 
@@ -319,13 +330,15 @@ class HMBackup {
 
 		if ( ! $this->files_only )
 			$archive->add( $this->database_dump_filepath(), PCLZIP_OPT_REMOVE_PATH, $this->path );
+			
+		unset( $GLOBALS['_hmbkp_exclude_string'] );
 
 	}
 
 	/**
 	 * Attempt to work out the path to mysqldump
 	 *
-	 * @access private
+	 * @access public
 	 * @return bool
 	 */
 	public function guess_mysqldump_command_path() {
@@ -365,7 +378,7 @@ class HMBackup {
 	/**
 	 * Attempt to work out the path to the zip command
 	 *
-	 * @access private
+	 * @access public
 	 * @return bool
 	 */
 	public function guess_zip_command_path() {
@@ -392,11 +405,11 @@ class HMBackup {
 	/**
 	 * Get the array of exclude rules
 	 *
-	 * @access private
+	 * @access public
 	 * @return array
 	 */
 	public function excludes() {
-		return array_unique( array_map( 'trim', array_merge( array( trailingslashit( $this->path ) ), (array) $this->excludes ) ) );
+		return array_filter( array_unique( array_map( 'trim', array_merge( array( trailingslashit( $this->path ) ), (array) $this->excludes ) ) ) );
 	}
 
 	/**
@@ -405,7 +418,7 @@ class HMBackup {
 	 * Takes the exclude rules and formats them for use with either
 	 * the shell zip command or pclzip
 	 *
-	 * @access private
+	 * @access public
 	 * @param string $context. (default: 'zip')
 	 * @return string
 	 */
@@ -482,6 +495,7 @@ class HMBackup {
 		// Escape shell args for zip command
 		if ( $context == 'zip' )
 			$excludes = array_map( 'escapeshellarg', $excludes );
+			
 
 		return implode( $separator, $excludes );
 
@@ -530,7 +544,7 @@ class HMBackup {
 	 * @param bool $rel. (default: false)
 	 * @return string $dir
 	 */
-	public static function conform_dir( $dir, $recursive = false ) {
+	public function conform_dir( $dir, $recursive = false ) {
 
 		// Replace single forward slash (looks like double slash because we have to escape it)
 		$dir = str_replace( '\\', '/', $dir );
@@ -540,8 +554,8 @@ class HMBackup {
 		$dir = untrailingslashit( $dir );
 		
 		// Carry on until completely normalized
-		if ( !$recursive && HMBackup::conform_dir( $dir, true ) != $dir )
-			return HMBackup::conform_dir( $dir );
+		if ( !$recursive && self::conform_dir( $dir, true ) != $dir )
+			return self::conform_dir( $dir );
 
 		return $dir;
 	}
@@ -782,14 +796,14 @@ class HMBackup {
  */
 function hmbkp_pclzip_callback( $event, &$file ) {
 
-	global $hm_backup;
+	global $_hmbkp_exclude_string;
 
     // Don't try to add unreadable files.
     if ( ! is_readable( $file['filename'] ) )
     	return false;
 
     // Match everything else past the exclude list
-    elseif ( preg_match( '(' . $hm_backup->exclude_string( 'pclzip' ) . ')', $file['stored_filename'] ) )
+    elseif ( preg_match( '(' . $_hmbkp_exclude_string . ')', $file['stored_filename'] ) )
     	return false;
 
     return true;
