@@ -2,8 +2,6 @@
 
 /**
  * Runs the backup process
- * 
- * @todo make proper singleton, or come up with a better way to handle pclzip callback
  */
 class HM_Backup {
 
