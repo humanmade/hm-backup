@@ -212,7 +212,7 @@ class HM_Backup {
 			$cmd .= ' ' . escapeshellarg( DB_NAME );
 			
 			// Send stdout to null
-			$cmd =. ' 2> /dev/null';
+			$cmd .= ' 2> /dev/null';
 
 			shell_exec( $cmd );
 
