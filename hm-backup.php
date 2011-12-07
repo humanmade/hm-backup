@@ -317,6 +317,9 @@ class HM_Backup {
 		global $_hmbkp_exclude_string;
 		
 		$_hmbkp_exclude_string = $this->exclude_string( 'pclzip' );
+		
+		if ( ! defined( 'PCLZIP_TEMPORARY_DIR' ) )
+			define( 'PCLZIP_TEMPORARY_DIR', $this->path );
 
 		require_once( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
 
