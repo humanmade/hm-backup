@@ -341,7 +341,7 @@ class HM_Backup {
 	 */
 	public function guess_mysqldump_command_path() {
 
-		if ( !$this->shell_exec_available() )
+		if ( ! $this->shell_exec_available() )
 			return '';
 
 		// List of possible mysqldump locations
@@ -552,7 +552,7 @@ class HM_Backup {
 		$dir = untrailingslashit( $dir );
 		
 		// Carry on until completely normalized
-		if ( !$recursive && self::conform_dir( $dir, true ) != $dir )
+		if ( ! $recursive && self::conform_dir( $dir, true ) != $dir )
 			return self::conform_dir( $dir );
 
 		return $dir;
@@ -566,7 +566,7 @@ class HM_Backup {
 	 */
 	private function sql_backquote( $a_name ) {
 
-	    if ( !empty( $a_name ) && $a_name != '*' ) {
+	    if ( ! empty( $a_name ) && $a_name != '*' ) {
 
 	    	if ( is_array( $a_name ) ) {
 
@@ -685,7 +685,7 @@ class HM_Backup {
 	    	// build the statement
 	    	for ( $j = 0; $j < $fields_cnt; $j++ ) {
 
-	    		if ( !isset($row[$j] ) ) {
+	    		if ( ! isset($row[$j] ) ) {
 	    			$values[]     = 'NULL';
 
 	    		} elseif ( $row[$j] == '0' || $row[$j] != '' ) {
