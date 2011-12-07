@@ -210,8 +210,9 @@ class HM_Backup {
 
 			// The database we're dumping
 			$cmd .= ' ' . escapeshellarg( DB_NAME );
-
-			error_log( $cmd );
+			
+			// Send stdout to null
+			$cmd =. ' 2> /dev/null';
 
 			shell_exec( $cmd );
 
@@ -282,11 +283,11 @@ class HM_Backup {
 
 			// Zip up $this->root
 			if ( ! $this->database_only )
-				shell_exec( 'cd ' . escapeshellarg( $this->root ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) );
+				shell_exec( 'cd ' . escapeshellarg( $this->root ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2> /dev/null' );
 
 			// Add the database dump to the archive
 			if ( ! $this->files_only )
-				shell_exec( 'cd ' . escapeshellarg( $this->path ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename ) );
+				shell_exec( 'cd ' . escapeshellarg( $this->path ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename ) . ' 2> /dev/null' );
 
 		}
 
@@ -468,7 +469,6 @@ class HM_Backup {
 
 			// Escape string for regex
 			if ( $context == 'pclzip' )
-				//$rule = preg_quote( $rule );
 				$rule = str_replace( '.', '\.', $rule );
 
 			// Convert any existing wildcards
