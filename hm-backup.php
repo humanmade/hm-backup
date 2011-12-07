@@ -367,9 +367,9 @@ class HM_Backup {
 			'\Program Files\MySQL\MySQL Server 4.1\bin\mysqldump'
 		);
 
-		// Try to find out where mysqldump is
+		// Find the one which works
 		foreach ( $mysqldump_locations as $location )
-		    if ( shell_exec( $location ) )
+		    if ( shell_exec( $location . ' --version 2> /dev/null' ) )
 	 	    	return $location;
 
 		return '';
@@ -396,7 +396,7 @@ class HM_Backup {
 
 		// Find the one which works
 		foreach ( $zip_locations as $location )
-		    if ( shell_exec( 'which ' . $location ) )
+		    if ( shell_exec( $location . ' --version 2> /dev/null' ) )
 	 	    	return $location;
 
 		return '';
