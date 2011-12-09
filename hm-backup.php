@@ -433,7 +433,7 @@ class HM_Backup {
 
 		// Find the one which works
 		foreach ( $mysqldump_locations as $location )
-		    if ( shell_exec( 'hash ' . $location . ' 2> /dev/null' ) )
+		    if ( ! shell_exec( 'hash ' . $location . ' 2>&1' ) )
 	 	    	return $location;
 
 		return '';
@@ -460,7 +460,7 @@ class HM_Backup {
 
 		// Find the one which works
 		foreach ( $zip_locations as $location )
-		    if ( shell_exec( 'hash ' . $location . ' 2> /dev/null' ) )
+		    if ( ! shell_exec( 'hash ' . $location . ' 2>&1' ) )
 	 	    	return $location;
 
 		return '';
