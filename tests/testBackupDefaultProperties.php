@@ -40,7 +40,7 @@ class BackUpWordPressPropertiesTestCase extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Make sure settings a custom path + archive filename correctly sets the archive filepath
+	 * Make sure setting a custom path + archive filename correctly sets the archive filepath
 	 *
 	 * @access public
 	 * @return null
@@ -55,7 +55,7 @@ class BackUpWordPressPropertiesTestCase extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Make sure settings a custom path + database dump filename correctly sets the database dump filepath
+	 * Make sure setting a custom path + database dump filename correctly sets the database dump filepath
 	 *
 	 * @access public
 	 * @return null

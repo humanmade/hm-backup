@@ -25,9 +25,9 @@ class testDatabaseDumpTestCase extends WP_UnitTestCase {
 	function setUp() {
 
 		$this->backup = new HM_Backup();
-		$this->backup->path = $this->tmp = dirname( __FILE__ ) . '/tmp';
+		$this->backup->path = dirname( __FILE__ ) . '/tmp';
 
-		mkdir( $this->tmp );
+		mkdir( $this->backup->path );
 
 	}
 
@@ -43,8 +43,8 @@ class testDatabaseDumpTestCase extends WP_UnitTestCase {
 		if ( file_exists( $this->backup->database_dump_filepath() ) )
 			unlink( $this->backup->database_dump_filepath() );
 
-		if ( file_exists( $this->tmp ) )
-			rmdir( $this->tmp );
+		if ( file_exists( $this->backup->path ) )
+			rmdir( $this->backup->path );
 
 	}
 	

@@ -17,14 +17,6 @@ class testExcludesTestCase extends WP_UnitTestCase {
 	protected $backup;
 
 	/**
-	 * The temporary directory to write the backup file too
-	 *
-	 * @var string
-	 * @access protected
-	 */
-	protected $tmp;
-
-	/**
 	 * Setup the backup object and create the tmp directory
 	 *
 	 * @access public
@@ -34,9 +26,9 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->backup = new HM_Backup();
 		$this->backup->root = dirname( __FILE__ ) . '/test-data/';
-		$this->backup->path = $this->tmp = dirname( __FILE__ ) . '/tmp';
+		$this->backup->path = dirname( __FILE__ ) . '/tmp';
 
-		mkdir( $this->tmp );
+		mkdir( $this->backup->path );
 
 	}
 
@@ -52,397 +44,370 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		if ( file_exists( $this->backup->archive_filepath() ) )
 			unlink( $this->backup->archive_filepath() );
 
-		if ( file_exists( $this->tmp ) )
-			rmdir( $this->tmp );
+		if ( file_exists( $this->backup->path ) )
+			rmdir( $this->backup->path );
 
 	}
 
-	function testBackUpPathIsExcludedByDefault() {
-
-		$this->assertEquals( $this->backup->excludes(), array( trailingslashit( $this->backup->path ) ) );
-
-	}
-
-	function testDefaultExcludesAreMergedWithUserExcludes() {
-
-		$this->backup->excludes = '/exclude/';
-
-		$this->assertEquals( $this->backup->excludes(), array( trailingslashit( $this->backup->path ), $this->backup->excludes ) );
-
-	}
-
-	function testExcludeAbsoluteDirPathWithZipCommand() {
+	function testExcludeAbsoluteDirPathWithZip() {
 
 		$this->backup->excludes = '/exclude/';
 		$this->backup->files_only = true;
 
 		$this->assertNotEmpty( $this->backup->zip_command_path );
 
-		$this->backup->backup();
+		$this->backup->zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
 
 	}
 
-	function testExcludeAbsoluteDirPathWithZipFallback() {
+	function testExcludeAbsoluteDirPathWithPclZip() {
 
 		$this->backup->excludes = '/exclude/';
 		$this->backup->files_only = true;
 
-		$this->backup->zip_command_path = false;
-
-		$this->backup->backup();
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
 
 	}
 
-	function testExcludeDirPathFragmentWithZipCommand() {
+	function testExcludeDirPathFragmentWithZip() {
 
 		$this->backup->excludes = 'exclude/';
 		$this->backup->files_only = true;
 
 		$this->assertNotEmpty( $this->backup->zip_command_path );
 
-		$this->backup->backup();
+		$this->backup->zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
 
 	}
 
-	function testExcludeDirPathFragmentWithZipFallback() {
+	function testExcludeDirPathFragmentWithPclZip() {
 
 		$this->backup->excludes = 'exclude/';
 		$this->backup->files_only = true;
 
-		$this->backup->zip_command_path = false;
-
-		$this->backup->backup();
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
 
 	}
 
-	function testExcludeAmbiguousAbsoluteDirPathWithZipCommand() {
+	function testExcludeAmbiguousAbsoluteDirPathWithZip() {
 
 		$this->backup->excludes = 'exclude';
 		$this->backup->files_only = true;
 
 		$this->assertNotEmpty( $this->backup->zip_command_path );
 
-		$this->backup->backup();
+		$this->backup->zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
 
 	}
 
-	function testExcludeAmbiguousAbsoluteDirPathWithZipFallback() {
+	function testExcludeAmbiguousAbsoluteDirPathWithPclZip() {
 
 		$this->backup->excludes = 'exclude';
 		$this->backup->files_only = true;
 
-		$this->backup->zip_command_path = false;
-
-		$this->backup->backup();
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
 
 	}
 
-	function testExcludeAbsoluteFilePathWithZipCommand() {
+	function testExcludeAbsoluteFilePathWithZip() {
 
 		$this->backup->excludes = '/exclude/exclude.exclude';
 		$this->backup->files_only = true;
 
 		$this->assertNotEmpty( $this->backup->zip_command_path );
 
-		$this->backup->backup();
+		$this->backup->zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeAbsoluteFilePathWithZipFallback() {
+	function testExcludeAbsoluteFilePathWithPclZip() {
 
 		$this->backup->excludes = '/exclude/exclude.exclude';
 		$this->backup->files_only = true;
 
-		$this->backup->zip_command_path = false;
-
-		$this->backup->backup();
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeAmbiguousAbsoluteFilePathWithZipCommand() {
+	function testExcludeAmbiguousAbsoluteFilePathWithZip() {
 
 		$this->backup->excludes = 'exclude/exclude.exclude';
 		$this->backup->files_only = true;
 
 		$this->assertNotEmpty( $this->backup->zip_command_path );
 
-		$this->backup->backup();
+		$this->backup->zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeAmbiguousAbsoluteFilePathWithZipFallback() {
+	function testExcludeAmbiguousAbsoluteFilePathWithPclZip() {
 
 		$this->backup->excludes = 'exclude/exclude.exclude';
 		$this->backup->files_only = true;
 
-		$this->backup->zip_command_path = false;
-
-		$this->backup->backup();
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeAbsolutePathWithWildcardFileWithZipCommand() {
+	function testExcludeAbsolutePathWithWildcardFileWithZip() {
 
 		$this->backup->excludes = '/exclude/*';
 		$this->backup->files_only = true;
 
 		$this->assertNotEmpty( $this->backup->zip_command_path );
 
-		$this->backup->backup();
+		$this->backup->zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeAbsolutePathWithWildcardFileWithZipFallback() {
+	function testExcludeAbsolutePathWithWildcardFileWithPclZip() {
 
 		$this->backup->excludes = '/exclude/*';
 		$this->backup->files_only = true;
 
-		$this->backup->zip_command_path = false;
-
-		$this->backup->backup();
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeAmbiguousAbsolutePathWithWildcardFileWithZipCommand() {
+	function testExcludeAmbiguousAbsolutePathWithWildcardFileWithZip() {
 
 		$this->backup->excludes = 'exclude/*';
 		$this->backup->files_only = true;
 
 		$this->assertNotEmpty( $this->backup->zip_command_path );
 
-		$this->backup->backup();
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeAmbiguousAbsolutePathWithWildcardFileWithZipFallback() {
+	function testExcludeAmbiguousAbsolutePathWithWildcardFileWithPclZip() {
 
 		$this->backup->excludes = 'exclude/*';
 		$this->backup->files_only = true;
 
-		$this->backup->zip_command_path = false;
-
-		$this->backup->backup();
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeWildcardFileNameWithZipCommand() {
+	function testExcludeWildcardFileNameWithZip() {
 
 		$this->backup->excludes = '*.exclude';
 		$this->backup->files_only = true;
 
 		$this->assertNotEmpty( $this->backup->zip_command_path );
 
-		$this->backup->backup();
+		$this->backup->zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeWildcardFileNameWithZipFallback() {
+	function testExcludeWildcardFileNameWithPclZip() {
 
 		$this->backup->excludes = '*.exclude';
 		$this->backup->files_only = true;
 
-		$this->backup->zip_command_path = false;
-
-		$this->backup->backup();
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 	
-	function testExcludeAbsolutePathWithWildcardFileNameWithZipCommand() {
+	function testExcludeAbsolutePathWithWildcardFileNameWithZip() {
 
 		$this->backup->excludes = '/exclude/*.exclude';
 		$this->backup->files_only = true;
 
 		$this->assertNotEmpty( $this->backup->zip_command_path );
 
-		$this->backup->backup();
+		$this->backup->zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeAbsolutePathWithWildcardFileNameWithZipFallback() {
+	function testExcludeAbsolutePathWithWildcardFileNameWithPclZip() {
 
 		$this->backup->excludes = '/exclude/*.exclude';
 		$this->backup->files_only = true;
 
-		$this->backup->zip_command_path = false;
-
-		$this->backup->backup();
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeAmbiguousAbsolutePathWithWildcardFileNameWithZipCommand() {
+	function testExcludeAmbiguousAbsolutePathWithWildcardFileNameWithZip() {
 
 		$this->backup->excludes = 'exclude/*.exclude';
 		$this->backup->files_only = true;
 
 		$this->assertNotEmpty( $this->backup->zip_command_path );
 
-		$this->backup->backup();
+		$this->backup->zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeAmbiguousAbsolutePathWithWildcardFileNameWithZipFallback() {
+	function testExcludeAmbiguousAbsolutePathWithWildcardFileNameWithPclZip() {
 
 		$this->backup->excludes = 'exclude/*.exclude';
 		$this->backup->files_only = true;
 
-		$this->backup->zip_command_path = false;
-
-		$this->backup->backup();
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeWildcardFileExtensionWithZipCommand() {
+	function testExcludeWildcardFileExtensionWithZip() {
 
 		$this->backup->excludes = 'exclude.*';
 		$this->backup->files_only = true;
 
 		$this->assertNotEmpty( $this->backup->zip_command_path );
 
-		$this->backup->backup();
+		$this->backup->zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeWildcardFileExtensionWithZipFallback() {
+	function testExcludeWildcardFileExtensionWithPclZip() {
 
 		$this->backup->excludes = 'exclude.*';
 		$this->backup->files_only = true;
 
-		$this->backup->zip_command_path = false;
-
-		$this->backup->backup();
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 	
-	function testExcludeAbsolutePathWithWildcardFileExtensionWithZipCommand() {
+	function testExcludeAbsolutePathWithWildcardFileExtensionWithZip() {
 
 		$this->backup->excludes = '/exclude/exclude.*';
 		$this->backup->files_only = true;
 
 		$this->assertNotEmpty( $this->backup->zip_command_path );
 
-		$this->backup->backup();
+		$this->backup->zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeAbsolutePathWithWildcardFileExtensionWithZipFallback() {
+	function testExcludeAbsolutePathWithWildcardFileExtensionWithPclZip() {
 
 		$this->backup->excludes = '/exclude/exclude.*';
 		$this->backup->files_only = true;
 
-		$this->backup->zip_command_path = false;
-
-		$this->backup->backup();
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeAmbiguousAbsolutePathWithWildcardFileExtensionWithZipCommand() {
+	function testExcludeAmbiguousAbsolutePathWithWildcardFileExtensionWithZip() {
 
 		$this->backup->excludes = 'exclude/exclude.*';
 		$this->backup->files_only = true;
 
 		$this->assertNotEmpty( $this->backup->zip_command_path );
 
-		$this->backup->backup();
+		$this->backup->zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 
-	function testExcludeAmbiguousAbsolutePathWithWildcardFileExtensionWithZipFallback() {
+	function testExcludeAmbiguousAbsolutePathWithWildcardFileExtensionWithPclZip() {
 
 		$this->backup->excludes = 'exclude/exclude.*';
 		$this->backup->files_only = true;
 
-		$this->backup->zip_command_path = false;
-
-		$this->backup->backup();
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
 	}
 	
-	function testWildCardWithZipCommand() {
+	function testWildCardWithZip() {
 		
 		$this->backup->excludes = '*';
 		$this->backup->files_only = true;
 
 		$this->assertNotEmpty( $this->backup->zip_command_path );
 
-		$this->backup->backup();
+		$this->backup->zip();
+
+		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 0 );
+		
+	}
+	
+	function testWildCardWithPclZip() {
+		
+		$this->backup->excludes = '*';
+		$this->backup->files_only = true;
+		
+		$this->assertNotEmpty( $this->backup->zip_command_path );
+
+		$this->backup->pcl_zip();
 
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 0 );
 		

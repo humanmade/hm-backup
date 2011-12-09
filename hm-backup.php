@@ -76,15 +76,15 @@ class HM_Backup {
 	 * @access public
 	 */
 	public $root;
-	
+
 	/**
 	 * Holds the current db connection
-	 * 
+	 *
 	 * @var resource
 	 * @access private
 	 */
 	private $db;
-	
+
 	static $instance;
 
 	/**
@@ -115,18 +115,14 @@ class HM_Backup {
 		$this->files_only = false;
 
 	}
-	
+
 	public static function get_instance() {
-		
+
 		if ( empty( self::$instance ) )
 			self::$instance = new HM_Backup();
-			
+
 		return self::$instance;
-		
-	}
-	
-	public function __destruct() {
-		unset( $GLOBALS['hm_backup'] );
+
 	}
 
 	/**
@@ -210,7 +206,7 @@ class HM_Backup {
 
 			// The database we're dumping
 			$cmd .= ' ' . escapeshellarg( DB_NAME );
-			
+
 			// Send stdout to null
 			$cmd .= ' 2> /dev/null';
 
@@ -279,21 +275,16 @@ class HM_Backup {
 		do_action( 'hmbkp_archive_started' );
 
 		// Do we have the path to the zip command
-		if ( $this->zip_command_path ) {
+		if ( $this->zip_command_path )
+			$this->zip();
 
-			// Zip up $this->root
-			if ( ! $this->database_only )
-				shell_exec( 'cd ' . escapeshellarg( $this->root ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2> /dev/null' );
+		// If not or if the shell zip failed then use ZipArchive
+		if ( ! file_exists( $this->archive_filepath() ) && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) )
+			$this->zip_archive();
 
-			// Add the database dump to the archive
-			if ( ! $this->files_only )
-				shell_exec( 'cd ' . escapeshellarg( $this->path ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename ) . ' 2> /dev/null' );
-
-		}
-
-		// If not or if the shell zip failed then use the PHP fallback
+		// If ZipArchive is unavailable or one of the above failed
 		if ( ! file_exists( $this->archive_filepath() ) )
-			$this->archive_fallback();
+			$this->pcl_zip();
 
 		// Delete the database dump file
 		if ( file_exists( $this->database_dump_filepath() ) )
@@ -303,22 +294,93 @@ class HM_Backup {
 
 	}
 
+	public function zip() {
+
+		var_dump( $this->exclude_string( 'zip' ) );
+
+		// Zip up $this->root with excludes
+		if ( ! $this->database_only && $this->exclude_string( 'zip' ) )
+		    shell_exec( 'cd ' . escapeshellarg( $this->root ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2> /dev/null' );
+
+		// Zip up $this->root
+		elseif ( ! $this->database_only )
+		    shell_exec( 'cd ' . escapeshellarg( $this->root ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' 2> /dev/null' );
+
+		// Add the database dump to the archive
+		if ( ! $this->files_only )
+		    shell_exec( 'cd ' . escapeshellarg( $this->path ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename ) . ' 2> /dev/null' );
+
+	}
+
 	/**
 	 * Fallback for creating zip archives if zip command is
 	 * unnavailable.
 	 *
-	 * Uses the PCLZIP library that ships with WordPress
-	 *
-	 * @todo support zipArchive
 	 * @access public
 	 * @param string $path
 	 */
-	public function archive_fallback() {
-	
+	public function zip_archive() {
+
+    	$zip = new ZipArchive();
+
+    	if ( ! class_exists( 'ZipArchive' ) || ! $zip->open( $this->archive_filepath(), ZIPARCHIVE::CREATE ) )
+    	    return;
+
+		if ( ! $this->database_only ) {
+
+			$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root ), RecursiveIteratorIterator::SELF_FIRST );
+
+			$files_added = 0;
+
+			$excludes = $this->exclude_string( 'regex' );
+
+			foreach ( $files as $file ) {
+
+				// Skip bad files
+			    if ( ! is_readable( $file ) || ! file_exists( $file ) || is_link( $file ) )
+			    	continue;
+
+			    // Excludes
+			    if ( $excludes && preg_match( '(' . $excludes . ')', str_replace( $this->root, '', $this->conform_dir( $file ) ) ) )
+			    	continue;
+
+			    if ( is_dir( $file ) )
+					$zip->addEmptyDir( str_replace( trailingslashit( $this->root ), '', trailingslashit( $file ) ) );
+
+			    elseif ( is_file( $file ) )
+					$zip->addFile( $file, str_replace( trailingslashit( $this->root ), '', $file ) );
+
+				if ( ++$files_added % 500 === 0 )
+					if ( ! $zip->close() || ! $zip->open( $this->archive_filepath(), ZIPARCHIVE::CREATE ) )
+						return;
+
+			}
+
+		}
+
+		// Add the database
+		if ( ! $this->files_only )
+			$zip->addFile( $this->database_dump_filepath(), $this->database_dump_filename );
+
+		$zip->close();
+
+	}
+
+	/**
+	 * Fallback for creating zip archives if zip command and ZipArchive are
+	 * unnavailable.
+	 *
+	 * Uses the PclZip library that ships with WordPress
+	 *
+	 * @access public
+	 * @param string $path
+	 */
+	public function pcl_zip() {
+
 		global $_hmbkp_exclude_string;
-		
-		$_hmbkp_exclude_string = $this->exclude_string( 'pclzip' );
-		
+
+		$_hmbkp_exclude_string = $this->exclude_string( 'regex' );
+
 		if ( ! defined( 'PCLZIP_TEMPORARY_DIR' ) )
 			define( 'PCLZIP_TEMPORARY_DIR', $this->path );
 
@@ -330,9 +392,10 @@ class HM_Backup {
 		if ( ! $this->database_only )
 			$archive->add( $this->root, PCLZIP_OPT_REMOVE_PATH, $this->root, PCLZIP_CB_PRE_ADD, 'hmbkp_pclzip_callback' );
 
+		// Add the database
 		if ( ! $this->files_only )
 			$archive->add( $this->database_dump_filepath(), PCLZIP_OPT_REMOVE_PATH, $this->path );
-			
+
 		unset( $GLOBALS['_hmbkp_exclude_string'] );
 
 	}
@@ -405,16 +468,6 @@ class HM_Backup {
 	}
 
 	/**
-	 * Get the array of exclude rules
-	 *
-	 * @access public
-	 * @return array
-	 */
-	public function excludes() {
-		return array_filter( array_unique( array_map( 'trim', array_merge( array( trailingslashit( $this->path ) ), (array) $this->excludes ) ) ) );
-	}
-
-	/**
 	 * Generate the exclude param string for the zip backup
 	 *
 	 * Takes the exclude rules and formats them for use with either
@@ -435,16 +488,16 @@ class HM_Backup {
 			$wildcard = '*';
 			$separator = ' -x ';
 
-		// The PCLZIP fallback library
-		} elseif ( $context == 'pclzip' ) {
-			$wildcard = '([.]*?)';
+		// The PclZip fallback library
+		} elseif ( $context == 'regex' ) {
+			$wildcard = '([\s\S]*?)';
 			$separator = '|';
 
 		}
 
-		$excludes = $this->excludes();
+		// Sanitize the excludes
+		$excludes = array_filter( array_unique( array_map( 'trim', (array) $this->excludes ) ) );
 
-		// Add wildcards to the directories
 		foreach( $excludes as $key => &$rule ) {
 
 			$file = $absolute = $fragment = false;
@@ -464,31 +517,32 @@ class HM_Backup {
 			// Strip $this->root and conform
 			$rule = str_replace( $this->conform_dir( $this->root ), '', untrailingslashit( $this->conform_dir( $rule ) ) );
 
+			// Strip the preceeding slash
 			if ( in_array( substr( $rule, 0, 1 ), array( '\\', '/' ) ) )
 				$rule = substr( $rule, 1 );
 
 			// Escape string for regex
-			if ( $context == 'pclzip' )
+			if ( $context == 'regex' )
 				$rule = str_replace( '.', '\.', $rule );
 
 			// Convert any existing wildcards
 			if ( $wildcard != '*' && strpos( $rule, '*' ) !== false )
 				$rule = str_replace( '*', $wildcard, $rule );
 
-			// Wrap directory fragments in wildcards for zip
-			if ( $context == 'zip' && $fragment )
+			// Wrap directory fragments and files in wildcards for zip
+			if ( $context == 'zip' && ( $fragment || $file ) )
 				$rule = $wildcard . $rule . $wildcard;
 
 			// Add a wildcard to the end of absolute url for zips
 			if ( $context == 'zip' && $absolute )
 				$rule .= $wildcard;
 
-			// Add and end carrot to files for pclzip
-			if ( $file && $context == 'pclzip' )
+			// Add and end carrot to files for pclzip but only if it doesn't end in a wildcard
+			if ( $file && $context == 'regex' )
 				$rule .= '$';
 
 			// Add a start carrot to absolute urls for pclzip
-			if ( $absolute && $context == 'pclzip' )
+			if ( $absolute && $context == 'regex' )
 				$rule = '^' . $rule;
 
 		}
@@ -496,7 +550,6 @@ class HM_Backup {
 		// Escape shell args for zip command
 		if ( $context == 'zip' )
 			$excludes = array_map( 'escapeshellarg', $excludes );
-			
 
 		return implode( $separator, $excludes );
 
@@ -553,7 +606,7 @@ class HM_Backup {
 
 		// Remove the trailing slash
 		$dir = untrailingslashit( $dir );
-		
+
 		// Carry on until completely normalized
 		if ( ! $recursive && self::conform_dir( $dir, true ) != $dir )
 			return self::conform_dir( $dir );
@@ -800,11 +853,11 @@ function hmbkp_pclzip_callback( $event, &$file ) {
 	global $_hmbkp_exclude_string;
 
     // Don't try to add unreadable files.
-    if ( ! is_readable( $file['filename'] ) )
+    if ( ! is_readable( $file['filename'] ) || ! file_exists( $file['filename'] ) || is_link( $file['filename'] ) )
     	return false;
 
     // Match everything else past the exclude list
-    elseif ( preg_match( '(' . $_hmbkp_exclude_string . ')', $file['stored_filename'] ) )
+    elseif ( $_hmbkp_exclude_string && preg_match( '(' . $_hmbkp_exclude_string . ')', $file['stored_filename'] ) )
     	return false;
 
     return true;
