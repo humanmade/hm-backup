@@ -296,8 +296,6 @@ class HM_Backup {
 
 	public function zip() {
 
-		var_dump( $this->exclude_string( 'zip' ) );
-
 		// Zip up $this->root with excludes
 		if ( ! $this->database_only && $this->exclude_string( 'zip' ) )
 		    shell_exec( 'cd ' . escapeshellarg( $this->root ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2> /dev/null' );
