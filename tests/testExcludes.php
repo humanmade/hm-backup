@@ -74,6 +74,32 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
 
 	}
+	
+	function testExcludeAbsoluteRootDirPathWithZip() {
+
+		$this->backup->excludes = '/Users/willmot/Dropbox/Sites/backupwordpress/trunk/hm-backup/tests/test-data/exclude/';
+		$this->backup->files_only = true;
+
+		$this->assertNotEmpty( $this->backup->zip_command_path );
+
+		$this->backup->zip();
+
+		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
+		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
+
+	}
+
+	function testExcludeAbsoluteRootDirPathWithPclZip() {
+
+		$this->backup->excludes = '/Users/willmot/Dropbox/Sites/backupwordpress/trunk/hm-backup/tests/test-data/exclude/';
+		$this->backup->files_only = true;
+
+		$this->backup->pcl_zip();
+
+		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
+		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
+
+	}
 
 	function testExcludeDirPathFragmentWithZip() {
 
