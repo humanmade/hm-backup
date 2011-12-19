@@ -2,6 +2,8 @@
 
 /**
  * Runs the backup process
+ *
+ * @version 1.2
  */
 class HM_Backup {
 
