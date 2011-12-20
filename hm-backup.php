@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Runs the backup process
+ * Generic file and database backup class
  *
- * @version 1.2
+ * @version 1.3
  */
 class HM_Backup {
 
@@ -87,7 +87,14 @@ class HM_Backup {
 	 */
 	private $db;
 
-	static $instance;
+	/**
+	 * Store the current backup instance
+	 *
+	 * @var object
+	 * @static
+	 * @access public
+	 */
+	public static $instance;
 
 	/**
 	 * Sets up the default properties
@@ -118,6 +125,13 @@ class HM_Backup {
 
 	}
 
+	/**
+	 * Return the current instance
+	 *
+	 * @access public
+	 * @static
+	 * @return object
+	 */
 	public static function get_instance() {
 
 		if ( empty( self::$instance ) )
@@ -128,7 +142,7 @@ class HM_Backup {
 	}
 
 	/**
-	 * The full filepath to the archive filepath.
+	 * The full filepath to the archive file.
 	 *
 	 * @access public
 	 * @return string
@@ -138,7 +152,7 @@ class HM_Backup {
 	}
 
 	/**
-	 * The full filepath to the database dump filepath.
+	 * The full filepath to the database dump file.
 	 *
 	 * @access public
 	 * @return string
@@ -148,7 +162,7 @@ class HM_Backup {
 	}
 
 	/**
-	 * Run the backup
+	 * Kick off a backup
 	 *
 	 * @access public
 	 * @return bool
@@ -263,11 +277,11 @@ class HM_Backup {
 	}
 
 	/**
-	 * Zip up all the wordpress files.
+	 * Zip up all the files.
 	 *
 	 * Attempts to use the shell zip command, if
-	 * thats not available then it fallsback on
-	 * PHP zip classes.
+	 * thats not available then it fallsback to
+	 * PHP ZipArchive and finally PclZip.
 	 *
 	 * @access public
 	 * @return null
@@ -296,13 +310,19 @@ class HM_Backup {
 
 	}
 
+	/**
+	 * Zip using the native zip command
+	 *
+	 * @access public
+	 * @return null
+	 */
 	public function zip() {
 
 		// Zip up $this->root with excludes
 		if ( ! $this->database_only && $this->exclude_string( 'zip' ) )
 		    shell_exec( 'cd ' . escapeshellarg( $this->root ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2> /dev/null' );
 
-		// Zip up $this->root
+		// Zip up $this->root without excludes
 		elseif ( ! $this->database_only )
 		    shell_exec( 'cd ' . escapeshellarg( $this->root ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' 2> /dev/null' );
 
@@ -336,19 +356,18 @@ class HM_Backup {
 
 			foreach ( $files as $file ) {
 
-				// Skip bad files
-			    if ( ! is_readable( $file ) || ! file_exists( $file ) || is_link( $file ) )
-			    	continue;
+				if ( ! $file->isReadable() )
+					continue;
 
 			    // Excludes
-			    if ( $excludes && preg_match( '(' . $excludes . ')', str_replace( $this->root, '', $this->conform_dir( $file ) ) ) )
+			    if ( $excludes && preg_match( '(' . $excludes . ')', str_replace( $this->root, '', $this->conform_dir( $file->getPathname() ) ) ) )
 			    	continue;
 
-			    if ( is_dir( $file ) )
-					$zip->addEmptyDir( str_replace( trailingslashit( $this->root ), '', trailingslashit( $file ) ) );
+			    if ( $file->isDir() )
+					$zip->addEmptyDir( str_replace( trailingslashit( $this->root ), '', trailingslashit( $file->getPathname() ) ) );
 
-			    elseif ( is_file( $file ) )
-					$zip->addFile( $file, str_replace( trailingslashit( $this->root ), '', $file ) );
+			    elseif ( $file->isFile() )
+					$zip->addFile( $file, str_replace( trailingslashit( $this->root ), '', $file->getPathname() ) );
 
 				if ( ++$files_added % 500 === 0 )
 					if ( ! $zip->close() || ! $zip->open( $this->archive_filepath(), ZIPARCHIVE::CREATE ) )
@@ -556,7 +575,7 @@ class HM_Backup {
 	}
 
 	/**
-	 * Check whether safe mode if active or not
+	 * Check whether safe mode is active or not
 	 *
 	 * @access private
 	 * @return bool
@@ -593,7 +612,7 @@ class HM_Backup {
 	/**
 	 * Sanitize a directory path
 	 *
-	 * @access private
+	 * @access public
 	 * @param string $dir
 	 * @param bool $rel. (default: false)
 	 * @return string $dir
@@ -608,8 +627,8 @@ class HM_Backup {
 		$dir = untrailingslashit( $dir );
 
 		// Carry on until completely normalized
-		if ( ! $recursive && self::conform_dir( $dir, true ) != $dir )
-			return self::conform_dir( $dir );
+		if ( ! $recursive && $this->conform_dir( $dir, true ) != $dir )
+			return $this->conform_dir( $dir );
 
 		return $dir;
 	}
@@ -839,7 +858,7 @@ class HM_Backup {
 }
 
 /**
- * Add file callback, excludes files in the backups directory
+ * Add file callback for PclZip, excludes files
  * and sets the database dump to be stored in the root
  * of the zip
  *
