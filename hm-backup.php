@@ -328,7 +328,7 @@ class HM_Backup {
 
 		if ( ! $this->database_only ) {
 
-			$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root ), RecursiveIteratorIterator::SELF_FIRST );
+			$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
 
 			$files_added = 0;
 
