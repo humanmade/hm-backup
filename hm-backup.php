@@ -148,7 +148,7 @@ class HM_Backup {
 	 * @return string
 	 */
 	public function archive_filepath() {
-		return trailingslashit( $this->path ) . $this->archive_filename;
+		return trailingslashit( $this->path() ) . $this->archive_filename;
 	}
 
 	/**
@@ -158,11 +158,15 @@ class HM_Backup {
 	 * @return string
 	 */
 	public function database_dump_filepath() {
-		return trailingslashit( $this->path ) . $this->database_dump_filename;
+		return trailingslashit( $this->path() ) . $this->database_dump_filename;
 	}
     
     public function root() {
         return $this->conform_dir( $this->root );
+    }
+    
+    public function path() {
+        return $this->conform_dir( $this->path );
     }
 
 	/**
@@ -332,7 +336,7 @@ class HM_Backup {
 
 		// Add the database dump to the archive
 		if ( ! $this->files_only )
-		    shell_exec( 'cd ' . escapeshellarg( $this->path ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename ) . ' 2> /dev/null' );
+		    shell_exec( 'cd ' . escapeshellarg( $this->path() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename ) . ' 2> /dev/null' );
 
 	}
 
@@ -405,7 +409,7 @@ class HM_Backup {
 		$_hmbkp_exclude_string = $this->exclude_string( 'regex' );
 
 		if ( ! defined( 'PCLZIP_TEMPORARY_DIR' ) )
-			define( 'PCLZIP_TEMPORARY_DIR', $this->path );
+			define( 'PCLZIP_TEMPORARY_DIR', $this->path() );
 
 		require_once( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
 
@@ -417,7 +421,7 @@ class HM_Backup {
 
 		// Add the database
 		if ( ! $this->files_only )
-			$archive->add( $this->database_dump_filepath(), PCLZIP_OPT_REMOVE_PATH, $this->path );
+			$archive->add( $this->database_dump_filepath(), PCLZIP_OPT_REMOVE_PATH, $this->path() );
 
 		unset( $GLOBALS['_hmbkp_exclude_string'] );
 
