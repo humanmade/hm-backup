@@ -356,7 +356,7 @@ class HM_Backup {
 
 		if ( ! $this->database_only ) {
 
-			$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root() ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
+			$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
 
 			$files_added = 0;
 
@@ -880,7 +880,7 @@ function hmbkp_pclzip_callback( $event, &$file ) {
 	global $_hmbkp_exclude_string;
 
     // Don't try to add unreadable files.
-    if ( ! is_readable( $file['filename'] ) || ! file_exists( $file['filename'] ) || is_link( $file['filename'] ) )
+    if ( ! is_readable( $file['filename'] ) || ! file_exists( $file['filename'] ) )
     	return false;
 
     // Match everything else past the exclude list
