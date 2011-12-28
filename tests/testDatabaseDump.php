@@ -56,7 +56,8 @@ class testDatabaseDumpTestCase extends WP_UnitTestCase {
 	 */
 	function testDatabaseDumpWithMysqldump() {
 		
-		$this->assertNotEmpty( $this->backup->zip_command_path );
+		if ( ! $this->backup->mysqldump_command_path )
+            $this->markTestSkipped( "Empty mysqldump command path" );
 		
 		$this->backup->mysqldump();
 		

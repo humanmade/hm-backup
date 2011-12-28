@@ -109,7 +109,7 @@ class HM_Backup {
 		@set_time_limit( 0 );
 
 		// Defaults
-		$this->root = ABSPATH;
+		$this->root = $this->conform_dir( ABSPATH );
 
 		$this->path = $this->conform_dir( WP_CONTENT_DIR . '/backups' );
 
@@ -160,6 +160,10 @@ class HM_Backup {
 	public function database_dump_filepath() {
 		return trailingslashit( $this->path ) . $this->database_dump_filename;
 	}
+    
+    public function root() {
+        return $this->conform_dir( $this->root );
+    }
 
 	/**
 	 * Kick off a backup
@@ -320,11 +324,11 @@ class HM_Backup {
 
 		// Zip up $this->root with excludes
 		if ( ! $this->database_only && $this->exclude_string( 'zip' ) )
-		    shell_exec( 'cd ' . escapeshellarg( $this->root ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2> /dev/null' );
+		    shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2> /dev/null' );
 
 		// Zip up $this->root without excludes
 		elseif ( ! $this->database_only )
-		    shell_exec( 'cd ' . escapeshellarg( $this->root ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' 2> /dev/null' );
+		    shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' 2> /dev/null' );
 
 		// Add the database dump to the archive
 		if ( ! $this->files_only )
@@ -348,7 +352,7 @@ class HM_Backup {
 
 		if ( ! $this->database_only ) {
 
-			$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
+			$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root() ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
 
 			$files_added = 0;
 
@@ -360,14 +364,14 @@ class HM_Backup {
 					continue;
 
 			    // Excludes
-			    if ( $excludes && preg_match( '(' . $excludes . ')', str_replace( $this->root, '', $this->conform_dir( $file->getPathname() ) ) ) )
+			    if ( $excludes && preg_match( '(' . $excludes . ')', str_replace( $this->root(), '', $this->conform_dir( $file->getPathname() ) ) ) )
 			    	continue;
 
 			    if ( $file->isDir() )
-					$zip->addEmptyDir( str_replace( trailingslashit( $this->root ), '', trailingslashit( $file->getPathname() ) ) );
+					$zip->addEmptyDir( str_replace( trailingslashit( $this->root() ), '', trailingslashit( $file->getPathname() ) ) );
 
 			    elseif ( $file->isFile() )
-					$zip->addFile( $file, str_replace( trailingslashit( $this->root ), '', $file->getPathname() ) );
+					$zip->addFile( $file, str_replace( trailingslashit( $this->root() ), '', $file->getPathname() ) );
 
 				if ( ++$files_added % 500 === 0 )
 					if ( ! $zip->close() || ! $zip->open( $this->archive_filepath(), ZIPARCHIVE::CREATE ) )
@@ -409,7 +413,7 @@ class HM_Backup {
 
 		// Zip up everything
 		if ( ! $this->database_only )
-			$archive->add( $this->root, PCLZIP_OPT_REMOVE_PATH, $this->root, PCLZIP_CB_PRE_ADD, 'hmbkp_pclzip_callback' );
+			$archive->add( $this->root(), PCLZIP_OPT_REMOVE_PATH, $this->root(), PCLZIP_CB_PRE_ADD, 'hmbkp_pclzip_callback' );
 
 		// Add the database
 		if ( ! $this->files_only )
@@ -534,7 +538,7 @@ class HM_Backup {
 				$fragment = true;
 
 			// Strip $this->root and conform
-			$rule = str_replace( $this->conform_dir( $this->root ), '', untrailingslashit( $this->conform_dir( $rule ) ) );
+			$rule = str_replace( $this->root(), '', untrailingslashit( $this->conform_dir( $rule ) ) );
 
 			// Strip the preceeding slash
 			if ( in_array( substr( $rule, 0, 1 ), array( '\\', '/' ) ) )

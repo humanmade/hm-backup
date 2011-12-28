@@ -57,9 +57,12 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 	 */
 	function testFullBackupWithCommands() {
 
-		$this->assertNotEmpty( $this->backup->zip_command_path );
-		$this->assertNotEmpty( $this->backup->mysqldump_command_path );
-
+		if ( ! $this->backup->zip_command_path )
+            $this->markTestSkipped( 'Empty zip command path' );
+        
+        if ( ! $this->backup->mysqldump_command_path )
+            $this->markTestSkipped( 'Empty mysqldump command path' );
+        
 		$this->backup->backup();
 
 		$this->assertFileExists( $this->backup->archive_filepath() );
@@ -124,7 +127,8 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 
 		$this->backup->files_only = true;
 
-		$this->assertNotEmpty( $this->backup->zip_command_path );
+		if ( ! $this->backup->zip_command_path )
+            $this->markTestSkipped( "Empty zip command path" );
 
 		$this->backup->backup();
 
@@ -189,8 +193,11 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 	function testDatabaseOnlyWithMysqldumpCommand() {
 
 		$this->backup->database_only = true;
-		$this->assertNotEmpty( $this->backup->mysqldump_command_path );
-
+		if ( ! $this->backup->mysqldump_command_path ) {
+            $this->markTestSkipped( "Empty mysqldump Command Path" );
+            return false;
+        }
+ 
 		$this->backup->backup();
 
 		$this->assertFileExists( $this->backup->archive_filepath() );

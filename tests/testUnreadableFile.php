@@ -62,7 +62,8 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	 */
 	function testArchiveUnreadableFileWithZip() {
 
-		$this->assertNotEmpty( $this->backup->zip_command_path );
+		if ( ! $this->backup->zip_command_path )
+            $this->markTestSkipped( "Empty zip command path" );
 
 		$this->assertFalse( is_readable( $this->backup->root . '/test-data.txt' ) );
 
