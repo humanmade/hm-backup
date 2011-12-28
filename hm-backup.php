@@ -160,11 +160,11 @@ class HM_Backup {
 	public function database_dump_filepath() {
 		return trailingslashit( $this->path() ) . $this->database_dump_filename;
 	}
-    
+
     public function root() {
         return $this->conform_dir( $this->root );
     }
-    
+
     public function path() {
         return $this->conform_dir( $this->path );
     }
