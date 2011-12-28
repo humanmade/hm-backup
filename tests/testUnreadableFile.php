@@ -1,8 +1,7 @@
 <?php
 
 /**
- * Tests for the Archive process with various permissions,
- * broken files, symlinks and other edge cases
+ * Tests for the Archive process with unreadble files
  *
  * @extends WP_UnitTestCase
  */
