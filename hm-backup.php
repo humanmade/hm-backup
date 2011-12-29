@@ -354,6 +354,9 @@ class HM_Backup {
 		// Make sure the verification is only run once per backup
 		if ( ! empty( $this->archive_verified ) )
 			return true;
+			
+		if ( ! file_exists( $this->archive_filepath() ) )
+			return false;
 		
 		// Verify using the zip command if possible
 		if ( $this->zip_command_path )
