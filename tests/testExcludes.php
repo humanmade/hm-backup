@@ -93,7 +93,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	function testExcludeAbsoluteRootDirPathWithPclZip() {
 
-		$this->backup->excludes = '/Users/willmot/Dropbox/Sites/WordPress/wp-content/plugins/backupwordpress/hm-backup/tests/test-data/exclude/';
+		$this->backup->excludes = dirname( __FILE__ ) . '/test-data/exclude/';
 		$this->backup->files_only = true;
 
 		$this->backup->pcl_zip();
