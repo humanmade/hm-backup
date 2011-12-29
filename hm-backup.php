@@ -394,7 +394,7 @@ class HM_Backup {
 		foreach( $archive->extract( PCLZIP_OPT_EXTRACT_AS_STRING ) as $fileInfo )
 			$archive_files[] = untrailingslashit( $fileInfo['filename'] );
 		
-		// Check that the array of files that should have been backed up matched the array of files in the zip
+		// Check that the array of files that should have been backed up matches the array of files in the zip
 		if ( $paths !== $archive_files )
 			return false;
 
