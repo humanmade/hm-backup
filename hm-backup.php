@@ -107,6 +107,9 @@ class HM_Backup {
 		// Raise the memory limit and max_execution_time time
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
 		@set_time_limit( 0 );
+		
+		// Load PclZip
+		require_once( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
 
 		// Defaults
 		$this->root = $this->conform_dir( ABSPATH );
@@ -303,11 +306,11 @@ class HM_Backup {
 			$this->zip();
 
 		// If not or if the shell zip failed then use ZipArchive
-		if ( ! file_exists( $this->archive_filepath() ) && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) )
+		if ( ! $this->check_archive() && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) )
 			$this->zip_archive();
 
 		// If ZipArchive is unavailable or one of the above failed
-		if ( ! file_exists( $this->archive_filepath() ) )
+		if ( ! $this->check_archive() )
 			$this->pcl_zip();
 
 		// Delete the database dump file
@@ -337,6 +340,62 @@ class HM_Backup {
 		// Add the database dump to the archive
 		if ( ! $this->files_only )
 		    shell_exec( 'cd ' . escapeshellarg( $this->path() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename ) . ' 2> /dev/null' );
+
+	}
+
+	/**
+	 * Verify that the archive is valid and contains all the files it should contain.
+	 *
+	 * @access public
+	 * @return bool
+	 */
+	public function check_archive() {
+		
+		// Make sure the verification is only run once per backup
+		if ( ! empty( $this->archive_verified ) )
+			return true;
+		
+		// Verify using the zip command if possible
+		if ( $this->zip_command_path )
+		    if ( strpos( shell_exec( escapeshellarg( $this->zip_command_path ) . ' -T ' . escapeshellarg( $this->archive_filepath() ) . ' 2> /dev/null' ), 'OK' ) === false )
+		    	return false;
+		
+		// If it's a file backup, get an array of all the files that should have been backed up
+		if ( ! $this->database_only ) {
+
+			$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
+
+			$excludes = $this->exclude_string( 'regex' );
+
+			foreach ( $files as $file ) {
+
+				if ( ! $file->isReadable() )
+				    continue;
+
+				// Excludes
+				if ( $excludes && preg_match( '(' . $excludes . ')', str_replace( trailingslashit( $this->root() ), '', $this->conform_dir( $file->getPathname() ) ) ) )
+				    continue;
+
+				$paths[] = str_replace( trailingslashit( $this->root() ), '', $this->conform_dir( $file->getPathname() ) );
+
+			}
+
+		}
+		
+		// Check that the database was backed up
+		if ( ! $this->files_only )
+			$paths[] = $this->database_dump_filename;
+
+		$archive = new PclZip( $this->archive_filepath() );
+
+		foreach( $archive->extract( PCLZIP_OPT_EXTRACT_AS_STRING ) as $fileInfo )
+			$archive_files[] = untrailingslashit( $fileInfo['filename'] );
+		
+		// Check that the array of files that should have been backed up matched the array of files in the zip
+		if ( $paths !== $archive_files )
+			return false;
+
+		return $this->archive_verified = true;
 
 	}
 
@@ -410,8 +469,6 @@ class HM_Backup {
 
 		if ( ! defined( 'PCLZIP_TEMPORARY_DIR' ) )
 			define( 'PCLZIP_TEMPORARY_DIR', $this->path() );
-
-		require_once( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
 
 		$archive = new PclZip( $this->archive_filepath() );
 
