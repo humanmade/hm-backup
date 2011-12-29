@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Tests for the Archive process with unreadble files
+ * Tests for the Archive process with symlinks
  *
  * @extends WP_UnitTestCase
  */
-class testUnreadableFileTestCase extends WP_UnitTestCase {
+class testSymlinkDirTestCase extends WP_UnitTestCase {
 
 	/**
 	 * Contains the current backup instance
@@ -30,7 +30,9 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 
 		mkdir( $this->backup->path );
 
-		chmod( $this->backup->root . '/test-data.txt', 0220 );
+		$this->symlink = dirname( __FILE__ ) . '/test-data/tests';
+
+		symlink( HMBKP_PLUGIN_PATH . '/tests/', $this->symlink );
 
 	}
 
@@ -49,7 +51,8 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 		if ( file_exists( $this->backup->path ) )
 			rmdir( $this->backup->path );
 
-		chmod( $this->backup->root . '/test-data.txt', 0664 );
+		if ( file_exists( $this->symlink ) )
+			unlink( $this->symlink );
 
 	}
 
@@ -59,19 +62,19 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	 * @access public
 	 * @return null
 	 */
-	function testArchiveUnreadableFileWithZip() {
+	function testArchiveSymlinkDirWithZip() {
 
 		if ( ! $this->backup->zip_command_path )
             $this->markTestSkipped( "Empty zip command path" );
 
-		$this->assertFalse( is_readable( $this->backup->root . '/test-data.txt' ) );
+		$this->assertFileExists( $this->symlink );
 
 		$this->backup->zip();
 
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
-		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
-		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+		$this->assertArchiveContains( $this->backup->archive_filepath(), array( basename( $this->symlink ) ) );
+		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 7 );
 
 	}
 
@@ -81,18 +84,18 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	 * @access public
 	 * @return null
 	 */
-	function testArchiveUnreadableFileWithZipArchive() {
+	function testArchiveSymlinkDirWithZipArchive() {
 
 		$this->backup->zip_command_path = false;
 
-		$this->assertFalse( is_readable( $this->backup->root . '/test-data.txt' ) );
+		$this->assertFileExists( $this->symlink );
 
 		$this->backup->zip_archive();
 
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
-		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
-		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+		$this->assertArchiveContains( $this->backup->archive_filepath(), array( basename( $this->symlink ) ) );
+		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 7 );
 
 	}
 
@@ -102,18 +105,18 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	 * @access public
 	 * @return null
 	 */
-	function testArchiveUnreadableFileWithPclZip() {
+	function testArchiveSymlinkDirWithPclZip() {
 
 		$this->backup->zip_command_path = false;
 
-		$this->assertFalse( is_readable( $this->backup->root . '/test-data.txt' ) );
+		$this->assertFileExists( $this->symlink );
 
 		$this->backup->pcl_zip();
 
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
-		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
-		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+		$this->assertArchiveContains( $this->backup->archive_filepath(), array( basename( $this->symlink ) ) );
+		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 7 );
 
 	}
 
