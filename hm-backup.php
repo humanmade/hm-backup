@@ -467,6 +467,13 @@ class HM_Backup {
 
 	}
 
+	/**
+	 * Generate the array of files to be backed up by looping through
+	 * root, ignored unreadable files and excludes
+	 *
+	 * @access public
+	 * @return array
+	 */
 	public function files() {
 
 		if ( ! empty( $this->files ) )
