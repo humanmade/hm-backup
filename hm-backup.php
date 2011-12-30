@@ -117,9 +117,6 @@ class HM_Backup {
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
 		@set_time_limit( 0 );
 
-		// Load PclZip
-		require_once( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
-
 		// Defaults
 		$this->root = $this->conform_dir( ABSPATH );
 
@@ -409,9 +406,8 @@ class HM_Backup {
 
 		$_hmbkp_exclude_string = $this->exclude_string( 'regex' );
 
-		if ( ! defined( 'PCLZIP_TEMPORARY_DIR' ) )
-			define( 'PCLZIP_TEMPORARY_DIR', $this->path() );
-
+		$this->load_pclzip();
+		
 		$archive = new PclZip( $this->archive_filepath() );
 
 		// Zip up everything
@@ -434,7 +430,7 @@ class HM_Backup {
 	 */
 	public function check_archive() {
 
-		// Make sure the verification is only run once per backup
+		// If we've already passed then no need to check again
 		if ( ! empty( $this->archive_verified ) )
 			return true;
 
@@ -453,6 +449,8 @@ class HM_Backup {
 		// Check that the database was backed up
 		if ( ! $this->files_only )
 			$files[] = $this->database_dump_filename;
+
+		$this->load_pclzip();
 
 		$archive = new PclZip( $this->archive_filepath() );
 
@@ -481,7 +479,11 @@ class HM_Backup {
 
 		$this->files = array();
 
-		$filesystem = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
+		if ( defined( 'RecursiveDirectoryIterator::FOLLOW_SYMLINKS' ) )
+			$filesystem = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
+
+		else
+			$filesystem = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root() ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
 
 		$excludes = $this->exclude_string( 'regex' );
 
@@ -506,6 +508,16 @@ class HM_Backup {
 
 		return $this->files;
 
+	}
+	
+	private function load_pclzip() {
+		
+		// Load PclZip
+		if ( ! defined( 'PCLZIP_TEMPORARY_DIR' ) )
+			define( 'PCLZIP_TEMPORARY_DIR', $this->path() );
+
+		require_once( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
+		
 	}
 
 	/**
