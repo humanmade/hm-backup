@@ -407,7 +407,7 @@ class HM_Backup {
 		$_hmbkp_exclude_string = $this->exclude_string( 'regex' );
 
 		$this->load_pclzip();
-		
+
 		$archive = new PclZip( $this->archive_filepath() );
 
 		// Zip up everything
@@ -479,45 +479,90 @@ class HM_Backup {
 
 		$this->files = array();
 
-		if ( defined( 'RecursiveDirectoryIterator::FOLLOW_SYMLINKS' ) )
+		if ( defined( 'RecursiveDirectoryIterator::FOLLOW_SYMLINKS' ) && false ) {
+
 			$filesystem = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
 
-		else
-			$filesystem = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root() ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
+			$excludes = $this->exclude_string( 'regex' );
 
-		$excludes = $this->exclude_string( 'regex' );
+			foreach ( $filesystem as $file ) {
 
-		foreach ( $filesystem as $file ) {
+			    if ( ! $file->isReadable() )
+			        continue;
 
-		    if ( ! $file->isReadable() )
-		        continue;
+			    $pathname = str_replace( trailingslashit( $this->root() ), '', $this->conform_dir( $file->getPathname() ) );
 
-		    $pathname = str_replace( trailingslashit( $this->root() ), '', $this->conform_dir( $file->getPathname() ) );
+			    // Excludes
+			    if ( $excludes && preg_match( '(' . $excludes . ')', $pathname ) )
+			        continue;
 
-		    // Excludes
-		    if ( $excludes && preg_match( '(' . $excludes . ')', $pathname ) )
-		        continue;
+			    // Don't include database dump as it's added separately
+			    if ( basename( $pathname ) == $this->database_dump_filename )
+			    	continue;
 
-		    // Don't include database dump as it's added separately
-		    if ( basename( $pathname ) == $this->database_dump_filename )
-		    	continue;
+			    $this->files[] = $pathname;
 
-		    $this->files[] = $pathname;
+			}
+
+		} else {
+
+			$this->files = $this->files_fallback( $this->root() );
 
 		}
 
 		return $this->files;
 
 	}
-	
+
+	/**
+	 * Fallback function for generating a filesystem
+	 * array
+	 *
+	 * Used if RecursiveDirectoryIterator::FOLLOW_SYMLINKS isn't available
+	 *
+	 * @access private
+	 * @param stromg $dir
+	 * @param array $files. (default: array())
+	 * @return array
+	 */
+	private function files_fallback( $dir, $files = array() ) {
+
+	    $handle = opendir( $dir );
+
+	    $excludes = $this->exclude_string( 'regex' );
+
+	    while ( $file = readdir( $handle ) ) :
+
+	    	// Ignore current dir and containing dir and any unreadable files or directories
+	    	if ( $file == '.' || $file == '..' )
+	    		continue;
+
+	    	$filepath = $this->conform_dir( trailingslashit( $dir ) . $file );
+	    	$file = str_replace( trailingslashit( $this->root() ), '', $filepath );
+
+	    	// Skip the backups dir and any excluded paths
+	    	if ( ! is_readable( $filepath ) || ( $excludes && preg_match( '(' . $excludes . ')', $file ) ) )
+	    		continue;
+
+	    	$files[] = $file;
+
+	    	if ( is_dir( $filepath ) )
+	    		$files = $this->files_fallback( $filepath, $files );
+
+		endwhile;
+
+		return $files;
+
+	}
+
 	private function load_pclzip() {
-		
+
 		// Load PclZip
 		if ( ! defined( 'PCLZIP_TEMPORARY_DIR' ) )
 			define( 'PCLZIP_TEMPORARY_DIR', $this->path() );
 
 		require_once( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
-		
+
 	}
 
 	/**
