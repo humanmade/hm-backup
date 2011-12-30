@@ -31,6 +31,10 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 		mkdir( $this->backup->path );
 
 		chmod( $this->backup->root . '/test-data.txt', 0220 );
+		
+		remove_action( 'hmbkp_backup_started', 'hmbkp_set_status', 10, 0 );
+		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
+		remove_action( 'hmbkp_archive_started', 'hmbkp_set_status_archiving' );
 
 	}
 

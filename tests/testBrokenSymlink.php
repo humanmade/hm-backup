@@ -37,6 +37,10 @@ class testBrokenSymlinkTestCase extends WP_UnitTestCase {
 		symlink( dirname( __FILE__ ) . '/test-data/symlink', $this->symlink );
 
 		unlink( dirname( __FILE__ ) . '/test-data/symlink' );
+		
+		remove_action( 'hmbkp_backup_started', 'hmbkp_set_status', 10, 0 );
+		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
+		remove_action( 'hmbkp_archive_started', 'hmbkp_set_status_archiving' );
 
 	}
 

@@ -29,6 +29,10 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->backup->path = dirname( __FILE__ ) . '/tmp';
 
 		mkdir( $this->backup->path );
+		
+		remove_action( 'hmbkp_backup_started', 'hmbkp_set_status', 10, 0 );
+		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
+		remove_action( 'hmbkp_archive_started', 'hmbkp_set_status_archiving' );
 
 	}
 
