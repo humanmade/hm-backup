@@ -97,6 +97,15 @@ class HM_Backup {
 	public static $instance;
 
 	/**
+	 * An array of all the files in root
+	 * excluding excludes
+	 *
+	 * @var array
+	 * @access private
+	 */
+	private $files;
+
+	/**
 	 * Sets up the default properties
 	 *
 	 * @access public
@@ -107,7 +116,7 @@ class HM_Backup {
 		// Raise the memory limit and max_execution_time time
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
 		@set_time_limit( 0 );
-		
+
 		// Load PclZip
 		require_once( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
 
@@ -344,65 +353,6 @@ class HM_Backup {
 	}
 
 	/**
-	 * Verify that the archive is valid and contains all the files it should contain.
-	 *
-	 * @access public
-	 * @return bool
-	 */
-	public function check_archive() {
-		
-		// Make sure the verification is only run once per backup
-		if ( ! empty( $this->archive_verified ) )
-			return true;
-			
-		if ( ! file_exists( $this->archive_filepath() ) )
-			return false;
-		
-		// Verify using the zip command if possible
-		if ( $this->zip_command_path )
-		    if ( strpos( shell_exec( escapeshellarg( $this->zip_command_path ) . ' -T ' . escapeshellarg( $this->archive_filepath() ) . ' 2> /dev/null' ), 'OK' ) === false )
-		    	return false;
-		
-		// If it's a file backup, get an array of all the files that should have been backed up
-		if ( ! $this->database_only ) {
-
-			$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
-
-			$excludes = $this->exclude_string( 'regex' );
-
-			foreach ( $files as $file ) {
-
-				if ( ! $file->isReadable() )
-				    continue;
-
-				// Excludes
-				if ( $excludes && preg_match( '(' . $excludes . ')', str_replace( trailingslashit( $this->root() ), '', $this->conform_dir( $file->getPathname() ) ) ) )
-				    continue;
-
-				$paths[] = str_replace( trailingslashit( $this->root() ), '', $this->conform_dir( $file->getPathname() ) );
-
-			}
-
-		}
-		
-		// Check that the database was backed up
-		if ( ! $this->files_only )
-			$paths[] = $this->database_dump_filename;
-
-		$archive = new PclZip( $this->archive_filepath() );
-
-		foreach( $archive->extract( PCLZIP_OPT_EXTRACT_AS_STRING ) as $fileInfo )
-			$archive_files[] = untrailingslashit( $fileInfo['filename'] );
-		
-		// Check that the array of files that should have been backed up matches the array of files in the zip
-		if ( $paths !== $archive_files )
-			return false;
-
-		return $this->archive_verified = true;
-
-	}
-
-	/**
 	 * Fallback for creating zip archives if zip command is
 	 * unnavailable.
 	 *
@@ -418,26 +368,15 @@ class HM_Backup {
 
 		if ( ! $this->database_only ) {
 
-			$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
-
 			$files_added = 0;
 
-			$excludes = $this->exclude_string( 'regex' );
+			foreach ( $this->files() as $file ) {
 
-			foreach ( $files as $file ) {
+			    if ( is_dir( trailingslashit( $this->root() ) . $file ) )
+					$zip->addEmptyDir( trailingslashit( $file ) );
 
-				if ( ! $file->isReadable() )
-					continue;
-
-			    // Excludes
-			    if ( $excludes && preg_match( '(' . $excludes . ')', str_replace( $this->root(), '', $this->conform_dir( $file->getPathname() ) ) ) )
-			    	continue;
-
-			    if ( $file->isDir() )
-					$zip->addEmptyDir( str_replace( trailingslashit( $this->root() ), '', trailingslashit( $file->getPathname() ) ) );
-
-			    elseif ( $file->isFile() )
-					$zip->addFile( $file, str_replace( trailingslashit( $this->root() ), '', $file->getPathname() ) );
+			    elseif ( is_file( trailingslashit( $this->root() ) . $file ) )
+					$zip->addFile( trailingslashit( $this->root() ) . $file, $file );
 
 				if ( ++$files_added % 500 === 0 )
 					if ( ! $zip->close() || ! $zip->open( $this->archive_filepath(), ZIPARCHIVE::CREATE ) )
@@ -484,6 +423,81 @@ class HM_Backup {
 			$archive->add( $this->database_dump_filepath(), PCLZIP_OPT_REMOVE_PATH, $this->path() );
 
 		unset( $GLOBALS['_hmbkp_exclude_string'] );
+
+	}
+
+	/**
+	 * Verify that the archive is valid and contains all the files it should contain.
+	 *
+	 * @access public
+	 * @return bool
+	 */
+	public function check_archive() {
+
+		// Make sure the verification is only run once per backup
+		if ( ! empty( $this->archive_verified ) )
+			return true;
+
+		if ( ! file_exists( $this->archive_filepath() ) )
+			return false;
+
+		// Verify using the zip command if possible
+		if ( $this->zip_command_path )
+		    if ( strpos( shell_exec( escapeshellarg( $this->zip_command_path ) . ' -T ' . escapeshellarg( $this->archive_filepath() ) . ' 2> /dev/null' ), 'OK' ) === false )
+		    	return false;
+
+		// If it's a file backup, get an array of all the files that should have been backed up
+		if ( ! $this->database_only )
+			$files = $this->files();
+
+		// Check that the database was backed up
+		if ( ! $this->files_only )
+			$files[] = $this->database_dump_filename;
+
+		$archive = new PclZip( $this->archive_filepath() );
+
+		foreach( $archive->extract( PCLZIP_OPT_EXTRACT_AS_STRING ) as $file )
+			$archive_files[] = untrailingslashit( $file['filename'] );
+
+		// Check that the array of files that should have been backed up matches the array of files in the zip
+		if ( $files !== $archive_files )
+			return false;
+
+		return $this->archive_verified = true;
+
+	}
+
+	public function files() {
+
+		if ( ! empty( $this->files ) )
+			return $this->files;
+
+		$this->files = array();
+
+		$filesystem = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
+
+		$excludes = $this->exclude_string( 'regex' );
+
+		foreach ( $filesystem as $file ) {
+
+		    if ( ! $file->isReadable() )
+		        continue;
+
+		    $pathname = str_replace( trailingslashit( $this->root() ), '', $this->conform_dir( $file->getPathname() ) );
+
+		    // Excludes
+		    if ( $excludes && preg_match( '(' . $excludes . ')', $pathname ) )
+		        continue;
+
+		    // Don't include database dump as it's added separately
+		    if ( basename( $pathname ) == $this->database_dump_filename )
+		    	continue;
+
+		    $this->files[] = $pathname;
+
+		}
+
+		return $this->files;
 
 	}
 
