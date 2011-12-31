@@ -281,7 +281,7 @@ class HM_Backup {
 	    mysql_set_charset( DB_CHARSET, $this->db );
 
 	    // Begin new backup of MySql
-	    $tables = mysql_list_tables( DB_NAME );
+	    $tables = mysql_query( 'SHOW TABLES' );
 
 	    $sql_file  = "# WordPress : " . get_bloginfo( 'url' ) . " MySQL database backup\n";
 	    $sql_file .= "#\n";
