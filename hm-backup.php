@@ -94,7 +94,7 @@ class HM_Backup {
 	 * @static
 	 * @access public
 	 */
-	public static $instance;
+	private static $instance;
 
 	/**
 	 * An array of all the files in root
