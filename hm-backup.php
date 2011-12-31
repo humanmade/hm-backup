@@ -379,15 +379,15 @@ class HM_Backup {
 
 		// Zip up $this->root with excludes
 		if ( ! $this->database_only && $this->exclude_string( 'zip' ) )
-		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && (' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2> /dev/null) 3>&1 1>&2 2>&3' ) );
+		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2>&1' ) );
 
 		// Zip up $this->root without excludes
 		elseif ( ! $this->database_only )
-		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && (' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' 2> /dev/null) 3>&1 1>&2 2>&3' ) );
+		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' 2>&1' ) );
 
 		// Add the database dump to the archive
 		if ( ! $this->files_only )
-		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->path() ) . ' && (' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename ) . ' 2> /dev/null) 3>&1 1>&2 2>&3' ) );
+		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->path() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename ) . ' 2>&1' ) );
 
 	}
 
