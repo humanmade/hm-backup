@@ -119,7 +119,7 @@ class testBrokenSymlinkTestCase extends WP_UnitTestCase {
 		$this->assertFileNotExists( $this->symlink );
 		$this->assertTrue( is_link( $this->symlink ) );
 
-		$this->backup->zip_archive();
+		$this->backup->pcl_zip();
 
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
