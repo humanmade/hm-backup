@@ -862,7 +862,7 @@ class HM_Backup {
 	private function make_sql( $sql_file, $table ) {
 
 	    // Add SQL statement to drop existing table
-	    $sql_file = "\n";
+	    $sql_file .= "\n";
 	    $sql_file .= "\n";
 	    $sql_file .= "#\n";
 	    $sql_file .= "# Delete any existing table " . $this->sql_backquote( $table ) . "\n";
@@ -916,11 +916,13 @@ class HM_Backup {
 
 	    // Checks whether the field is an integer or not
 	    for ( $j = 0; $j < $fields_cnt; $j++ ) {
+	    	
 	    	$field_set[$j] = $this->sql_backquote( mysql_field_name( $result, $j ) );
 	    	$type = mysql_field_type( $result, $j );
 
 	    	if ( $type == 'tinyint' || $type == 'smallint' || $type == 'mediumint' || $type == 'int' || $type == 'bigint'  || $type == 'timestamp')
 	    		$field_num[$j] = true;
+	    	
 	    	else
 	    		$field_num[$j] = false;
 
