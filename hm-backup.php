@@ -106,6 +106,14 @@ class HM_Backup {
 	private $files;
 
 	/**
+	 * Contains an array of errors
+	 *
+	 * @var mixed
+	 * @access private
+	 */
+	private $errors;
+
+	/**
 	 * Sets up the default properties
 	 *
 	 * @access public
@@ -116,6 +124,10 @@ class HM_Backup {
 		// Raise the memory limit and max_execution_time time
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
 		@set_time_limit( 0 );
+
+		$this->errors = array();
+
+		set_error_handler( array( &$this, 'error_handler' ) );
 
 		// Defaults
 		$this->root = $this->conform_dir( ABSPATH );
@@ -195,7 +207,7 @@ class HM_Backup {
 		// Zip everything up
 		$this->archive();
 
-		do_action( 'hmbkp_backup_complete' );
+		do_action( 'hmbkp_backup_complete', $this );
 
 	}
 
@@ -337,15 +349,15 @@ class HM_Backup {
 
 		// Zip up $this->root with excludes
 		if ( ! $this->database_only && $this->exclude_string( 'zip' ) )
-		    shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2> /dev/null' );
+		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && (' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2> /dev/null) 3>&1 1>&2 2>&3' ) );
 
 		// Zip up $this->root without excludes
 		elseif ( ! $this->database_only )
-		    shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' 2> /dev/null' );
+		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && (' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' 2> /dev/null) 3>&1 1>&2 2>&3' ) );
 
 		// Add the database dump to the archive
 		if ( ! $this->files_only )
-		    shell_exec( 'cd ' . escapeshellarg( $this->path() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename ) . ' 2> /dev/null' );
+		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->path() ) . ' && (' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename ) . ' 2> /dev/null) 3>&1 1>&2 2>&3' ) );
 
 	}
 
@@ -387,6 +399,12 @@ class HM_Backup {
 		if ( ! $this->files_only )
 			$zip->addFile( $this->database_dump_filepath(), $this->database_dump_filename );
 
+		if ( $zip->status )
+			$this->error( 'ziparchive', $zip->status );
+
+		if ( $zip->statusSys )
+			$this->error( 'ziparchive', $zip->statusSys );
+
 		$zip->close();
 
 	}
@@ -412,11 +430,13 @@ class HM_Backup {
 
 		// Zip up everything
 		if ( ! $this->database_only )
-			$archive->add( $this->root(), PCLZIP_OPT_REMOVE_PATH, $this->root(), PCLZIP_CB_PRE_ADD, 'hmbkp_pclzip_callback' );
+			if ( ! $archive->add( $this->root(), PCLZIP_OPT_REMOVE_PATH, $this->root(), PCLZIP_CB_PRE_ADD, 'hmbkp_pclzip_callback' ) )
+				$this->error( 'pclzip', $archive->errorInfo( true ) );
 
 		// Add the database
 		if ( ! $this->files_only )
-			$archive->add( $this->database_dump_filepath(), PCLZIP_OPT_REMOVE_PATH, $this->path() );
+			if ( ! $archive->add( $this->database_dump_filepath(), PCLZIP_OPT_REMOVE_PATH, $this->path() ) )
+				$this->error( 'pclzip', $archive->errorInfo( true ) );
 
 		unset( $GLOBALS['_hmbkp_exclude_string'] );
 
@@ -998,6 +1018,42 @@ class HM_Backup {
 	    	return true;
 
 	    }
+
+	}
+
+	public function errors() {
+
+		return $this->errors;
+
+	}
+
+	private function error( $context, $error ) {
+
+		if ( empty( $context ) || empty( $error ) )
+			return;
+
+		$this->errors[$context][$_key = md5( implode( ':' , (array) $error ) )] = $error;
+
+	}
+
+	/**
+	 * Custom error handler for catching errors
+	 *
+	 * @access private
+	 * @param string $type
+	 * @param string $message
+	 * @param string $file
+	 * @param string $line
+	 * @return null
+	 */
+	public function error_handler( $type ) {
+
+		if ( in_array( $type, array( E_STRICT, E_DEPRECATED ) ) || error_reporting() === 0 )
+			return false;
+
+		$this->errors['php'][$_key] = array_splice( func_get_args(), 0, 4 );
+
+		return false;
 
 	}
 
