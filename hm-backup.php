@@ -114,6 +114,22 @@ class HM_Backup {
 	private $errors;
 
 	/**
+	 * The archive method used
+	 * 
+	 * @var string
+	 * @access private
+	 */
+	private $archive_method;
+
+	/**
+	 * The mysqldump method used
+	 * 
+	 * @var string
+	 * @access private
+	 */
+	private $mysqldump_method;
+
+	/**
 	 * Sets up the default properties
 	 *
 	 * @access public
@@ -189,7 +205,15 @@ class HM_Backup {
     public function path() {
         return $this->conform_dir( $this->path );
     }
+	
+	public function archive_method() {
+		return $this->archive_method;
+	}
 
+	public function mysqldump_method() {
+		return $this->mysqldump_method;
+	}
+	
 	/**
 	 * Kick off a backup
 	 *
@@ -223,6 +247,8 @@ class HM_Backup {
 	public function mysqldump() {
 
 		do_action( 'hmbkp_mysqldump_started' );
+		
+		$this->mysqldump_method = 'mysqldump';
 
 		// Use mysqldump if we can
 		if ( $this->mysqldump_command_path ) {
@@ -274,6 +300,8 @@ class HM_Backup {
 	 * @return null
 	 */
 	public function mysqldump_fallback() {
+	
+		$this->mysqldump_method = 'mysqldump_fallback';
 
 	    $this->db = mysql_pconnect( DB_HOST, DB_USER, DB_PASSWORD );
 
@@ -346,6 +374,8 @@ class HM_Backup {
 	 * @return null
 	 */
 	public function zip() {
+	
+		$this->archive_method = 'zip';
 
 		// Zip up $this->root with excludes
 		if ( ! $this->database_only && $this->exclude_string( 'zip' ) )
@@ -369,6 +399,8 @@ class HM_Backup {
 	 * @param string $path
 	 */
 	public function zip_archive() {
+	
+		$this->archive_method = 'ziparchive';
 
     	$zip = new ZipArchive();
 
@@ -419,6 +451,8 @@ class HM_Backup {
 	 * @param string $path
 	 */
 	public function pcl_zip() {
+	
+		$this->archive_method = 'pclzip';
 
 		global $_hmbkp_exclude_string;
 
