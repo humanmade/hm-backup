@@ -52,10 +52,12 @@ class testBrokenSymlinkTestCase extends WP_UnitTestCase {
 	 * @return null
 	 */
 	function tearDown() {
-
-		unlink( $this->backup->archive_filepath() );
-
-		rmdir( $this->backup->path );
+		
+		if ( file_exists( $this->backup->archive_filepath() ) )
+			unlink( $this->backup->archive_filepath() );
+		
+		if ( file_exists( $this->backup->path() ) )
+			rmdir( $this->backup->path() );
 
 		unlink( $this->symlink );
 
