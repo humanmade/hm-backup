@@ -477,8 +477,9 @@ class HM_Backup {
 		$this->load_pclzip();
 
 		$archive = new PclZip( $this->archive_filepath() );
+		$filesystem = $archive->extract( PCLZIP_OPT_EXTRACT_AS_STRING );
 
-		foreach( $archive->extract( PCLZIP_OPT_EXTRACT_AS_STRING ) as $file )
+		foreach( $filesystem as $file )
 			$archive_files[] = untrailingslashit( $file['filename'] );
 
 		// Check that the array of files that should have been backed up matches the array of files in the zip
