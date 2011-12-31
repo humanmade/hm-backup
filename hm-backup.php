@@ -1116,7 +1116,7 @@ class HM_Backup {
 		if ( in_array( $type, array( E_STRICT, E_DEPRECATED ) ) || error_reporting() === 0 )
 			return false;
 
-		$this->errors['php'][$_key] = array_splice( func_get_args(), 0, 4 );
+		$this->error( 'php', array_splice( func_get_args(), 0, 4 ) );
 
 		return false;
 
