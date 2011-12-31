@@ -197,10 +197,9 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 	function testDatabaseOnlyWithMysqldumpCommand() {
 
 		$this->backup->database_only = true;
-		if ( ! $this->backup->mysqldump_command_path ) {
+		
+		if ( ! $this->backup->mysqldump_command_path )
             $this->markTestSkipped( "Empty mysqldump Command Path" );
-            return false;
-        }
  
 		$this->backup->backup();
 
