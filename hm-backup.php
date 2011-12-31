@@ -692,6 +692,10 @@ class HM_Backup {
 		// Sanitize the excludes
 		$excludes = array_filter( array_unique( array_map( 'trim', (array) $this->excludes ) ) );
 
+		// If path is inside root, exclude it
+		if ( strpos( $this->path(), $this->root() ) !== false )
+			$excludes[] = trailingslashit( $this->path() );
+
 		foreach( $excludes as $key => &$rule ) {
 
 			$file = $absolute = $fragment = false;
