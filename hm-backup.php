@@ -490,7 +490,7 @@ class HM_Backup {
 			    if ( ! $file->isReadable() )
 			        continue;
 
-			    $pathname = str_replace( trailingslashit( $this->root() ), '', $this->conform_dir( $file->getPathname() ) );
+			    $pathname = str_ireplace( trailingslashit( $this->root() ), '', $this->conform_dir( $file->getPathname() ) );
 
 			    // Excludes
 			    if ( $excludes && preg_match( '(' . $excludes . ')', $pathname ) )
@@ -538,7 +538,7 @@ class HM_Backup {
 	    		continue;
 
 	    	$filepath = $this->conform_dir( trailingslashit( $dir ) . $file );
-	    	$file = str_replace( trailingslashit( $this->root() ), '', $filepath );
+	    	$file = str_ireplace( trailingslashit( $this->root() ), '', $filepath );
 
 	    	// Skip the backups dir and any excluded paths
 	    	if ( ! is_readable( $filepath ) || ( $excludes && preg_match( '(' . $excludes . ')', $file ) ) )
@@ -680,7 +680,7 @@ class HM_Backup {
 				$fragment = true;
 
 			// Strip $this->root and conform
-			$rule = str_replace( $this->root(), '', untrailingslashit( $this->conform_dir( $rule ) ) );
+			$rule = str_ireplace( $this->root(), '', untrailingslashit( $this->conform_dir( $rule ) ) );
 
 			// Strip the preceeding slash
 			if ( in_array( substr( $rule, 0, 1 ), array( '\\', '/' ) ) )
