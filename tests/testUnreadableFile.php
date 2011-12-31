@@ -31,7 +31,7 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 		mkdir( $this->backup->path );
 
 		chmod( $this->backup->root . '/test-data.txt', 0220 );
-		
+
 		remove_action( 'hmbkp_backup_started', 'hmbkp_set_status', 10, 0 );
 		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
 		remove_action( 'hmbkp_archive_started', 'hmbkp_set_status_archiving' );
@@ -77,6 +77,8 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
+		$this->assertNotEmpty( $this->backup->errors() );
+
 	}
 
 	/**
@@ -98,6 +100,8 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	/**
@@ -118,6 +122,8 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 

@@ -68,6 +68,9 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
             $this->markTestSkipped( 'Empty mysqldump command path' );
         
 		$this->backup->backup();
+		
+		$this->assertEquals( $this->backup->archive_method(), 'zip' );
+		$this->assertEquals( $this->backup->mysqldump_method(), 'mysqldump' );
 
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
@@ -91,11 +94,16 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 		$this->assertTrue( class_exists( 'ZipArchive' ) );
 
 		$this->backup->backup();
+		
+		$this->assertEquals( $this->backup->archive_method(), 'ziparchive' );
+		$this->assertEquals( $this->backup->mysqldump_method(), 'mysqldump_fallback' );
 
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->archive_filepath(), array( 'test-data.txt', $this->backup->database_dump_filename ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 4 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 	
@@ -113,11 +121,16 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 		$this->backup->skip_zip_archive = true;
 
 		$this->backup->backup();
+		
+		$this->assertEquals( $this->backup->archive_method(), 'pclzip' );
+		$this->assertEquals( $this->backup->mysqldump_method(), 'mysqldump_fallback' );
 
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->archive_filepath(), array( 'test-data.txt', $this->backup->database_dump_filename ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 4 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -136,10 +149,14 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 
 		$this->backup->backup();
 
+		$this->assertEquals( $this->backup->archive_method(), 'zip' );
+
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 3 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -157,11 +174,15 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 		$this->assertTrue( class_exists( 'ZipArchive' ) );
 
 		$this->backup->backup();
+		
+		$this->assertEquals( $this->backup->archive_method(), 'ziparchive' );
 
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 3 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 	
@@ -180,10 +201,14 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 
 		$this->backup->backup();
 
+		$this->assertEquals( $this->backup->archive_method(), 'pclzip' );
+
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 3 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -202,11 +227,16 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
             $this->markTestSkipped( "Empty mysqldump Command Path" );
  
 		$this->backup->backup();
+		
+		$this->assertEquals( $this->backup->archive_method(), 'zip' );
+		$this->assertEquals( $this->backup->mysqldump_method(), 'mysqldump' );
 
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->archive_filepath(), array( $this->backup->database_dump_filename ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -222,11 +252,16 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 		$this->backup->mysqldump_command_path = false;
 
 		$this->backup->backup();
+		
+		$this->assertEquals( $this->backup->archive_method(), 'zip' );
+		$this->assertEquals( $this->backup->mysqldump_method(), 'mysqldump_fallback' );
 
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->archive_filepath(), array( $this->backup->database_dump_filename ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 

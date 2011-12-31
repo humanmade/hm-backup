@@ -29,7 +29,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->backup->path = dirname( __FILE__ ) . '/tmp';
 
 		mkdir( $this->backup->path );
-		
+
 		remove_action( 'hmbkp_backup_started', 'hmbkp_set_status', 10, 0 );
 		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
 		remove_action( 'hmbkp_archive_started', 'hmbkp_set_status_archiving' );
@@ -66,6 +66,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	function testExcludeAbsoluteDirPathWithPclZip() {
@@ -77,6 +79,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -93,6 +97,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	function testExcludeAbsoluteRootDirPathWithPclZip() {
@@ -104,6 +110,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -120,6 +128,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	function testExcludeDirPathFragmentWithPclZip() {
@@ -131,6 +141,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -147,6 +159,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	function testExcludeAmbiguousAbsoluteDirPathWithPclZip() {
@@ -158,6 +172,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 1 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -174,6 +190,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	function testExcludeAbsoluteFilePathWithPclZip() {
@@ -185,6 +203,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -201,6 +221,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	function testExcludeAmbiguousAbsoluteFilePathWithPclZip() {
@@ -212,6 +234,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -228,6 +252,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	function testExcludeAbsolutePathWithWildcardFileWithPclZip() {
@@ -239,6 +265,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -255,6 +283,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	function testExcludeAmbiguousAbsolutePathWithWildcardFileWithPclZip() {
@@ -266,6 +296,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -282,6 +314,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	function testExcludeWildcardFileNameWithPclZip() {
@@ -293,6 +327,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -309,6 +345,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	function testExcludeAbsolutePathWithWildcardFileNameWithPclZip() {
@@ -320,6 +358,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -336,6 +376,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	function testExcludeAmbiguousAbsolutePathWithWildcardFileNameWithPclZip() {
@@ -347,6 +389,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -363,6 +407,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	function testExcludeWildcardFileExtensionWithPclZip() {
@@ -374,6 +420,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -390,6 +438,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	function testExcludeAbsolutePathWithWildcardFileExtensionWithPclZip() {
@@ -401,6 +451,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -417,6 +469,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	function testExcludeAmbiguousAbsolutePathWithWildcardFileExtensionWithPclZip() {
@@ -428,6 +482,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -443,6 +499,9 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 0 );
 
+		// Expect an error "Nothing to do"
+		$this->assertNotEmpty( $this->backup->errors() );
+
 	}
 
 	function testWildCardWithPclZip() {
@@ -456,6 +515,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->backup->pcl_zip();
 
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 0 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 

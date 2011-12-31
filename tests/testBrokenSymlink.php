@@ -84,6 +84,8 @@ class testBrokenSymlinkTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( basename( $this->symlink ) ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 3 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	/**
@@ -106,6 +108,8 @@ class testBrokenSymlinkTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( basename( $this->symlink ) ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 3 );
 
+		$this->assertEmpty( $this->backup->errors() );
+
 	}
 
 	/**
@@ -127,6 +131,8 @@ class testBrokenSymlinkTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( basename( $this->symlink ) ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 3 );
+
+		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
