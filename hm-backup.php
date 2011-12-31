@@ -950,13 +950,13 @@ class HM_Backup {
 
 	    // Checks whether the field is an integer or not
 	    for ( $j = 0; $j < $fields_cnt; $j++ ) {
-	    	
+
 	    	$field_set[$j] = $this->sql_backquote( mysql_field_name( $result, $j ) );
 	    	$type = mysql_field_type( $result, $j );
 
 	    	if ( $type == 'tinyint' || $type == 'smallint' || $type == 'mediumint' || $type == 'int' || $type == 'bigint'  || $type == 'timestamp')
 	    		$field_num[$j] = true;
-	    	
+
 	    	else
 	    		$field_num[$j] = false;
 
@@ -1071,12 +1071,27 @@ class HM_Backup {
 
 	}
 
+	/**
+	 * Get the errors
+	 *
+	 * @access public
+	 * @return null
+	 */
 	public function errors() {
 
 		return $this->errors;
 
 	}
 
+
+	/**
+	 * Add an error to the errors stack
+	 *
+	 * @access private
+	 * @param string $context
+	 * @param mixed $error
+	 * @return null
+	 */
 	private function error( $context, $error ) {
 
 		if ( empty( $context ) || empty( $error ) )
