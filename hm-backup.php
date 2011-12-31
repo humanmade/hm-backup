@@ -458,9 +458,13 @@ class HM_Backup {
 			return false;
 
 		// Verify using the zip command if possible
-		if ( $this->zip_command_path )
-		    if ( strpos( shell_exec( escapeshellarg( $this->zip_command_path ) . ' -T ' . escapeshellarg( $this->archive_filepath() ) . ' 2> /dev/null' ), 'OK' ) === false )
-		    	return false;
+		if ( $this->zip_command_path && strpos( shell_exec( escapeshellarg( $this->zip_command_path ) . ' -T ' . escapeshellarg( $this->archive_filepath() ) . ' 2> /dev/null' ), 'OK' ) === false ) {
+
+			unlink( $this->archive_filepath() );
+
+		    return false;
+
+		}
 
 		// If it's a file backup, get an array of all the files that should have been backed up
 		if ( ! $this->database_only )
@@ -478,8 +482,13 @@ class HM_Backup {
 			$archive_files[] = untrailingslashit( $file['filename'] );
 
 		// Check that the array of files that should have been backed up matches the array of files in the zip
-		if ( $files !== $archive_files )
+		if ( $files !== $archive_files ) {
+
+			unlink( $this->archive_filepath() );
+
 			return false;
+
+		}
 
 		return $this->archive_verified = true;
 
