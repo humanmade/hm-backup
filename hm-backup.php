@@ -115,7 +115,7 @@ class HM_Backup {
 
 	/**
 	 * The archive method used
-	 * 
+	 *
 	 * @var string
 	 * @access private
 	 */
@@ -123,7 +123,7 @@ class HM_Backup {
 
 	/**
 	 * The mysqldump method used
-	 * 
+	 *
 	 * @var string
 	 * @access private
 	 */
@@ -205,7 +205,7 @@ class HM_Backup {
     public function path() {
         return $this->conform_dir( $this->path );
     }
-	
+
 	public function archive_method() {
 		return $this->archive_method;
 	}
@@ -213,7 +213,7 @@ class HM_Backup {
 	public function mysqldump_method() {
 		return $this->mysqldump_method;
 	}
-	
+
 	/**
 	 * Kick off a backup
 	 *
@@ -247,7 +247,7 @@ class HM_Backup {
 	public function mysqldump() {
 
 		do_action( 'hmbkp_mysqldump_started' );
-		
+
 		$this->mysqldump_method = 'mysqldump';
 
 		// Use mysqldump if we can
@@ -300,7 +300,7 @@ class HM_Backup {
 	 * @return null
 	 */
 	public function mysqldump_fallback() {
-	
+
 		$this->mysqldump_method = 'mysqldump_fallback';
 
 	    $this->db = mysql_pconnect( DB_HOST, DB_USER, DB_PASSWORD );
@@ -352,11 +352,11 @@ class HM_Backup {
 			$this->zip();
 
 		// If not or if the shell zip failed then use ZipArchive
-		if ( ! $this->check_archive() && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) )
+		if ( $this->errors() && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) )
 			$this->zip_archive();
 
 		// If ZipArchive is unavailable or one of the above failed
-		if ( ! $this->check_archive() )
+		if ( $this->errors() )
 			$this->pcl_zip();
 
 		// Delete the database dump file
@@ -374,7 +374,7 @@ class HM_Backup {
 	 * @return null
 	 */
 	public function zip() {
-	
+
 		$this->archive_method = 'zip';
 
 		// Zip up $this->root with excludes
@@ -389,6 +389,8 @@ class HM_Backup {
 		if ( ! $this->files_only )
 		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->path() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename ) . ' 2>&1' ) );
 
+		$this->check_archive( 'zip' );
+
 	}
 
 	/**
@@ -399,7 +401,7 @@ class HM_Backup {
 	 * @param string $path
 	 */
 	public function zip_archive() {
-	
+
 		$this->archive_method = 'ziparchive';
 
     	$zip = new ZipArchive();
@@ -439,6 +441,8 @@ class HM_Backup {
 
 		$zip->close();
 
+		$this->check_archive( 'ziparchive' );
+
 	}
 
 	/**
@@ -451,7 +455,7 @@ class HM_Backup {
 	 * @param string $path
 	 */
 	public function pcl_zip() {
-	
+
 		$this->archive_method = 'pclzip';
 
 		global $_hmbkp_exclude_string;
@@ -474,6 +478,8 @@ class HM_Backup {
 
 		unset( $GLOBALS['_hmbkp_exclude_string'] );
 
+		$this->check_archive( 'pclzip' );
+
 	}
 
 	/**
@@ -482,48 +488,49 @@ class HM_Backup {
 	 * @access public
 	 * @return bool
 	 */
-	public function check_archive() {
+	public function check_archive( $context ) {
 
 		// If we've already passed then no need to check again
 		if ( ! empty( $this->archive_verified ) )
 			return true;
 
-		if ( ! file_exists( $this->archive_filepath() ) )
-			return false;
+		if ( ! file_exists( $this->archive_filepath() ) ) {
+			$this->error( $context, __( 'Backup file does not exist' ) );
 
 		// Verify using the zip command if possible
-		if ( $this->zip_command_path && strpos( shell_exec( escapeshellarg( $this->zip_command_path ) . ' -T ' . escapeshellarg( $this->archive_filepath() ) . ' 2> /dev/null' ), 'OK' ) === false ) {
+		} elseif ( $this->zip_command_path && strpos( shell_exec( escapeshellarg( $this->zip_command_path ) . ' -T ' . escapeshellarg( $this->archive_filepath() ) . ' 2> /dev/null' ), 'OK' ) === false ) {
+			$this->error( $context, __( 'Backup file corrupt' ) );
 
-			unlink( $this->archive_filepath() );
+		} else {
 
-		    return false;
+			// If it's a file backup, get an array of all the files that should have been backed up
+			if ( ! $this->database_only )
+				$files = $this->files();
+
+			// Check that the database was backed up
+			if ( ! $this->files_only )
+				$files[] = $this->database_dump_filename;
+
+			$this->load_pclzip();
+
+			$archive = new PclZip( $this->archive_filepath() );
+			$filesystem = $archive->extract( PCLZIP_OPT_EXTRACT_AS_STRING );
+
+			foreach( $filesystem as $file )
+				$archive_files[] = untrailingslashit( $file['filename'] );
+
+			// Check that the array of files that should have been backed up matches the array of files in the zip
+			if ( $files !== $archive_files )
+				$this->error( $context, 'Backup file doesn\'t contain the the following files: ' . implode( ', ', array_diff( $files, $archive_files ) ) );
 
 		}
 
-		// If it's a file backup, get an array of all the files that should have been backed up
-		if ( ! $this->database_only )
-			$files = $this->files();
-
-		// Check that the database was backed up
-		if ( ! $this->files_only )
-			$files[] = $this->database_dump_filename;
-
-		$this->load_pclzip();
-
-		$archive = new PclZip( $this->archive_filepath() );
-		$filesystem = $archive->extract( PCLZIP_OPT_EXTRACT_AS_STRING );
-
-		foreach( $filesystem as $file )
-			$archive_files[] = untrailingslashit( $file['filename'] );
-
-		// Check that the array of files that should have been backed up matches the array of files in the zip
-		if ( $files !== $archive_files ) {
-
+		// If there are errors delete the backup file.
+		if ( $this->errors() && file_exists( $this->archive_filepath() ) )
 			unlink( $this->archive_filepath() );
 
+		if ( $this->errors() )
 			return false;
-
-		}
 
 		return $this->archive_verified = true;
 
