@@ -35,7 +35,7 @@ class BackUpWordPressPropertiesTestCase extends WP_UnitTestCase {
 	 */
 	function testDefaultBackupPath() {
 
-		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/backups' ), $this->backup->path );
+		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/backups' ), $this->backup->path() );
 
 	}
 
