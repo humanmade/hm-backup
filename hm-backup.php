@@ -397,7 +397,7 @@ class HM_Backup {
 		if ( ! $this->files_only )
 		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->path() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename ) . ' 2>&1' ) );
 
-		$this->check_archive( 'zip' );
+		$this->check_archive();
 
 	}
 
@@ -449,7 +449,7 @@ class HM_Backup {
 
 		$zip->close();
 
-		$this->check_archive( 'ziparchive' );
+		$this->check_archive();
 
 	}
 
@@ -486,7 +486,7 @@ class HM_Backup {
 
 		unset( $GLOBALS['_hmbkp_exclude_string'] );
 
-		$this->check_archive( 'pclzip' );
+		$this->check_archive();
 
 	}
 
@@ -496,18 +496,22 @@ class HM_Backup {
 	 * @access public
 	 * @return bool
 	 */
-	public function check_archive( $context ) {
+	public function check_archive() {
 
 		// If we've already passed then no need to check again
 		if ( ! empty( $this->archive_verified ) )
 			return true;
 
 		if ( ! file_exists( $this->archive_filepath() ) ) {
-			$this->error( $context, __( 'Backup file does not exist' ) );
+			$this->error( $this->archive_method(), __( 'Backup file does not exist' ) );
 
 		// Verify using the zip command if possible
-		} elseif ( $this->zip_command_path && strpos( shell_exec( escapeshellarg( $this->zip_command_path ) . ' -T ' . escapeshellarg( $this->archive_filepath() ) . ' 2> /dev/null' ), 'OK' ) === false ) {
-			$this->error( $context, __( 'Backup file corrupt' ) );
+		} elseif ( $this->zip_command_path ) {
+
+			$verify = shell_exec( escapeshellarg( $this->zip_command_path ) . ' -T ' . escapeshellarg( $this->archive_filepath() ) . ' 2> /dev/null' );
+
+			if ( strpos( $verify, 'OK' ) === false )
+				$this->error( $this->archive_method(), __( $verify ) );
 
 		} else {
 
@@ -529,7 +533,7 @@ class HM_Backup {
 
 			// Check that the array of files that should have been backed up matches the array of files in the zip
 			if ( $files !== $archive_files )
-				$this->error( $context, 'Backup file doesn\'t contain the the following files: ' . implode( ', ', array_diff( $files, $archive_files ) ) );
+				$this->error( $this->archive_method(), 'Backup file doesn\'t contain the the following files: ' . implode( ', ', array_diff( $files, $archive_files ) ) );
 
 		}
 
