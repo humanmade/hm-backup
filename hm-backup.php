@@ -360,11 +360,11 @@ class HM_Backup {
 			$this->zip();
 
 		// If not or if the shell zip failed then use ZipArchive
-		if ( $this->errors() && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) )
+		if ( ( empty( $this->archive_verified ) || $this->errors() ) && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) )
 			$this->zip_archive();
 
 		// If ZipArchive is unavailable or one of the above failed
-		if ( $this->errors() )
+		if ( ( empty( $this->archive_verified ) || $this->errors() ) )
 			$this->pcl_zip();
 
 		// Delete the database dump file
