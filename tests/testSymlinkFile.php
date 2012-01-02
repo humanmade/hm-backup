@@ -22,7 +22,7 @@ class testSymlinkFileTestCase extends WP_UnitTestCase {
 	 * @return null
 	 */
 	function setUp() {
-	
+
 		if ( ! function_exists( 'symlink' ) )
 			$this->markTestSkipped( 'symlink function not defined' );
 
@@ -36,7 +36,7 @@ class testSymlinkFileTestCase extends WP_UnitTestCase {
 		$this->symlink = dirname( __FILE__ ) . '/test-data/' . basename( __FILE__ );
 
 		symlink( __FILE__, $this->symlink );
-		
+
 		remove_action( 'hmbkp_backup_started', 'hmbkp_set_status', 10, 0 );
 		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
 		remove_action( 'hmbkp_archive_started', 'hmbkp_set_status_archiving' );
@@ -51,6 +51,9 @@ class testSymlinkFileTestCase extends WP_UnitTestCase {
 	 * @return null
 	 */
 	function tearDown() {
+
+		if ( ! function_exists( 'symlink' ) )
+			return;
 
 		if ( file_exists( $this->backup->archive_filepath() ) )
 			unlink( $this->backup->archive_filepath() );
