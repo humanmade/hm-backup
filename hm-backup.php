@@ -112,7 +112,7 @@ class HM_Backup {
 	 * @access private
 	 */
 	private $errors;
-	
+
 	/**
 	 * Contains an array of warnings
 	 *
@@ -120,7 +120,7 @@ class HM_Backup {
 	 * @access private
 	 */
 	private $warnings;
-	
+
 	/**
 	 * The archive method used
 	 *
@@ -502,18 +502,20 @@ class HM_Backup {
 		if ( ! empty( $this->archive_verified ) )
 			return true;
 
-		if ( ! file_exists( $this->archive_filepath() ) ) {
-			$this->error( $this->archive_method(), __( 'Backup file does not exist' ) );
+		if ( ! file_exists( $this->archive_filepath() ) )
+			$this->error( $this->archive_method(), __( 'The backup file was not created', 'hmbkp' ) );
 
 		// Verify using the zip command if possible
-		} elseif ( $this->zip_command_path ) {
+		if ( ! $this->errors() && $this->zip_command_path ) {
 
 			$verify = shell_exec( escapeshellarg( $this->zip_command_path ) . ' -T ' . escapeshellarg( $this->archive_filepath() ) . ' 2> /dev/null' );
 
 			if ( strpos( $verify, 'OK' ) === false )
-				$this->error( $this->archive_method(), __( $verify ) );
+				$this->error( $this->archive_method(), $verify );
 
-		} else {
+		}
+
+		if ( ! $this->errors() ) {
 
 			// If it's a file backup, get an array of all the files that should have been backed up
 			if ( ! $this->database_only )
@@ -533,7 +535,7 @@ class HM_Backup {
 
 			// Check that the array of files that should have been backed up matches the array of files in the zip
 			if ( $files !== $archive_files )
-				$this->error( $this->archive_method(), 'Backup file doesn\'t contain the the following files: ' . implode( ', ', array_diff( $files, $archive_files ) ) );
+				$this->error( $this->archive_method(), __( 'Backup file doesn\'t contain the the following files: ', 'hmbkp' ) . implode( ', ', array_diff( $files, $archive_files ) ) );
 
 		}
 
@@ -570,8 +572,10 @@ class HM_Backup {
 
 			foreach ( $filesystem as $file ) {
 
-			    if ( ! $file->isReadable() )
+			    if ( ! $file->isReadable() ) {
+			        $this->unreadable_files[] = $file->getPathName();
 			        continue;
+			    }
 
 			    $pathname = str_ireplace( trailingslashit( $this->root() ), '', $this->conform_dir( $file->getPathname() ) );
 
@@ -592,6 +596,9 @@ class HM_Backup {
 			$this->files = $this->files_fallback( $this->root() );
 
 		}
+
+		if ( ! empty( $this->unreadable_files ) )
+			$this->warning( $this->archive_method(), __( 'The following files are unreadable and couldn\'t be backed up: ', 'hmbkp' ) . implode( ', ', $this->unreadable_files ) );
 
 		return $this->files;
 
@@ -623,8 +630,13 @@ class HM_Backup {
 	    	$filepath = $this->conform_dir( trailingslashit( $dir ) . $file );
 	    	$file = str_ireplace( trailingslashit( $this->root() ), '', $filepath );
 
+	    	if ( ! is_readable( $filepath ) ) {
+				$this->unreadable_files[] = $filepath;
+				continue;
+	    	}
+
 	    	// Skip the backups dir and any excluded paths
-	    	if ( ! is_readable( $filepath ) || ( $excludes && preg_match( '(' . $excludes . ')', $file ) ) )
+	    	if ( ( $excludes && preg_match( '(' . $excludes . ')', $file ) ) )
 	    		continue;
 
 	    	$files[] = $file;
@@ -1115,15 +1127,15 @@ class HM_Backup {
 
 		if ( empty( $context ) || empty( $error ) )
 			return;
-			
+
 		if ( $context == 'zip' && strpos( $error, 'zip warning' ) !== false )
 			return $this->warning( $context, $error );
-	
+
 
 		$this->errors[$context][$_key = md5( implode( ':' , (array) $error ) )] = $error;
 
 	}
-	
+
 	/**
 	 * Get the warnings
 	 *
