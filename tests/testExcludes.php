@@ -516,7 +516,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 0 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		// Expect a nothing to do! error
+		$this->assertNotEmpty( $this->backup->errors() );
 
 	}
 

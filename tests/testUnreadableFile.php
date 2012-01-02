@@ -72,12 +72,14 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 
 		$this->backup->zip();
 
+		$this->assertEmpty( $this->backup->errors() );
+		
+		$this->assertNotEmpty( $this->backup->warnings() );
+
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
-
-		$this->assertNotEmpty( $this->backup->errors() );
 
 	}
 
@@ -95,12 +97,12 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 
 		$this->backup->zip_archive();
 
+		$this->assertEmpty( $this->backup->errors() );
+
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
-
-		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
@@ -118,12 +120,12 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 
 		$this->backup->pcl_zip();
 
+		$this->assertEmpty( $this->backup->errors() );
+
 		$this->assertFileExists( $this->backup->archive_filepath() );
 
 		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
 		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
-
-		$this->assertEmpty( $this->backup->errors() );
 
 	}
 
