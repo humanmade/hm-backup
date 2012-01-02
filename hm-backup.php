@@ -562,7 +562,7 @@ class HM_Backup {
 
 		$this->files = array();
 
-		if ( defined( 'RecursiveDirectoryIterator::FOLLOW_SYMLINKS' ) && false ) {
+		if ( defined( 'RecursiveDirectoryIterator::FOLLOW_SYMLINKS' ) ) {
 
 			$filesystem = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
 
