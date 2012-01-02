@@ -22,6 +22,9 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 	 * @return null
 	 */
 	function setUp() {
+	
+		if ( ! function_exists( 'symlink' ) )
+			$this->markTestSkipped( 'symlink function not defined' );
 
 		$this->backup = new HM_Backup();
 		$this->backup->root = dirname( __FILE__ ) . '/test-data/';
