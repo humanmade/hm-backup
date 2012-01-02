@@ -193,7 +193,17 @@ class HM_Backup {
 	 * @return string
 	 */
 	public function archive_filepath() {
-		return trailingslashit( $this->path() ) . $this->archive_filename;
+		return trailingslashit( $this->path() ) . $this->archive_filename();
+	}
+	
+	/**
+	 * The full filepath to the archive file.
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function archive_filename() {
+		return sanitize_file_name( $this->archive_filename );
 	}
 
 	/**
@@ -203,7 +213,11 @@ class HM_Backup {
 	 * @return string
 	 */
 	public function database_dump_filepath() {
-		return trailingslashit( $this->path() ) . $this->database_dump_filename;
+		return trailingslashit( $this->path() ) . $this->database_dump_filename();
+	}
+	
+	public function database_dump_filename() {
+		return sanitize_file_name( $this->database_dump_filename );
 	}
 
     public function root() {
@@ -395,7 +409,7 @@ class HM_Backup {
 
 		// Add the database dump to the archive
 		if ( ! $this->files_only )
-		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->path() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename ) . ' 2>&1' ) );
+		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->path() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename() ) . ' 2>&1' ) );
 
 		$this->check_archive();
 
@@ -439,7 +453,7 @@ class HM_Backup {
 
 		// Add the database
 		if ( ! $this->files_only )
-			$zip->addFile( $this->database_dump_filepath(), $this->database_dump_filename );
+			$zip->addFile( $this->database_dump_filepath(), $this->database_dump_filename() );
 
 		if ( $zip->status )
 			$this->error( 'ziparchive', $zip->status );
@@ -523,7 +537,7 @@ class HM_Backup {
 
 			// Check that the database was backed up
 			if ( ! $this->files_only )
-				$files[] = $this->database_dump_filename;
+				$files[] = $this->database_dump_filename();
 
 			$this->load_pclzip();
 
@@ -584,7 +598,7 @@ class HM_Backup {
 			        continue;
 
 			    // Don't include database dump as it's added separately
-			    if ( basename( $pathname ) == $this->database_dump_filename )
+			    if ( basename( $pathname ) == $this->database_dump_filename() )
 			    	continue;
 
 			    $this->files[] = $pathname;

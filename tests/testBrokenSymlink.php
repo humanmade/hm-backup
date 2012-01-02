@@ -31,7 +31,7 @@ class testBrokenSymlinkTestCase extends WP_UnitTestCase {
 		$this->backup->path = dirname( __FILE__ ) . '/tmp';
 		$this->backup->files_only = true;
 
-		mkdir( $this->backup->path );
+		mkdir( $this->backup->path() );
 
 		$this->symlink = dirname( __FILE__ ) . '/test-data/' . basename( __FILE__ );
 

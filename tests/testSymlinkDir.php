@@ -31,7 +31,7 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 		$this->backup->path = dirname( __FILE__ ) . '/tmp';
 		$this->backup->files_only = true;
 
-		mkdir( $this->backup->path );
+		mkdir( $this->backup->path() );
 
 		$this->symlink = dirname( __FILE__ ) . '/test-data/tests';
 
@@ -58,8 +58,8 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 		if ( file_exists( $this->backup->archive_filepath() ) )
 			unlink( $this->backup->archive_filepath() );
 
-		if ( file_exists( $this->backup->path ) )
-			rmdir( $this->backup->path );
+		if ( file_exists( $this->backup->path() ) )
+			rmdir( $this->backup->path() );
 
 		if ( file_exists( $this->symlink ) )
 			unlink( $this->symlink );

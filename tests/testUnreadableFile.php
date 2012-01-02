@@ -28,9 +28,9 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 		$this->backup->path = dirname( __FILE__ ) . '/tmp';
 		$this->backup->files_only = true;
 
-		mkdir( $this->backup->path );
+		mkdir( $this->backup->path() );
 
-		chmod( $this->backup->root . '/test-data.txt', 0220 );
+		chmod( $this->backup->root() . '/test-data.txt', 0220 );
 
 		remove_action( 'hmbkp_backup_started', 'hmbkp_set_status', 10, 0 );
 		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
@@ -50,10 +50,10 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 		if ( file_exists( $this->backup->archive_filepath() ) )
 			unlink( $this->backup->archive_filepath() );
 
-		if ( file_exists( $this->backup->path ) )
-			rmdir( $this->backup->path );
+		if ( file_exists( $this->backup->path() ) )
+			rmdir( $this->backup->path() );
 
-		chmod( $this->backup->root . '/test-data.txt', 0664 );
+		chmod( $this->backup->root() . '/test-data.txt', 0664 );
 
 	}
 
@@ -68,7 +68,7 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 		if ( ! $this->backup->zip_command_path )
             $this->markTestSkipped( "Empty zip command path" );
 
-		$this->assertFalse( is_readable( $this->backup->root . '/test-data.txt' ) );
+		$this->assertFalse( is_readable( $this->backup->root() . '/test-data.txt' ) );
 
 		$this->backup->zip();
 
@@ -93,7 +93,7 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 
 		$this->backup->zip_command_path = false;
 
-		$this->assertFalse( is_readable( $this->backup->root . '/test-data.txt' ) );
+		$this->assertFalse( is_readable( $this->backup->root() . '/test-data.txt' ) );
 
 		$this->backup->zip_archive();
 
@@ -116,7 +116,7 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 
 		$this->backup->zip_command_path = false;
 
-		$this->assertFalse( is_readable( $this->backup->root . '/test-data.txt' ) );
+		$this->assertFalse( is_readable( $this->backup->root() . '/test-data.txt' ) );
 
 		$this->backup->pcl_zip();
 

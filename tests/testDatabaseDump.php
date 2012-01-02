@@ -27,7 +27,7 @@ class testDatabaseDumpTestCase extends WP_UnitTestCase {
 		$this->backup = new HM_Backup();
 		$this->backup->path = dirname( __FILE__ ) . '/tmp';
 
-		mkdir( $this->backup->path );
+		mkdir( $this->backup->path() );
 
 		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
 
@@ -45,8 +45,8 @@ class testDatabaseDumpTestCase extends WP_UnitTestCase {
 		if ( file_exists( $this->backup->database_dump_filepath() ) )
 			unlink( $this->backup->database_dump_filepath() );
 
-		if ( file_exists( $this->backup->path ) )
-			rmdir( $this->backup->path );
+		if ( file_exists( $this->backup->path() ) )
+			rmdir( $this->backup->path() );
 
 	}
 	
