@@ -112,7 +112,15 @@ class HM_Backup {
 	 * @access private
 	 */
 	private $errors;
-
+	
+	/**
+	 * Contains an array of warnings
+	 *
+	 * @var mixed
+	 * @access private
+	 */
+	private $warnings;
+	
 	/**
 	 * The archive method used
 	 *
@@ -1103,10 +1111,45 @@ class HM_Backup {
 
 		if ( empty( $context ) || empty( $error ) )
 			return;
+			
+		if ( $context == 'zip' && strpos( $error, 'zip warning' ) !== false )
+			return $this->warning( $context, $error );
+	
 
 		$this->errors[$context][$_key = md5( implode( ':' , (array) $error ) )] = $error;
 
 	}
+	
+	/**
+	 * Get the warnings
+	 *
+	 * @access public
+	 * @return null
+	 */
+	public function warnings() {
+
+		return $this->warnings;
+
+	}
+
+
+	/**
+	 * Add an warning to the warnings stack
+	 *
+	 * @access private
+	 * @param string $context
+	 * @param mixed $warning
+	 * @return null
+	 */
+	private function warning( $context, $warning ) {
+
+		if ( empty( $context ) || empty( $warning ) )
+			return;
+
+		$this->warnings[$context][$_key = md5( implode( ':' , (array) $warning ) )] = $warning;
+
+	}
+
 
 	/**
 	 * Custom error handler for catching errors
