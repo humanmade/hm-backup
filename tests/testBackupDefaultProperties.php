@@ -35,7 +35,7 @@ class BackUpWordPressPropertiesTestCase extends WP_UnitTestCase {
 	 */
 	function testDefaultBackupPath() {
 
-		$this->assertEquals( WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'backups' , $this->backup->path );
+		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/backups' ), $this->backup->path );
 
 	}
 
@@ -47,10 +47,10 @@ class BackUpWordPressPropertiesTestCase extends WP_UnitTestCase {
 	 */
 	function testCustomArchivePath() {
 
-		$this->backup->path = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'custom';
+		$this->backup->path = WP_CONTENT_DIR . '/custom';
 		$this->backup->archive_filename = 'backup.zip';
 
-		$this->assertEquals( WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'custom/backup.zip' , $this->backup->archive_filepath() );
+		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/custom/backup.zip' ), $this->backup->archive_filepath() );
 
 	}
 
@@ -62,10 +62,10 @@ class BackUpWordPressPropertiesTestCase extends WP_UnitTestCase {
 	 */
 	function testCustomDatabaseDumpPath() {
 
-		$this->backup->path = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'custom';
+		$this->backup->path = WP_CONTENT_DIR . '/custom';
 		$this->backup->database_dump_filename = 'dump.sql';
 
-		$this->assertEquals( WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'custom/dump.sql' , $this->backup->database_dump_filepath() );
+		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/custom/dump.sql' ), $this->backup->database_dump_filepath() );
 
 	}
 
