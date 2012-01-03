@@ -195,7 +195,7 @@ class HM_Backup {
 	public function archive_filepath() {
 		return trailingslashit( $this->path() ) . $this->archive_filename();
 	}
-	
+
 	/**
 	 * The full filepath to the archive file.
 	 *
@@ -203,7 +203,7 @@ class HM_Backup {
 	 * @return string
 	 */
 	public function archive_filename() {
-		return sanitize_file_name( $this->archive_filename );
+		return strtolower( sanitize_file_name( remove_accents( $this->archive_filename ) ) );
 	}
 
 	/**
@@ -215,9 +215,9 @@ class HM_Backup {
 	public function database_dump_filepath() {
 		return trailingslashit( $this->path() ) . $this->database_dump_filename();
 	}
-	
+
 	public function database_dump_filename() {
-		return sanitize_file_name( $this->database_dump_filename );
+		return strtolower( sanitize_file_name( remove_accents( $this->database_dump_filename ) ) );
 	}
 
     public function root() {
@@ -402,15 +402,15 @@ class HM_Backup {
 		// Zip up $this->root with excludes
 		if ( ! $this->database_only && $this->exclude_string( 'zip' ) )
 		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2>&1' ) );
-
+				
 		// Zip up $this->root without excludes
 		elseif ( ! $this->database_only )
 		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' 2>&1' ) );
-
+			
 		// Add the database dump to the archive
 		if ( ! $this->files_only )
 		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->path() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename() ) . ' 2>&1' ) );
-
+		
 		$this->check_archive();
 
 	}
