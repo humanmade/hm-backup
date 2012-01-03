@@ -827,7 +827,7 @@ class HM_Backup {
 
 		// Escape shell args for zip command
 		if ( $context == 'zip' )
-			$excludes = array_map( 'escapeshellarg', $excludes );
+			$excludes = array_map( 'escapeshellarg', array_unique( $excludes ) );
 
 		return implode( $separator, $excludes );
 
