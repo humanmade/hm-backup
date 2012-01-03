@@ -772,7 +772,7 @@ class HM_Backup {
 		// Sanitize the excludes
 		$excludes = array_filter( array_unique( array_map( 'trim', (array) $this->excludes ) ) );
 
-		// If path is inside root, exclude it
+		// If path() is inside root(), exclude it
 		if ( strpos( $this->path(), $this->root() ) !== false )
 			$excludes[] = trailingslashit( $this->path() );
 
@@ -1195,10 +1195,10 @@ class HM_Backup {
 
 		if ( in_array( $type, array( E_STRICT, E_DEPRECATED ) ) || error_reporting() === 0 )
 			return false;
-		
+
 		$args = func_get_args();
-		
-		$this->error( 'php', array_splice( $args, 0, 4 ) );
+
+		$this->warning( 'php', array_splice( $args, 0, 4 ) );
 
 		return false;
 
