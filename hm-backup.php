@@ -670,7 +670,7 @@ class HM_Backup {
 
 		// Load PclZip
 		if ( ! defined( 'PCLZIP_TEMPORARY_DIR' ) )
-			define( 'PCLZIP_TEMPORARY_DIR', $this->path() );
+			define( 'PCLZIP_TEMPORARY_DIR', trailingslashit( $this->path() ) );
 
 		require_once( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
 
