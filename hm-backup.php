@@ -301,9 +301,9 @@ class HM_Backup {
 			$cmd .= ' ' . escapeshellarg( DB_NAME );
 
 			// Send stdout to null
-			$cmd .= ' 2> /dev/null';
+			$cmd .= ' 2>&1';
 
-			shell_exec( $cmd );
+			$this->error( 'mysqldump', shell_exec( $cmd ) );
 
 		}
 
