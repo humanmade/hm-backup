@@ -374,11 +374,11 @@ class HM_Backup {
 			$this->zip();
 
 		// If not or if the shell zip failed then use ZipArchive
-		if ( ( empty( $this->archive_verified ) || $this->errors() ) && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) )
+		if ( ( empty( $this->archive_verified ) || $this->errors( 'zip' ) ) && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) )
 			$this->zip_archive();
 
 		// If ZipArchive is unavailable or one of the above failed
-		if ( ( empty( $this->archive_verified ) || $this->errors() ) )
+		if ( empty( $this->archive_verified ) && $this->errors( 'ziparchive' ) )
 			$this->pcl_zip();
 
 		// Delete the database dump file
@@ -402,15 +402,15 @@ class HM_Backup {
 		// Zip up $this->root with excludes
 		if ( ! $this->database_only && $this->exclude_string( 'zip' ) )
 		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2>&1' ) );
-				
+
 		// Zip up $this->root without excludes
 		elseif ( ! $this->database_only )
 		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' 2>&1' ) );
-			
+
 		// Add the database dump to the archive
 		if ( ! $this->files_only )
 		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->path() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename() ) . ' 2>&1' ) );
-		
+
 		$this->check_archive();
 
 	}
@@ -520,7 +520,7 @@ class HM_Backup {
 			$this->error( $this->archive_method(), __( 'The backup file was not created', 'hmbkp' ) );
 
 		// Verify using the zip command if possible
-		if ( ! $this->errors() && $this->zip_command_path ) {
+		if ( ! $this->errors( 'zip' ) && $this->zip_command_path ) {
 
 			$verify = shell_exec( escapeshellarg( $this->zip_command_path ) . ' -T ' . escapeshellarg( $this->archive_filepath() ) . ' 2> /dev/null' );
 
@@ -528,9 +528,9 @@ class HM_Backup {
 				$this->error( $this->archive_method(), $verify );
 
 		}
-		
+
 		/* Comment out for now as causes memory issues on large sites */
-		
+
 		//if ( ! $this->errors() ) {
 		//
 		//	// If it's a file backup, get an array of all the files that should have been backed up
@@ -556,10 +556,10 @@ class HM_Backup {
 		//}
 
 		// If there are errors delete the backup file.
-		if ( $this->errors() && file_exists( $this->archive_filepath() ) )
+		if ( $this->errors( $this->archive_method() ) && file_exists( $this->archive_filepath() ) )
 			unlink( $this->archive_filepath() );
 
-		if ( $this->errors() )
+		if ( $this->errors( $this->archive_method() ) )
 			return false;
 
 		return $this->archive_verified = true;
@@ -1124,7 +1124,10 @@ class HM_Backup {
 	 * @access public
 	 * @return null
 	 */
-	public function errors() {
+	public function errors( $context = null ) {
+
+		if ( ! empty( $context ) )
+			return isset( $this->errors[$context] ) ? $this->errors[$context] : array();
 
 		return $this->errors;
 
@@ -1158,7 +1161,10 @@ class HM_Backup {
 	 * @access public
 	 * @return null
 	 */
-	public function warnings() {
+	public function warnings( $context = null ) {
+
+		if ( ! empty( $context ) )
+			return isset( $this->warnings[$context] ) ? $this->warnings[$context] : array();
 
 		return $this->warnings;
 
