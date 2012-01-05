@@ -689,7 +689,6 @@ class HM_Backup {
 
 		// List of possible mysqldump locations
 		$mysqldump_locations = array(
-			'mysqldump',
 			'/usr/local/bin/mysqldump',
 			'/usr/local/mysql/bin/mysqldump',
 			'/usr/mysql/bin/mysqldump',
@@ -697,19 +696,22 @@ class HM_Backup {
 			'/opt/local/lib/mysql6/bin/mysqldump',
 			'/opt/local/lib/mysql5/bin/mysqldump',
 			'/opt/local/lib/mysql4/bin/mysqldump',
-			'\xampp\mysql\bin\mysqldump',
-			'\Program Files\xampp\mysql\bin\mysqldump',
-			'\Program Files\MySQL\MySQL Server 6.0\bin\mysqldump',
-			'\Program Files\MySQL\MySQL Server 5.5\bin\mysqldump',
-			'\Program Files\MySQL\MySQL Server 5.4\bin\mysqldump',
-			'\Program Files\MySQL\MySQL Server 5.1\bin\mysqldump',
-			'\Program Files\MySQL\MySQL Server 5.0\bin\mysqldump',
-			'\Program Files\MySQL\MySQL Server 4.1\bin\mysqldump'
+			'/xampp/mysql/bin/mysqldump',
+			'/Program Files/xampp/mysql/bin/mysqldump',
+			'/Program Files/MySQL/MySQL Server 6.0/bin/mysqldump',
+			'/Program Files/MySQL/MySQL Server 5.5/bin/mysqldump',
+			'/Program Files/MySQL/MySQL Server 5.4/bin/mysqldump',
+			'/Program Files/MySQL/MySQL Server 5.1/bin/mysqldump',
+			'/Program Files/MySQL/MySQL Server 5.0/bin/mysqldump',
+			'/Program Files/MySQL/MySQL Server 4.1/bin/mysqldump'
 		);
+
+		if ( is_null( shell_exec( 'hash mysqldump 2>&1' ) ) )
+			return 'mysqldump';
 
 		// Find the one which works
 		foreach ( $mysqldump_locations as $location )
-		    if ( ! shell_exec( 'hash ' . $location . ' 2>&1' ) )
+		    if ( file_exists( $this->conform_dir( $location ) ) )
 	 	    	return $location;
 
 		return '';
@@ -730,9 +732,13 @@ class HM_Backup {
 
 		// List of possible zip locations
 		$zip_locations = array(
-			'zip',
 			'/usr/bin/zip'
 		);
+		
+		return 'wrong';
+
+		if ( is_null( shell_exec( 'hash zip 2>&1' ) ) )
+			return 'zip';
 
 		// Find the one which works
 		foreach ( $zip_locations as $location )
