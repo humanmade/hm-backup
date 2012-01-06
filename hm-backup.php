@@ -711,7 +711,7 @@ class HM_Backup {
 
 		// Find the one which works
 		foreach ( $mysqldump_locations as $location )
-		    if ( file_exists( $this->conform_dir( $location ) ) )
+		    if ( @file_exists( $this->conform_dir( $location ) ) )
 	 	    	return $location;
 
 		return '';
@@ -740,7 +740,7 @@ class HM_Backup {
 
 		// Find the one which works
 		foreach ( $zip_locations as $location )
-		    if ( ! shell_exec( 'hash ' . $location . ' 2>&1' ) )
+		    if ( ! @file_exists( $this->conform_dir( $location ) ) )
 	 	    	return $location;
 
 		return '';
@@ -869,7 +869,7 @@ class HM_Backup {
 		// Is shell_exec disabled?
 		if ( in_array( 'shell_exec', array_map( 'trim', explode( ',', ini_get( 'disable_functions' ) ) ) ) )
 			return false;
-		
+
 		// Can we issue a simple command
 		if ( ! @shell_exec( 'pwd' ) )
 			return false;
