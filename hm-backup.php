@@ -303,7 +303,7 @@ class HM_Backup {
 			// Send stdout to null
 			$cmd .= ' 2>&1';
 
-			$this->error( 'mysqldump', shell_exec( $cmd ) );
+			$this->warning( 'mysqldump', shell_exec( $cmd ) );
 
 		}
 
@@ -374,11 +374,11 @@ class HM_Backup {
 			$this->zip();
 
 		// If not or if the shell zip failed then use ZipArchive
-		if ( ( empty( $this->archive_verified ) || $this->errors( 'zip' ) ) && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) )
+		if ( empty( $this->archive_verified ) && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) )
 			$this->zip_archive();
 
 		// If ZipArchive is unavailable or one of the above failed
-		if ( empty( $this->archive_verified ) && $this->errors( 'ziparchive' ) )
+		if ( empty( $this->archive_verified ) )
 			$this->pcl_zip();
 
 		// Delete the database dump file
@@ -401,15 +401,15 @@ class HM_Backup {
 
 		// Zip up $this->root with excludes
 		if ( ! $this->database_only && $this->exclude_string( 'zip' ) )
-		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2>&1' ) );
+		    $this->warning( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2>&1' ) );
 
 		// Zip up $this->root without excludes
 		elseif ( ! $this->database_only )
-		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' 2>&1' ) );
+		    $this->warning( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->root() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -rq ' . escapeshellarg( $this->archive_filepath() ) . ' ./' . ' 2>&1' ) );
 
 		// Add the database dump to the archive
 		if ( ! $this->files_only )
-		    $this->error( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->path() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename() ) . ' 2>&1' ) );
+		    $this->warning( 'zip', shell_exec( 'cd ' . escapeshellarg( $this->path() ) . ' && ' . escapeshellarg( $this->zip_command_path ) . ' -uq ' . escapeshellarg( $this->archive_filepath() ) . ' ' . escapeshellarg( $this->database_dump_filename() ) . ' 2>&1' ) );
 
 		$this->check_archive();
 
@@ -456,10 +456,10 @@ class HM_Backup {
 			$zip->addFile( $this->database_dump_filepath(), $this->database_dump_filename() );
 
 		if ( $zip->status )
-			$this->error( 'ziparchive', $zip->status );
+			$this->warning( 'ziparchive', $zip->status );
 
 		if ( $zip->statusSys )
-			$this->error( 'ziparchive', $zip->statusSys );
+			$this->warning( 'ziparchive', $zip->statusSys );
 
 		$zip->close();
 
@@ -491,12 +491,12 @@ class HM_Backup {
 		// Zip up everything
 		if ( ! $this->database_only )
 			if ( ! $archive->add( $this->root(), PCLZIP_OPT_REMOVE_PATH, $this->root(), PCLZIP_CB_PRE_ADD, 'hmbkp_pclzip_callback' ) )
-				$this->error( 'pclzip', $archive->errorInfo( true ) );
+				$this->warning( 'pclzip', $archive->errorInfo( true ) );
 
 		// Add the database
 		if ( ! $this->files_only )
 			if ( ! $archive->add( $this->database_dump_filepath(), PCLZIP_OPT_REMOVE_PATH, $this->path() ) )
-				$this->error( 'pclzip', $archive->errorInfo( true ) );
+				$this->warning( 'pclzip', $archive->errorInfo( true ) );
 
 		unset( $GLOBALS['_hmbkp_exclude_string'] );
 
@@ -734,8 +734,6 @@ class HM_Backup {
 		$zip_locations = array(
 			'/usr/bin/zip'
 		);
-		
-		return 'wrong';
 
 		if ( is_null( shell_exec( 'hash zip 2>&1' ) ) )
 			return 'zip';
@@ -1152,10 +1150,6 @@ class HM_Backup {
 
 		if ( empty( $context ) || empty( $error ) )
 			return;
-
-		if ( $context == 'zip' && strpos( $error, 'zip warning' ) !== false )
-			return $this->warning( $context, $error );
-
 
 		$this->errors[$context][$_key = md5( implode( ':' , (array) $error ) )] = $error;
 
