@@ -869,6 +869,10 @@ class HM_Backup {
 		// Is shell_exec disabled?
 		if ( in_array( 'shell_exec', array_map( 'trim', explode( ',', ini_get( 'disable_functions' ) ) ) ) )
 			return false;
+		
+		// Can we issue a simple command
+		if ( ! @shell_exec( 'pwd' ) )
+			return false;
 
 		return true;
 
