@@ -275,6 +275,9 @@ class HM_Backup {
 		// Use mysqldump if we can
 		if ( $this->mysqldump_command_path ) {
 
+			$host = reset( explode( ':', DB_HOST ) );
+			$port = end( explode( ':', DB_HOST ) );
+
 			// Path to the mysqldump executable
 			$cmd = escapeshellarg( $this->mysqldump_command_path );
 
@@ -292,17 +295,22 @@ class HM_Backup {
 			    $cmd .= ' -p'  . escapeshellarg( DB_PASSWORD );
 
 			// Set the host
-			$cmd .= ' -h ' . escapeshellarg( DB_HOST );
+			$cmd .= ' -h ' . escapeshellarg( $host );
 
-			// Save the file
+			// Set the port if it was set
+			if ( ! empty( $port ) )
+				$cmd .= ' -P ' . $port;
+
+			// The file we're saving too
 			$cmd .= ' -r ' . escapeshellarg( $this->database_dump_filepath() );
 
 			// The database we're dumping
 			$cmd .= ' ' . escapeshellarg( DB_NAME );
 
-			// Send stdout to null
+			// Pipe STDERR to STDOUT
 			$cmd .= ' 2>&1';
 
+			// Store any returned data in warning
 			$this->warning( $this->mysqldump_method, shell_exec( $cmd ) );
 
 		}
