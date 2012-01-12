@@ -524,7 +524,7 @@ class HM_Backup {
 			$this->error( $this->archive_method(), __( 'The backup file was not created', 'hmbkp' ) );
 
 		// Verify using the zip command if possible
-		if ( ! $this->errors( 'zip' ) && $this->zip_command_path ) {
+		if ( $this->zip_command_path ) {
 
 			$verify = shell_exec( escapeshellarg( $this->zip_command_path ) . ' -T ' . escapeshellarg( $this->archive_filepath() ) . ' 2> /dev/null' );
 
