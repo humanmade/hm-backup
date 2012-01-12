@@ -533,32 +533,6 @@ class HM_Backup {
 
 		}
 
-		/* Comment out for now as causes memory issues on large sites */
-
-		//if ( ! $this->errors() ) {
-		//
-		//	// If it's a file backup, get an array of all the files that should have been backed up
-		//	if ( ! $this->database_only )
-		//		$files = $this->files();
-		//
-		//	// Check that the database was backed up
-		//	if ( ! $this->files_only )
-		//		$files[] = $this->database_dump_filename();
-		//
-		//	$this->load_pclzip();
-		//
-		//	$archive = new PclZip( $this->archive_filepath() );
-		//	$filesystem = $archive->extract( PCLZIP_OPT_EXTRACT_AS_STRING );
-		//
-		//	foreach( $filesystem as $file )
-		//		$archive_files[] = untrailingslashit( $file['filename'] );
-		//
-		//	// Check that the array of files that should have been backed up matches the array of files in the zip
-		//	if ( $files !== $archive_files )
-		//		$this->error( $this->archive_method(), __( 'Backup file doesn\'t contain the the following files: ', 'hmbkp' ) . implode( ', ', array_diff( $files, $archive_files ) ) );
-		//
-		//}
-
 		// If there are errors delete the backup file.
 		if ( $this->errors( $this->archive_method() ) && file_exists( $this->archive_filepath() ) )
 			unlink( $this->archive_filepath() );
