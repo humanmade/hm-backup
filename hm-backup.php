@@ -323,6 +323,8 @@ class HM_Backup {
 	 */
 	public function mysqldump_fallback() {
 
+		$this->errors_to_warnings( $this->mysqldump_method );
+
 		$this->mysqldump_method = 'mysqldump_fallback';
 
 	    $this->db = mysql_pconnect( DB_HOST, DB_USER, DB_PASSWORD );
@@ -423,7 +425,8 @@ class HM_Backup {
 	 * @param string $path
 	 */
 	public function zip_archive() {
-
+		
+		$this->errors_to_warnings( $this->archive_method );
 		$this->archive_method = 'ziparchive';
 
     	$zip = new ZipArchive();
@@ -478,6 +481,7 @@ class HM_Backup {
 	 */
 	public function pcl_zip() {
 
+		$this->errors_to_warnings( $this->archive_method );
 		$this->archive_method = 'pclzip';
 
 		global $_hmbkp_exclude_string;
@@ -1156,6 +1160,32 @@ class HM_Backup {
 			return;
 
 		$this->errors[$context][$_key = md5( implode( ':' , (array) $error ) )] = $error;
+
+	}
+
+	/**
+	 * Migrate errors to warnings
+	 *
+	 * @access private
+	 * @param string $context. (default: null)
+	 * @return null
+	 */
+	private function errors_to_warnings( $context = null ) {
+
+		$errors = empty( $context ) ? $this->errors() : array( $context => $this->errors( $context ) );
+
+		if ( empty( $errors ) )
+			return;
+
+		foreach ( $errors as $error_context => $errors )
+			foreach( $errors as $error )
+				$this->warning( $error_context, $error );
+
+		if ( $context )
+			unset( $this->errors[$context] );
+
+		else
+			$this->errors = array();
 
 	}
 
