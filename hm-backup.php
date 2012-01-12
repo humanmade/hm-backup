@@ -718,8 +718,8 @@ class HM_Backup {
 
 		// Find the one which works
 		foreach ( $zip_locations as $location )
-		    if ( ! @file_exists( $this->conform_dir( $location ) ) )
-	 	    	return $location;
+			if ( @file_exists( $this->conform_dir( $location ) ) )
+				return $location;
 
 		return '';
 
