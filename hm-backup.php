@@ -425,7 +425,7 @@ class HM_Backup {
 	 * @param string $path
 	 */
 	public function zip_archive() {
-		
+
 		$this->errors_to_warnings( $this->archive_method );
 		$this->archive_method = 'ziparchive';
 
@@ -878,6 +878,7 @@ class HM_Backup {
 			return $this->conform_dir( $dir );
 
 		return $dir;
+
 	}
 
 	/**
