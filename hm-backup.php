@@ -276,7 +276,7 @@ class HM_Backup {
 		if ( $this->mysqldump_command_path ) {
 
 			$host = reset( explode( ':', DB_HOST ) );
-			$port = end( explode( ':', DB_HOST ) );
+			$port = strpos( DB_HOST, ':' ) ? end( explode( ':', DB_HOST ) ) : '';
 
 			// Path to the mysqldump executable
 			$cmd = escapeshellarg( $this->mysqldump_command_path );
