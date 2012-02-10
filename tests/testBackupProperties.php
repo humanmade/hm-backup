@@ -5,7 +5,7 @@
  *
  * @extends WP_UnitTestCase
  */
-class BackUpWordPressPropertiesTestCase extends WP_UnitTestCase {
+class testPropertiesTestCase extends WP_UnitTestCase {
 
 	/**
 	 * Contains the current backup instance
@@ -38,6 +38,16 @@ class BackUpWordPressPropertiesTestCase extends WP_UnitTestCase {
 		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/backups' ), $this->backup->path() );
 
 	}
+	
+	function testRootBackupPath() {
+		
+		$this->backup->path = '/';
+		$this->backup->archive_filename = 'backup.zip';
+		
+		$this->assertEquals( '/', $this->backup->path() );
+		$this->assertEquals( '/backup.zip', $this->backup->archive_filepath() );
+		
+	}
 
 	/**
 	 * Make sure setting a custom path + archive filename correctly sets the archive filepath
@@ -45,7 +55,7 @@ class BackUpWordPressPropertiesTestCase extends WP_UnitTestCase {
 	 * @access public
 	 * @return null
 	 */
-	function testCustomArchivePath() {
+	function testCustomBackupPath() {
 
 		$this->backup->path = WP_CONTENT_DIR . '/custom';
 		$this->backup->archive_filename = 'backup.zip';
