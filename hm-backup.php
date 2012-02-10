@@ -1223,7 +1223,7 @@ class HM_Backup {
 	 */
 	public function error_handler( $type ) {
 
-		if ( in_array( $type, array( E_STRICT, E_DEPRECATED ) ) || error_reporting() === 0 )
+		if ( ( defined( 'E_DEPRECATED' ) && $type == E_DEPRECATED ) || ( defined( 'E_STRICT' ) && $type == E_STRICT ) || error_reporting() === 0 )
 			return false;
 
 		$args = func_get_args();
