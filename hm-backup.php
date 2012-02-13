@@ -3,7 +3,7 @@
 /**
  * Generic file and database backup class
  *
- * @version 1.5
+ * @version 1.5.1
  */
 class HM_Backup {
 
@@ -884,7 +884,7 @@ class HM_Backup {
 
 		// Remove the trailing slash
 		if ( $dir !== '/' )
-			$dir = untrailingslashit( strtolower( $dir ) );
+			$dir = untrailingslashit( $dir );
 
 		// Carry on until completely normalized
 		if ( ! $recursive && $this->conform_dir( $dir, true ) != $dir )
