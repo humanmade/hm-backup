@@ -3,7 +3,7 @@
 /**
  * Generic file and database backup class
  *
- * @version 1.5.1
+ * @version 1.5.2
  */
 class HM_Backup {
 
