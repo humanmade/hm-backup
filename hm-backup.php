@@ -856,8 +856,8 @@ class HM_Backup {
 		if ( in_array( 'shell_exec', array_map( 'trim', explode( ',', ini_get( 'disable_functions' ) ) ) ) )
 			return false;
 
-		// Can we issue a simple command
-		if ( ! @shell_exec( 'pwd' ) )
+		// Can we issue a simple echo command?
+		if ( ! @shell_exec( 'echo backupwordpress' ) )
 			return false;
 
 		return true;
