@@ -24,13 +24,13 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	function setUp() {
 
 		$this->backup = new HM_Backup();
-		$this->backup->root = dirname( __FILE__ ) . '/test-data/';
-		$this->backup->path = dirname( __FILE__ ) . '/tmp';
-		$this->backup->files_only = true;
+		$this->backup->set_root( dirname( __FILE__ ) . '/test-data/' );
+		$this->backup->set_path( dirname( __FILE__ ) . '/tmp' );
+		$this->backup->set_type( 'file' );
 
-		mkdir( $this->backup->path() );
+		mkdir( $this->backup->get_path() );
 
-		chmod( $this->backup->root() . '/test-data.txt', 0220 );
+		chmod( $this->backup->get_root() . '/test-data.txt', 0220 );
 
 		remove_action( 'hmbkp_backup_started', 'hmbkp_set_status', 10, 0 );
 		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
@@ -47,13 +47,13 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	 */
 	function tearDown() {
 
-		if ( file_exists( $this->backup->archive_filepath() ) )
-			unlink( $this->backup->archive_filepath() );
+		if ( file_exists( $this->backup->get_archive_filepath() ) )
+			unlink( $this->backup->get_archive_filepath() );
 
-		if ( file_exists( $this->backup->path() ) )
-			rmdir( $this->backup->path() );
+		if ( file_exists( $this->backup->get_path() ) )
+			rmdir( $this->backup->get_path() );
 
-		chmod( $this->backup->root() . '/test-data.txt', 0664 );
+		chmod( $this->backup->get_root() . '/test-data.txt', 0664 );
 
 	}
 
@@ -65,10 +65,10 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	 */
 	function testArchiveUnreadableFileWithZip() {
 
-		if ( ! $this->backup->zip_command_path )
+		if ( ! $this->backup->get_zip_command_path() )
             $this->markTestSkipped( "Empty zip command path" );
 
-		$this->assertFalse( is_readable( $this->backup->root() . '/test-data.txt' ) );
+		$this->assertFalse( is_readable( $this->backup->get_root() . '/test-data.txt' ) );
 
 		$this->backup->zip();
 
@@ -76,10 +76,10 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 		
 		$this->assertNotEmpty( $this->backup->warnings() );
 
-		$this->assertFileExists( $this->backup->archive_filepath() );
+		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
-		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
-		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'test-data.txt' ) );
+		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
 	}
 
@@ -91,18 +91,18 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	 */
 	function testArchiveUnreadableFileWithZipArchive() {
 
-		$this->backup->zip_command_path = false;
+		$this->backup->set_zip_command_path( false );
 
-		$this->assertFalse( is_readable( $this->backup->root() . '/test-data.txt' ) );
+		$this->assertFalse( is_readable( $this->backup->get_root() . '/test-data.txt' ) );
 
 		$this->backup->zip_archive();
 
 		$this->assertEmpty( $this->backup->errors() );
 
-		$this->assertFileExists( $this->backup->archive_filepath() );
+		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
-		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
-		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'test-data.txt' ) );
+		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
 	}
 
@@ -114,18 +114,18 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	 */
 	function testArchiveUnreadableFileWithPclZip() {
 
-		$this->backup->zip_command_path = false;
+		$this->backup->set_zip_command_path( false );
 
-		$this->assertFalse( is_readable( $this->backup->root() . '/test-data.txt' ) );
+		$this->assertFalse( is_readable( $this->backup->get_root() . '/test-data.txt' ) );
 
 		$this->backup->pcl_zip();
 
 		$this->assertEmpty( $this->backup->errors() );
 
-		$this->assertFileExists( $this->backup->archive_filepath() );
+		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
-		$this->assertArchiveNotContains( $this->backup->archive_filepath(), array( 'test-data.txt' ) );
-		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 2 );
+		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'test-data.txt' ) );
+		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
 	}
 

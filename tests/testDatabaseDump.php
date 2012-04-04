@@ -25,9 +25,9 @@ class testDatabaseDumpTestCase extends WP_UnitTestCase {
 	function setUp() {
 
 		$this->backup = new HM_Backup();
-		$this->backup->path = dirname( __FILE__ ) . '/tmp';
+		$this->backup->set_path( dirname( __FILE__ ) . '/tmp' );
 
-		mkdir( $this->backup->path() );
+		mkdir( $this->backup->get_path() );
 
 		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
 
@@ -42,11 +42,11 @@ class testDatabaseDumpTestCase extends WP_UnitTestCase {
 	 */
 	function tearDown() {
 
-		if ( file_exists( $this->backup->database_dump_filepath() ) )
-			unlink( $this->backup->database_dump_filepath() );
+		if ( file_exists( $this->backup->get_database_dump_filepath() ) )
+			unlink( $this->backup->get_database_dump_filepath() );
 
-		if ( file_exists( $this->backup->path() ) )
-			rmdir( $this->backup->path() );
+		if ( file_exists( $this->backup->get_path() ) )
+			rmdir( $this->backup->get_path() );
 
 	}
 	
@@ -58,12 +58,12 @@ class testDatabaseDumpTestCase extends WP_UnitTestCase {
 	 */
 	function testDatabaseDumpWithMysqldump() {
 		
-		if ( ! $this->backup->mysqldump_command_path )
+		if ( ! $this->backup->get_mysqldump_command_path() )
             $this->markTestSkipped( "Empty mysqldump command path" );
 		
 		$this->backup->mysqldump();
 		
-		$this->assertFileExists( $this->backup->database_dump_filepath() );
+		$this->assertFileExists( $this->backup->get_database_dump_filepath() );
 		
 	}
 
@@ -77,7 +77,7 @@ class testDatabaseDumpTestCase extends WP_UnitTestCase {
 		
 		$this->backup->mysqldump_fallback();
 		
-		$this->assertFileExists( $this->backup->database_dump_filepath() );
+		$this->assertFileExists( $this->backup->get_database_dump_filepath() );
 		
 	}
 	

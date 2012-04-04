@@ -35,17 +35,17 @@ class testPropertiesTestCase extends WP_UnitTestCase {
 	 */
 	function testDefaultBackupPath() {
 
-		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/backups' ), $this->backup->path() );
+		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/backups' ), $this->backup->get_path() );
 
 	}
 	
 	function testRootBackupPath() {
 		
-		$this->backup->path = '/';
-		$this->backup->archive_filename = 'backup.zip';
+		$this->backup->set_path( '/' );
+		$this->backup->set_archive_filename( 'backup.zip' );
 		
-		$this->assertEquals( '/', $this->backup->path() );
-		$this->assertEquals( '/backup.zip', $this->backup->archive_filepath() );
+		$this->assertEquals( '/', $this->backup->get_path() );
+		$this->assertEquals( '/backup.zip', $this->backup->get_archive_filepath() );
 		
 	}
 
@@ -57,10 +57,10 @@ class testPropertiesTestCase extends WP_UnitTestCase {
 	 */
 	function testCustomBackupPath() {
 
-		$this->backup->path = WP_CONTENT_DIR . '/custom';
-		$this->backup->archive_filename = 'backup.zip';
+		$this->backup->set_path( WP_CONTENT_DIR . '/custom' );
+		$this->backup->set_archive_filename( 'backup.zip' );
 
-		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/custom/backup.zip' ), $this->backup->archive_filepath() );
+		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/custom/backup.zip' ), $this->backup->get_archive_filepath() );
 
 	}
 
@@ -72,10 +72,10 @@ class testPropertiesTestCase extends WP_UnitTestCase {
 	 */
 	function testCustomDatabaseDumpPath() {
 
-		$this->backup->path = WP_CONTENT_DIR . '/custom';
-		$this->backup->database_dump_filename = 'dump.sql';
+		$this->backup->set_path( WP_CONTENT_DIR . '/custom' );
+		$this->backup->set_database_dump_filename( 'dump.sql' );
 
-		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/custom/dump.sql' ), $this->backup->database_dump_filepath() );
+		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/custom/dump.sql' ), $this->backup->get_database_dump_filepath() );
 
 	}
 

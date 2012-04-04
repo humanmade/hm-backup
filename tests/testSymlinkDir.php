@@ -27,11 +27,11 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 			$this->markTestSkipped( 'symlink function not defined' );
 
 		$this->backup = new HM_Backup();
-		$this->backup->root = dirname( __FILE__ ) . '/test-data/';
-		$this->backup->path = dirname( __FILE__ ) . '/tmp';
-		$this->backup->files_only = true;
+		$this->backup->set_root( dirname( __FILE__ ) . '/test-data/' );
+		$this->backup->set_path( dirname( __FILE__ ) . '/tmp' );
+		$this->backup->set_type( 'file' );
 
-		mkdir( $this->backup->path() );
+		mkdir( $this->backup->get_path() );
 
 		$this->symlink = dirname( __FILE__ ) . '/test-data/tests';
 
@@ -55,11 +55,11 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 		if ( ! function_exists( 'symlink' ) )
 			return;
 
-		if ( file_exists( $this->backup->archive_filepath() ) )
-			unlink( $this->backup->archive_filepath() );
+		if ( file_exists( $this->backup->get_archive_filepath() ) )
+			unlink( $this->backup->get_archive_filepath() );
 
-		if ( file_exists( $this->backup->path() ) )
-			rmdir( $this->backup->path() );
+		if ( file_exists( $this->backup->get_path() ) )
+			rmdir( $this->backup->get_path() );
 
 		if ( file_exists( $this->symlink ) )
 			unlink( $this->symlink );
@@ -74,17 +74,17 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 	 */
 	function testArchiveSymlinkDirWithZip() {
 
-		if ( ! $this->backup->zip_command_path )
+		if ( ! $this->backup->get_zip_command_path() )
             $this->markTestSkipped( "Empty zip command path" );
 
 		$this->assertFileExists( $this->symlink );
 
 		$this->backup->zip();
 
-		$this->assertFileExists( $this->backup->archive_filepath() );
+		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
-		$this->assertArchiveContains( $this->backup->archive_filepath(), array( basename( $this->symlink ) ) );
-		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 6 );
+		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( basename( $this->symlink ) ) );
+		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 6 );
 
 		$this->assertEmpty( $this->backup->errors() );
 
@@ -98,16 +98,16 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 	 */
 	function testArchiveSymlinkDirWithZipArchive() {
 
-		$this->backup->zip_command_path = false;
+		$this->backup->set_zip_command_path( false );
 
 		$this->assertFileExists( $this->symlink );
 
 		$this->backup->zip_archive();
 
-		$this->assertFileExists( $this->backup->archive_filepath() );
+		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
-		$this->assertArchiveContains( $this->backup->archive_filepath(), array( basename( $this->symlink ) ) );
-		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 6 );
+		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( basename( $this->symlink ) ) );
+		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 6 );
 
 		$this->assertEmpty( $this->backup->errors() );
 
@@ -121,16 +121,16 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 	 */
 	function testArchiveSymlinkDirWithPclZip() {
 
-		$this->backup->zip_command_path = false;
+		$this->backup->set_zip_command_path( false );
 
 		$this->assertFileExists( $this->symlink );
 
 		$this->backup->pcl_zip();
 
-		$this->assertFileExists( $this->backup->archive_filepath() );
+		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
-		$this->assertArchiveContains( $this->backup->archive_filepath(), array( basename( $this->symlink ) ) );
-		$this->assertArchiveFileCount( $this->backup->archive_filepath(), 6 );
+		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( basename( $this->symlink ) ) );
+		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 6 );
 
 		$this->assertEmpty( $this->backup->errors() );
 
