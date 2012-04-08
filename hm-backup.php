@@ -89,6 +89,15 @@ class HM_Backup {
 	private $files;
 
 	/**
+	 * An array of all the files in root
+	 * that match the exclude rules
+	 *
+	 * @var array
+	 * @access private
+	 */
+	private $excluded_files;
+
+	/**
 	 * Contains an array of errors
 	 *
 	 * @var mixed
@@ -838,7 +847,7 @@ class HM_Backup {
 			    $pathname = str_ireplace( trailingslashit( $this->get_root() ), '', $this->conform_dir( $file->getPathname() ) );
 
 			    // Excludes
-			    if ( $excludes && preg_match( '(' . $excludes . ')', $pathname ) )
+			    if ( $excludes && preg_match( '(' . $excludes . ')', $pathname ) && $this->excluded_files[] = $pathname )
 			        continue;
 
 			    // Don't include database dump as it's added separately
@@ -894,7 +903,7 @@ class HM_Backup {
 	    	}
 
 	    	// Skip the backups dir and any excluded paths
-	    	if ( ( $excludes && preg_match( '(' . $excludes . ')', $file ) ) )
+	    	if ( ( $excludes && preg_match( '(' . $excludes . ')', $file ) ) && $this->excluded_files[] = $file )
 	    		continue;
 
 	    	$files[] = $file;
@@ -905,6 +914,24 @@ class HM_Backup {
 		endwhile;
 
 		return $files;
+
+	}
+
+	/**
+	 * get_excluded_files function.
+	 * 
+	 * @access public
+	 * @return array
+	 */
+	public function get_excluded_files() {
+		
+		if ( empty( $this->files ) )
+			$this->get_files();
+		
+		if ( ! empty( $this->excluded_files ) )
+			return $this->excluded_files;
+
+		return array();
 
 	}
 
