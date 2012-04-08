@@ -266,7 +266,7 @@ class HM_Backup {
     public function set_root( $path ) {
 
     	if ( empty( $path ) || ! is_string( $path ) || ! is_dir ( $path ) )
-    		throw new Exception( '$path must be a valid directory path' );
+    		throw new Exception( 'Invalid root path <code>' . $path . '</code> must be a valid directory path' );
 
 
     	$this->root = $this->conform_dir( $path );
@@ -298,7 +298,7 @@ class HM_Backup {
     public function set_path( $path ) {
 
     	if ( empty( $path ) || ! is_string( $path ) )
-    		throw new Exception( '$path must be a non empty (string)' );
+    		throw new Exception( 'Invalid backup path <code>' . $path . '</code> must be a non empty (string)' );
 
     	$this->path = $this->conform_dir( $path );
 
@@ -357,7 +357,7 @@ class HM_Backup {
 	public function set_type( $type ) {
 
 		if ( ! is_string( $type ) || ! in_array( $type, array( 'file', 'database', 'complete' ) ) )
-			throw new Exception( '$type must be one of (string) file, database or complete' );
+			throw new Exception( 'Invalid backup type <code>' . $type . '</code> must be one of (string) file, database or complete' );
 
 		$this->type = $type;
 
