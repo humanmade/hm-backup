@@ -98,6 +98,15 @@ class HM_Backup {
 	private $excluded_files;
 
 	/**
+	 * An array of all the files in root
+	 * that are unreadable
+	 *
+	 * @var array
+	 * @access private
+	 */
+	private $unreadable_files;
+
+	/**
 	 * Contains an array of errors
 	 *
 	 * @var mixed
@@ -133,16 +142,14 @@ class HM_Backup {
 	 * Sets up the default properties
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function __construct() {
+	public function __construct() {
 
-		// Raise the memory limit and max_execution_time time
+		// Raise the memory limit and max_execution time
 		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
 		@set_time_limit( 0 );
 
-		$this->errors = array();
-
+		// Set a custom error handler so we can track errors
 		set_error_handler( array( &$this, 'error_handler' ) );
 
 	}
@@ -179,7 +186,6 @@ class HM_Backup {
 	 *
 	 * @access public
 	 * @param string $filename
-	 * @return null
 	 */
 	public function set_archive_filename( $filename ) {
 
@@ -225,7 +231,6 @@ class HM_Backup {
 	 *
 	 * @access public
 	 * @param string $filename
-	 * @return null
 	 */
 	public function set_database_dump_filename( $filename ) {
 
@@ -310,7 +315,6 @@ class HM_Backup {
 	 * Will be either zip, ZipArchive or PclZip
 	 *
 	 * @access public
-	 * @return null
 	 */
 	public function get_archive_method() {
 		return $this->archive_method;
@@ -322,7 +326,6 @@ class HM_Backup {
 	 * Will be either mysqldump or mysqldump_fallback
 	 *
 	 * @access public
-	 * @return null
 	 */
 	public function get_mysqldump_method() {
 		return $this->mysqldump_method;
@@ -334,7 +337,6 @@ class HM_Backup {
 	 * Defaults to complete
 	 *
 	 * @access public
-	 * @return null
 	 */
 	public function get_type() {
 
@@ -352,7 +354,6 @@ class HM_Backup {
 	 *
 	 * @access public
 	 * @param string $type
-	 * @return null
 	 */
 	public function set_type( $type ) {
 
@@ -416,7 +417,7 @@ class HM_Backup {
 
 		// Find the one which works
 		foreach ( $mysqldump_locations as $location )
-		    if ( @file_exists( $this->conform_dir( $location ) ) )
+		    if ( is_executable( $this->conform_dir( $location ) ) )
 	 	    	$this->set_mysqldump_command_path( $location );
 
 		return $this->mysqldump_command_path;
@@ -431,7 +432,6 @@ class HM_Backup {
 	 *
 	 * @access public
 	 * @param mixed $path
-	 * @return null
 	 */
 	public function set_mysqldump_command_path( $path ) {
 
@@ -478,7 +478,7 @@ class HM_Backup {
 
 		// Find the one which works
 		foreach ( $zip_locations as $location )
-			if ( @file_exists( $this->conform_dir( $location ) ) )
+			if ( is_executable( $this->conform_dir( $location ) ) )
 				$this->set_zip_command_path( $location );
 
 		return $this->zip_command_path;
@@ -493,7 +493,6 @@ class HM_Backup {
 	 *
 	 * @access public
 	 * @param mixed $path
-	 * @return null
 	 */
 	public function set_zip_command_path( $path ) {
 
@@ -529,7 +528,6 @@ class HM_Backup {
 	 * if not.
 	 *
 	 * @access public
-	 * @return null
 	 */
 	public function mysqldump() {
 
@@ -592,7 +590,6 @@ class HM_Backup {
 	 * PHP mysqldump fallback functions, exports the database to a .sql file
 	 *
 	 * @access public
-	 * @return null
 	 */
 	public function mysqldump_fallback() {
 
@@ -638,7 +635,6 @@ class HM_Backup {
 	 * PHP ZipArchive and finally PclZip.
 	 *
 	 * @access public
-	 * @return null
 	 */
 	public function archive() {
 
@@ -668,7 +664,6 @@ class HM_Backup {
 	 * Zip using the native zip command
 	 *
 	 * @access public
-	 * @return null
 	 */
 	public function zip() {
 
@@ -713,11 +708,11 @@ class HM_Backup {
 
 			foreach ( $this->get_files() as $file ) {
 
-			    if ( is_dir( trailingslashit( $this->get_root() ) . $file ) )
-					$zip->addEmptyDir( trailingslashit( $file ) );
+			    if ( $file->isDir() )
+					$zip->addEmptyDir( trailingslashit( str_ireplace( trailingslashit( $this->get_root() ), '', $this->conform_dir( $file->getPathname() ) ) ) );
 
-			    elseif ( is_file( trailingslashit( $this->get_root() ) . $file ) )
-					$zip->addFile( trailingslashit( $this->get_root() ) . $file, $file );
+			    elseif ( $file->isFile() )
+					$zip->addFile( $file->getPathname(), str_ireplace( trailingslashit( $this->get_root() ), '', $this->conform_dir( $file->getPathname() ) ) );
 
 				if ( ++$files_added % 500 === 0 )
 					if ( ! $zip->close() || ! $zip->open( $this->get_archive_filepath(), ZIPARCHIVE::CREATE ) )
@@ -840,21 +835,21 @@ class HM_Backup {
 			foreach ( $filesystem as $file ) {
 
 			    if ( ! $file->isReadable() ) {
-			        $this->unreadable_files[] = $file->getPathName();
+			        $this->unreadable_files[] = $file;
 			        continue;
 			    }
 
 			    $pathname = str_ireplace( trailingslashit( $this->get_root() ), '', $this->conform_dir( $file->getPathname() ) );
 
 			    // Excludes
-			    if ( $excludes && preg_match( '(' . $excludes . ')', $pathname ) && $this->excluded_files[] = $pathname )
+			    if ( $excludes && preg_match( '(' . $excludes . ')', $pathname ) && $this->excluded_files[] = $file )
 			        continue;
 
 			    // Don't include database dump as it's added separately
 			    if ( basename( $pathname ) == $this->get_database_dump_filename() )
 			    	continue;
 
-			    $this->files[] = $pathname;
+			    $this->files[] = $file;
 
 			}
 
@@ -898,15 +893,15 @@ class HM_Backup {
 	    	$file = str_ireplace( trailingslashit( $this->get_root() ), '', $filepath );
 
 	    	if ( ! is_readable( $filepath ) ) {
-				$this->unreadable_files[] = $filepath;
+				$this->unreadable_files[] = new SplFileInfo( $filepath );
 				continue;
 	    	}
 
 	    	// Skip the backups dir and any excluded paths
-	    	if ( ( $excludes && preg_match( '(' . $excludes . ')', $file ) ) && $this->excluded_files[] = $file )
+	    	if ( ( $excludes && preg_match( '(' . $excludes . ')', $file ) ) && $this->excluded_files[] = new SplFileInfo( $filepath ) )
 	    		continue;
 
-	    	$files[] = $file;
+	    	$files[] = new SplFileInfo( $filepath );
 
 	    	if ( is_dir( $filepath ) )
 	    		$files = $this->files_fallback( $filepath, $files );
@@ -918,18 +913,36 @@ class HM_Backup {
 	}
 
 	/**
-	 * get_excluded_files function.
-	 * 
+	 * Returns an array of files that match the exclude rules.
+	 *
 	 * @access public
 	 * @return array
 	 */
 	public function get_excluded_files() {
-		
+
 		if ( empty( $this->files ) )
 			$this->get_files();
-		
+
 		if ( ! empty( $this->excluded_files ) )
 			return $this->excluded_files;
+
+		return array();
+
+	}
+
+	/**
+	 * Returns an array of unreadable files.
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function get_unreadable_files() {
+
+		if ( empty( $this->files ) )
+			$this->get_files();
+
+		if ( ! empty( $this->unreadable_files ) )
+			return $this->unreadable_files;
 
 		return array();
 
@@ -973,12 +986,15 @@ class HM_Backup {
 	 *
 	 * @access public
 	 * @param  Array $excludes
-	 * @return null
+	 * @param Bool $append
 	 */
-	public function set_excludes( $excludes ) {
+	public function set_excludes( $excludes, $append = false ) {
 
 		if ( is_string( $excludes ) )
 			$excludes = explode( ',', $excludes );
+
+		if ( $append )
+			$excludes = array_merge( $this->excludes, $excludes );
 
 		$this->excludes = array_filter( array_unique( array_map( 'trim', $excludes ) ) );
 
@@ -1371,7 +1387,6 @@ class HM_Backup {
 	 * Get the errors
 	 *
 	 * @access public
-	 * @return null
 	 */
 	public function errors( $context = null ) {
 
@@ -1389,7 +1404,6 @@ class HM_Backup {
 	 * @access private
 	 * @param string $context
 	 * @param mixed $error
-	 * @return null
 	 */
 	private function error( $context, $error ) {
 
@@ -1405,7 +1419,6 @@ class HM_Backup {
 	 *
 	 * @access private
 	 * @param string $context. (default: null)
-	 * @return null
 	 */
 	private function errors_to_warnings( $context = null ) {
 
@@ -1430,7 +1443,6 @@ class HM_Backup {
 	 * Get the warnings
 	 *
 	 * @access public
-	 * @return null
 	 */
 	public function warnings( $context = null ) {
 
@@ -1448,7 +1460,6 @@ class HM_Backup {
 	 * @access private
 	 * @param string $context
 	 * @param mixed $warning
-	 * @return null
 	 */
 	private function warning( $context, $warning ) {
 
@@ -1468,7 +1479,6 @@ class HM_Backup {
 	 * @param string $message
 	 * @param string $file
 	 * @param string $line
-	 * @return null
 	 */
 	public function error_handler( $type ) {
 
