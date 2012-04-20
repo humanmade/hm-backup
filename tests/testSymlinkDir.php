@@ -19,10 +19,9 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 	 * Setup the backup object and create the tmp directory
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function setUp() {
-	
+	public function setUp() {
+
 		if ( ! function_exists( 'symlink' ) )
 			$this->markTestSkipped( 'symlink function not defined' );
 
@@ -36,7 +35,7 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 		$this->symlink = dirname( __FILE__ ) . '/test-data/tests';
 
 		symlink( HMBKP_PLUGIN_PATH . '/tests/', $this->symlink );
-		
+
 		remove_action( 'hmbkp_backup_started', 'hmbkp_set_status', 10, 0 );
 		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
 		remove_action( 'hmbkp_archive_started', 'hmbkp_set_status_archiving' );
@@ -48,10 +47,9 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 	 * after every test
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function tearDown() {
-	
+	public function tearDown() {
+
 		if ( ! function_exists( 'symlink' ) )
 			return;
 
@@ -70,9 +68,8 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 	 * Test an unreadable file with the shell commands
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testArchiveSymlinkDirWithZip() {
+	public function testArchiveSymlinkDirWithZip() {
 
 		if ( ! $this->backup->get_zip_command_path() )
             $this->markTestSkipped( "Empty zip command path" );
@@ -94,9 +91,8 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 	 * Test an unreadable file with the zipArchive commands
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testArchiveSymlinkDirWithZipArchive() {
+	public function testArchiveSymlinkDirWithZipArchive() {
 
 		$this->backup->set_zip_command_path( false );
 
@@ -117,9 +113,8 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 	 * Test an unreadable file with the PclZip commands
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testArchiveSymlinkDirWithPclZip() {
+	public function testArchiveSymlinkDirWithPclZip() {
 
 		$this->backup->set_zip_command_path( false );
 

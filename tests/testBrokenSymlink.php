@@ -19,10 +19,9 @@ class testBrokenSymlinkTestCase extends WP_UnitTestCase {
 	 * Setup the backup object and create the tmp directory
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function setUp() {
-	
+	public function setUp() {
+
 		if ( ! function_exists( 'symlink' ) )
 			$this->markTestSkipped( 'symlink function not defined' );
 
@@ -40,7 +39,7 @@ class testBrokenSymlinkTestCase extends WP_UnitTestCase {
 		symlink( dirname( __FILE__ ) . '/test-data/symlink', $this->symlink );
 
 		unlink( dirname( __FILE__ ) . '/test-data/symlink' );
-		
+
 		remove_action( 'hmbkp_backup_started', 'hmbkp_set_status', 10, 0 );
 		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
 		remove_action( 'hmbkp_archive_started', 'hmbkp_set_status_archiving' );
@@ -52,16 +51,15 @@ class testBrokenSymlinkTestCase extends WP_UnitTestCase {
 	 * after every test
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function tearDown() {
-	
+	public function tearDown() {
+
 		if ( ! function_exists( 'symlink' ) )
 			return;
-		
+
 		if ( file_exists( $this->backup->get_archive_filepath() ) )
 			unlink( $this->backup->get_archive_filepath() );
-		
+
 		if ( file_exists( $this->backup->get_path() ) )
 			rmdir( $this->backup->get_path() );
 
@@ -73,9 +71,8 @@ class testBrokenSymlinkTestCase extends WP_UnitTestCase {
 	 * Test an unreadable file with the shell commands
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testArchiveBrokenSymlinkWithZip() {
+	public function testArchiveBrokenSymlinkWithZip() {
 
 		if ( ! $this->backup->get_zip_command_path() )
             $this->markTestSkipped( "Empty zip command path" );
@@ -98,9 +95,8 @@ class testBrokenSymlinkTestCase extends WP_UnitTestCase {
 	 * Test an unreadable file with the zipArchive commands
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testArchiveBrokenSymlinkWithZipArchive() {
+	public function testArchiveBrokenSymlinkWithZipArchive() {
 
 		$this->backup->set_zip_command_path( false );
 
@@ -122,9 +118,8 @@ class testBrokenSymlinkTestCase extends WP_UnitTestCase {
 	 * Test an unreadable file with the PclZip commands
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testArchiveBrokenSymlinkWithPclZip() {
+	public function testArchiveBrokenSymlinkWithPclZip() {
 
 		$this->backup->set_zip_command_path(  false );
 

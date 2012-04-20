@@ -20,9 +20,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 	 * Setup the backup object and create the tmp directory
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function setUp() {
+	public function setUp() {
 
 		$this->backup = new HM_Backup();
 		$this->backup->set_root( dirname( __FILE__ ) . '/test-data/' );
@@ -41,9 +40,8 @@ class testExcludesTestCase extends WP_UnitTestCase {
 	 * after every test
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function tearDown() {
+	public function tearDown() {
 
 		if ( file_exists( $this->backup->get_archive_filepath() ) )
 			unlink( $this->backup->get_archive_filepath() );
@@ -53,7 +51,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAbsoluteDirPathWithZip() {
+	public function testExcludeAbsoluteDirPathWithZip() {
 
 		$this->backup->set_excludes( '/exclude/' );
 		$this->backup->set_type( 'file' );
@@ -70,7 +68,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAbsoluteDirPathWithPclZip() {
+	public function testExcludeAbsoluteDirPathWithPclZip() {
 
 		$this->backup->set_excludes( '/exclude/' );
 		$this->backup->set_type( 'file' );
@@ -84,7 +82,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAbsoluteRootDirPathWithZip() {
+	public function testExcludeAbsoluteRootDirPathWithZip() {
 
 		$this->backup->set_excludes( dirname( __FILE__ ) . '/test-data/exclude/' );
 		$this->backup->set_type( 'file' );
@@ -101,7 +99,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAbsoluteRootDirPathWithPclZip() {
+	public function testExcludeAbsoluteRootDirPathWithPclZip() {
 
 		$this->backup->set_excludes( dirname( __FILE__ ) . '/test-data/exclude/' );
 		$this->backup->set_type( 'file' );
@@ -115,7 +113,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeDirPathFragmentWithZip() {
+	public function testExcludeDirPathFragmentWithZip() {
 
 		$this->backup->set_excludes( 'exclude/' );
 		$this->backup->set_type( 'file' );
@@ -132,7 +130,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeDirPathFragmentWithPclZip() {
+	public function testExcludeDirPathFragmentWithPclZip() {
 
 		$this->backup->set_excludes( 'exclude/' );
 		$this->backup->set_type( 'file' );
@@ -146,7 +144,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAmbiguousAbsoluteDirPathWithZip() {
+	public function testExcludeAmbiguousAbsoluteDirPathWithZip() {
 
 		$this->backup->set_excludes( 'exclude' );
 		$this->backup->set_type( 'file' );
@@ -163,7 +161,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAmbiguousAbsoluteDirPathWithPclZip() {
+	public function testExcludeAmbiguousAbsoluteDirPathWithPclZip() {
 
 		$this->backup->set_excludes( 'exclude' );
 		$this->backup->set_type( 'file' );
@@ -177,7 +175,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAbsoluteFilePathWithZip() {
+	public function testExcludeAbsoluteFilePathWithZip() {
 
 		$this->backup->set_excludes( '/exclude/exclude.exclude' );
 		$this->backup->set_type( 'file' );
@@ -194,7 +192,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAbsoluteFilePathWithPclZip() {
+	public function testExcludeAbsoluteFilePathWithPclZip() {
 
 		$this->backup->set_excludes( '/exclude/exclude.exclude' );
 		$this->backup->set_type( 'file' );
@@ -208,7 +206,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAmbiguousAbsoluteFilePathWithZip() {
+	public function testExcludeAmbiguousAbsoluteFilePathWithZip() {
 
 		$this->backup->set_excludes( 'exclude/exclude.exclude' );
 		$this->backup->set_type( 'file' );
@@ -225,7 +223,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAmbiguousAbsoluteFilePathWithPclZip() {
+	public function testExcludeAmbiguousAbsoluteFilePathWithPclZip() {
 
 		$this->backup->set_excludes( 'exclude/exclude.exclude' );
 		$this->backup->set_type( 'file' );
@@ -239,7 +237,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAbsolutePathWithWildcardFileWithZip() {
+	public function testExcludeAbsolutePathWithWildcardFileWithZip() {
 
 		$this->backup->set_excludes( '/exclude/*' );
 		$this->backup->set_type( 'file' );
@@ -256,7 +254,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAbsolutePathWithWildcardFileWithPclZip() {
+	public function testExcludeAbsolutePathWithWildcardFileWithPclZip() {
 
 		$this->backup->set_excludes( '/exclude/*' );
 		$this->backup->set_type( 'file' );
@@ -270,7 +268,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAmbiguousAbsolutePathWithWildcardFileWithZip() {
+	public function testExcludeAmbiguousAbsolutePathWithWildcardFileWithZip() {
 
 		$this->backup->set_excludes( 'exclude/*' );
 		$this->backup->set_type( 'file' );
@@ -287,7 +285,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAmbiguousAbsolutePathWithWildcardFileWithPclZip() {
+	public function testExcludeAmbiguousAbsolutePathWithWildcardFileWithPclZip() {
 
 		$this->backup->set_excludes( 'exclude/*' );
 		$this->backup->set_type( 'file' );
@@ -301,7 +299,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeWildcardFileNameWithZip() {
+	public function testExcludeWildcardFileNameWithZip() {
 
 		$this->backup->set_excludes( '*.exclude' );
 		$this->backup->set_type( 'file' );
@@ -318,7 +316,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeWildcardFileNameWithPclZip() {
+	public function testExcludeWildcardFileNameWithPclZip() {
 
 		$this->backup->set_excludes( '*.exclude' );
 		$this->backup->set_type( 'file' );
@@ -332,7 +330,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAbsolutePathWithWildcardFileNameWithZip() {
+	public function testExcludeAbsolutePathWithWildcardFileNameWithZip() {
 
 		$this->backup->set_excludes( '/exclude/*.exclude' );
 		$this->backup->set_type( 'file' );
@@ -349,7 +347,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAbsolutePathWithWildcardFileNameWithPclZip() {
+	public function testExcludeAbsolutePathWithWildcardFileNameWithPclZip() {
 
 		$this->backup->set_excludes( '/exclude/*.exclude' );
 		$this->backup->set_type( 'file' );
@@ -363,7 +361,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAmbiguousAbsolutePathWithWildcardFileNameWithZip() {
+	public function testExcludeAmbiguousAbsolutePathWithWildcardFileNameWithZip() {
 
 		$this->backup->set_excludes( 'exclude/*.exclude' );
 		$this->backup->set_type( 'file' );
@@ -380,7 +378,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAmbiguousAbsolutePathWithWildcardFileNameWithPclZip() {
+	public function testExcludeAmbiguousAbsolutePathWithWildcardFileNameWithPclZip() {
 
 		$this->backup->set_excludes( 'exclude/*.exclude' );
 		$this->backup->set_type( 'file' );
@@ -394,7 +392,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeWildcardFileExtensionWithZip() {
+	public function testExcludeWildcardFileExtensionWithZip() {
 
 		$this->backup->set_excludes( 'exclude.*' );
 		$this->backup->set_type( 'file' );
@@ -411,7 +409,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeWildcardFileExtensionWithPclZip() {
+	public function testExcludeWildcardFileExtensionWithPclZip() {
 
 		$this->backup->set_excludes( 'exclude.*' );
 		$this->backup->set_type( 'file' );
@@ -425,7 +423,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAbsolutePathWithWildcardFileExtensionWithZip() {
+	public function testExcludeAbsolutePathWithWildcardFileExtensionWithZip() {
 
 		$this->backup->set_excludes( '/exclude/exclude.*' );
 		$this->backup->set_type( 'file' );
@@ -442,7 +440,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAbsolutePathWithWildcardFileExtensionWithPclZip() {
+	public function testExcludeAbsolutePathWithWildcardFileExtensionWithPclZip() {
 
 		$this->backup->set_excludes( '/exclude/exclude.*' );
 		$this->backup->set_type( 'file' );
@@ -456,7 +454,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAmbiguousAbsolutePathWithWildcardFileExtensionWithZip() {
+	public function testExcludeAmbiguousAbsolutePathWithWildcardFileExtensionWithZip() {
 
 		$this->backup->set_excludes( 'exclude/exclude.*' );
 		$this->backup->set_type( 'file' );
@@ -473,7 +471,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testExcludeAmbiguousAbsolutePathWithWildcardFileExtensionWithPclZip() {
+	public function testExcludeAmbiguousAbsolutePathWithWildcardFileExtensionWithPclZip() {
 
 		$this->backup->set_excludes( 'exclude/exclude.*' );
 		$this->backup->set_type( 'file' );
@@ -487,7 +485,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testWildCardWithZip() {
+	public function testWildCardWithZip() {
 
 		$this->backup->set_excludes( '*' );
 		$this->backup->set_type( 'file' );
@@ -504,7 +502,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 	}
 
-	function testWildCardWithPclZip() {
+	public function testWildCardWithPclZip() {
 
 		$this->backup->set_excludes( '*' );
 		$this->backup->set_type( 'file' );
@@ -515,7 +513,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->backup->pcl_zip();
 
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 0 );
-		
+
 		$this->assertEmpty( $this->backup->errors() );
 
 	}

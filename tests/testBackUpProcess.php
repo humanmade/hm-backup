@@ -20,9 +20,8 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 	 * Setup the backup object and create the tmp directory
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function setUp() {
+	public function setUp() {
 
 		mkdir( dirname( __FILE__ ) . '/tmp' );
 
@@ -42,9 +41,8 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 	 * after every test
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function tearDown() {
+	public function tearDown() {
 
 		if ( file_exists( $this->backup->get_archive_filepath() ) )
 			unlink( $this->backup->get_archive_filepath() );
@@ -58,9 +56,8 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 	 * Test a full backup with the shell commands
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testFullBackupWithCommands() {
+	public function testFullBackupWithCommands() {
 
 		if ( ! $this->backup->get_zip_command_path() )
             $this->markTestSkipped( 'Empty zip command path' );
@@ -84,9 +81,8 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 	 * Test a full backup with the ZipArchive
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testFullBackupWithZipArchiveMysqldumpFallback() {
+	public function testFullBackupWithZipArchiveMysqldumpFallback() {
 
 		$this->backup->set_zip_command_path( false );
 		$this->backup->set_mysqldump_command_path( false );
@@ -111,9 +107,8 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 	 * Test a full backup with the PclZip
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testFullBackupWithPclZipAndMysqldumpFallback() {
+	public function testFullBackupWithPclZipAndMysqldumpFallback() {
 
 		$this->backup->set_zip_command_path( false );
 		$this->backup->set_mysqldump_command_path( false );
@@ -138,9 +133,8 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 	 * Test a files only backup with the zip command
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testFileOnlyWithZipCommand() {
+	public function testFileOnlyWithZipCommand() {
 
 		$this->backup->set_type( 'file' );
 
@@ -164,9 +158,8 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 	 * Test a files only backup with ZipArchive
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testFileOnlyWithZipArchive() {
+	public function testFileOnlyWithZipArchive() {
 
 		$this->backup->set_type( 'file' );
 		$this->backup->set_zip_command_path( false );
@@ -190,9 +183,8 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 	 * Test a files only backup with PclZip
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testFileOnlyWithPclZip() {
+	public function testFileOnlyWithPclZip() {
 
 		$this->backup->set_type( 'file' );
 		$this->backup->set_zip_command_path( false );

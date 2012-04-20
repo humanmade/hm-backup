@@ -19,9 +19,8 @@ class testSymlinkFileTestCase extends WP_UnitTestCase {
 	 * Setup the backup object and create the tmp directory
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function setUp() {
+	public function setUp() {
 
 		if ( ! function_exists( 'symlink' ) )
 			$this->markTestSkipped( 'symlink function not defined' );
@@ -48,9 +47,8 @@ class testSymlinkFileTestCase extends WP_UnitTestCase {
 	 * after every test
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function tearDown() {
+	public function tearDown() {
 
 		if ( ! function_exists( 'symlink' ) )
 			return;
@@ -70,9 +68,8 @@ class testSymlinkFileTestCase extends WP_UnitTestCase {
 	 * Test an unreadable file with the shell commands
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testArchiveSymlinkFileWithZip() {
+	public function testArchiveSymlinkFileWithZip() {
 
 		if ( ! $this->backup->get_zip_command_path() )
             $this->markTestSkipped( "Empty zip command path" );
@@ -94,9 +91,8 @@ class testSymlinkFileTestCase extends WP_UnitTestCase {
 	 * Test an unreadable file with the zipArchive commands
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testArchiveSymlinkFileWithZipArchive() {
+	public function testArchiveSymlinkFileWithZipArchive() {
 
 		$this->backup->set_zip_command_path( false );
 
@@ -117,9 +113,8 @@ class testSymlinkFileTestCase extends WP_UnitTestCase {
 	 * Test an unreadable file with the PclZip commands
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testArchiveSymlinkFileWithPclZip() {
+	public function testArchiveSymlinkFileWithPclZip() {
 
 		$this->backup->set_zip_command_path( false );
 

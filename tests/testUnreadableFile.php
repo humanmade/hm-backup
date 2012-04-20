@@ -19,9 +19,8 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	 * Setup the backup object and create the tmp directory
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function setUp() {
+	public function setUp() {
 
 		$this->backup = new HM_Backup();
 		$this->backup->set_root( dirname( __FILE__ ) . '/test-data/' );
@@ -43,9 +42,8 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	 * after every test
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function tearDown() {
+	public function tearDown() {
 
 		if ( file_exists( $this->backup->get_archive_filepath() ) )
 			unlink( $this->backup->get_archive_filepath() );
@@ -61,9 +59,8 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	 * Test an unreadable file with the shell commands
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testArchiveUnreadableFileWithZip() {
+	public function testArchiveUnreadableFileWithZip() {
 
 		if ( ! $this->backup->get_zip_command_path() )
             $this->markTestSkipped( "Empty zip command path" );
@@ -73,7 +70,7 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 		$this->backup->zip();
 
 		$this->assertEmpty( $this->backup->errors() );
-		
+
 		$this->assertNotEmpty( $this->backup->warnings() );
 
 		$this->assertFileExists( $this->backup->get_archive_filepath() );
@@ -87,9 +84,8 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	 * Test an unreadable file with the zipArchive commands
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testArchiveUnreadableFileWithZipArchive() {
+	public function testArchiveUnreadableFileWithZipArchive() {
 
 		$this->backup->set_zip_command_path( false );
 
@@ -110,9 +106,8 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	 * Test an unreadable file with the PclZip commands
 	 *
 	 * @access public
-	 * @return null
 	 */
-	function testArchiveUnreadableFileWithPclZip() {
+	public function testArchiveUnreadableFileWithPclZip() {
 
 		$this->backup->set_zip_command_path( false );
 
