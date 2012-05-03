@@ -345,7 +345,6 @@ class HM_Backup {
     	if ( empty( $path ) || ! is_string( $path ) || ! is_dir ( $path ) )
     		throw new Exception( 'Invalid root path <code>' . $path . '</code> must be a valid directory path' );
 
-
     	$this->root = $this->conform_dir( $path );
 
     }
@@ -572,6 +571,12 @@ class HM_Backup {
 
 	}
 
+	protected function do_action( $action ) {
+
+		do_action( $action, $this );
+
+	}
+
 	/**
 	 * Kick off a backup
 	 *
@@ -580,7 +585,7 @@ class HM_Backup {
 	 */
 	public function backup() {
 
-		do_action( 'hmbkp_backup_started', $this );
+		$this->do_action( 'hmbkp_backup_started' );
 
 		// Backup database
 		if ( $this->get_type() != 'file' )
@@ -589,7 +594,7 @@ class HM_Backup {
 		// Zip everything up
 		$this->archive();
 
-		do_action( 'hmbkp_backup_complete', $this );
+		$this->do_action( 'hmbkp_backup_complete' );
 
 	}
 
@@ -603,7 +608,7 @@ class HM_Backup {
 	 */
 	public function mysqldump() {
 
-		do_action( 'hmbkp_mysqldump_started' );
+		$this->do_action( 'hmbkp_mysqldump_started' );
 
 		$this->mysqldump_method = 'mysqldump';
 
@@ -654,7 +659,7 @@ class HM_Backup {
 		if ( ! file_exists( $this->get_database_dump_filepath() ) )
 			$this->mysqldump_fallback();
 
-		do_action( 'hmbkp_mysqldump_finished' );
+		$this->do_action( 'hmbkp_mysqldump_finished' );
 
 	}
 
@@ -703,14 +708,14 @@ class HM_Backup {
 	 * Zip up all the files.
 	 *
 	 * Attempts to use the shell zip command, if
-	 * thats not available then it fallsback to
+	 * thats not available then it falls back to
 	 * PHP ZipArchive and finally PclZip.
 	 *
 	 * @access public
 	 */
 	public function archive() {
 
-		do_action( 'hmbkp_archive_started' );
+		$this->do_action( 'hmbkp_archive_started' );
 
 		// Do we have the path to the zip command
 		if ( $this->get_zip_command_path() )
@@ -728,7 +733,7 @@ class HM_Backup {
 		if ( file_exists( $this->get_database_dump_filepath() ) )
 			unlink( $this->get_database_dump_filepath() );
 
-		do_action( 'hmbkp_archive_finished' );
+		$this->do_action( 'hmbkp_archive_finished' );
 
 	}
 
