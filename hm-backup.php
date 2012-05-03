@@ -139,6 +139,78 @@ class HM_Backup {
 	private $mysqldump_method;
 
 	/**
+	 * Check whether safe mode is active or not
+	 *
+	 * @access public
+	 * @static
+	 * @return bool
+	 */
+	public static function is_safe_mode_active() {
+
+		if ( ( $safe_mode = @ini_get( 'safe_mode' ) ) && strtolower( $safe_mode ) != 'off' )
+			return true;
+
+		return false;
+
+	}
+
+	/**
+	 * Check whether shell_exec has been disabled.
+	 *
+	 * @access public
+	 * @static
+	 * @return bool
+	 */
+	public static function is_shell_exec_available() {
+
+		// Are we in Safe Mode
+		if ( HM_Backup::is_safe_mode_active() )
+			return false;
+
+		// Is shell_exec disabled?
+		if ( in_array( 'shell_exec', array_map( 'trim', explode( ',', @ini_get( 'disable_functions' ) ) ) ) )
+			return false;
+
+		// Can we issue a simple echo command?
+		if ( ! @shell_exec( 'echo backupwordpress' ) )
+			return false;
+
+		return true;
+
+	}
+
+	/**
+	 * Sanitize a directory path
+	 *
+	 * @access public
+	 * @static
+	 * @param string $dir
+	 * @param bool $rel. (default: false)
+	 * @return string $dir
+	 */
+	public static function conform_dir( $dir, $recursive = false ) {
+
+		// Assume empty dir is root
+		if ( ! $dir )
+			$dir = '/';
+
+		// Replace single forward slash (looks like double slash because we have to escape it)
+		$dir = str_replace( '\\', '/', $dir );
+		$dir = str_replace( '//', '/', $dir );
+
+		// Remove the trailing slash
+		if ( $dir !== '/' )
+			$dir = untrailingslashit( $dir );
+
+		// Carry on until completely normalized
+		if ( ! $recursive && self::conform_dir( $dir, true ) != $dir )
+			return self::conform_dir( $dir );
+
+		return (string) $dir;
+
+	}
+
+	/**
 	 * Sets up the default properties
 	 *
 	 * @access public
@@ -1084,78 +1156,6 @@ class HM_Backup {
 			$excludes = array_map( 'escapeshellarg', array_unique( $excludes ) );
 
 		return implode( $separator, $excludes );
-
-	}
-
-	/**
-	 * Check whether safe mode is active or not
-	 *
-	 * @access public
-	 * @static
-	 * @return bool
-	 */
-	public static function is_safe_mode_active() {
-
-		if ( ( $safe_mode = @ini_get( 'safe_mode' ) ) && strtolower( $safe_mode ) != 'off' )
-			return true;
-
-		return false;
-
-	}
-
-	/**
-	 * Check whether shell_exec has been disabled.
-	 *
-	 * @access public
-	 * @static
-	 * @return bool
-	 */
-	public static function is_shell_exec_available() {
-
-		// Are we in Safe Mode
-		if ( HM_Backup::is_safe_mode_active() )
-			return false;
-
-		// Is shell_exec disabled?
-		if ( in_array( 'shell_exec', array_map( 'trim', explode( ',', @ini_get( 'disable_functions' ) ) ) ) )
-			return false;
-
-		// Can we issue a simple echo command?
-		if ( ! @shell_exec( 'echo backupwordpress' ) )
-			return false;
-
-		return true;
-
-	}
-
-	/**
-	 * Sanitize a directory path
-	 *
-	 * @access public
-	 * @static
-	 * @param string $dir
-	 * @param bool $rel. (default: false)
-	 * @return string $dir
-	 */
-	public static function conform_dir( $dir, $recursive = false ) {
-
-		// Assume empty dir is root
-		if ( ! $dir )
-			$dir = '/';
-
-		// Replace single forward slash (looks like double slash because we have to escape it)
-		$dir = str_replace( '\\', '/', $dir );
-		$dir = str_replace( '//', '/', $dir );
-
-		// Remove the trailing slash
-		if ( $dir !== '/' )
-			$dir = untrailingslashit( $dir );
-
-		// Carry on until completely normalized
-		if ( ! $recursive && HM_Backup::conform_dir( $dir, true ) != $dir )
-			return HM_backup::conform_dir( $dir );
-
-		return (string) $dir;
 
 	}
 
