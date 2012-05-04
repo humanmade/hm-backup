@@ -13,7 +13,7 @@ class HM_Backup {
 	 * @string
 	 * @access private
 	 */
-	private $path;
+	private $path = '';
 
 	/**
 	 * The backup type, must be either complete, file or database
@@ -21,7 +21,7 @@ class HM_Backup {
 	 * @string
 	 * @access private
 	 */
-	private $type;
+	private $type = '';
 
 	/**
 	 * The filename of the backup file
@@ -29,7 +29,7 @@ class HM_Backup {
 	 * @string
 	 * @access private
 	 */
-	private $archive_filename;
+	private $archive_filename = '';
 
 	/**
 	 * The filename of the database dump
@@ -37,7 +37,7 @@ class HM_Backup {
 	 * @string
 	 * @access private
 	 */
-	private $database_dump_filename;
+	private $database_dump_filename = '';
 
 	/**
 	 * The path to the zip command
@@ -45,7 +45,7 @@ class HM_Backup {
 	 * @string
 	 * @access private
 	 */
-	private $zip_command_path;
+	private $zip_command_path = '';
 
 	/**
 	 * The path to the mysqldump command
@@ -53,7 +53,7 @@ class HM_Backup {
 	 * @string
 	 * @access private
 	 */
-	private $mysqldump_command_path;
+	private $mysqldump_command_path = '';
 
 	/**
 	 * An array of exclude rules
@@ -61,7 +61,7 @@ class HM_Backup {
 	 * @array
 	 * @access private
 	 */
-	private $excludes;
+	private $excludes = array();
 
 	/**
 	 * The path that should be backed up
@@ -69,7 +69,7 @@ class HM_Backup {
 	 * @var string
 	 * @access private
 	 */
-	private $root;
+	private $root = '';
 
 	/**
 	 * Holds the current db connection
@@ -86,7 +86,7 @@ class HM_Backup {
 	 * @var array
 	 * @access private
 	 */
-	private $files;
+	private $files = array();
 
 	/**
 	 * An array of all the files in root
@@ -95,7 +95,7 @@ class HM_Backup {
 	 * @var array
 	 * @access private
 	 */
-	private $excluded_files;
+	private $excluded_files = array();
 
 	/**
 	 * An array of all the files in root
@@ -104,7 +104,7 @@ class HM_Backup {
 	 * @var array
 	 * @access private
 	 */
-	private $unreadable_files;
+	private $unreadable_files = array();
 
 	/**
 	 * Contains an array of errors
@@ -112,7 +112,7 @@ class HM_Backup {
 	 * @var mixed
 	 * @access private
 	 */
-	private $errors;
+	private $errors = array();
 
 	/**
 	 * Contains an array of warnings
@@ -120,7 +120,7 @@ class HM_Backup {
 	 * @var mixed
 	 * @access private
 	 */
-	private $warnings;
+	private $warnings = array();
 
 	/**
 	 * The archive method used
@@ -128,7 +128,7 @@ class HM_Backup {
 	 * @var string
 	 * @access private
 	 */
-	private $archive_method;
+	private $archive_method = '';
 
 	/**
 	 * The mysqldump method used
@@ -136,7 +136,7 @@ class HM_Backup {
 	 * @var string
 	 * @access private
 	 */
-	private $mysqldump_method;
+	private $mysqldump_method = '';
 
 	/**
 	 * Check whether safe mode is active or not
@@ -879,10 +879,10 @@ class HM_Backup {
 		}
 
 		// If there are errors delete the backup file.
-		if ( $this->errors( $this->get_archive_method() ) && file_exists( $this->get_archive_filepath() ) )
+		if ( $this->get_errors( $this->get_archive_method() ) && file_exists( $this->get_archive_filepath() ) )
 			unlink( $this->get_archive_filepath() );
 
-		if ( $this->errors( $this->get_archive_method() ) )
+		if ( $this->get_errors( $this->get_archive_method() ) )
 			return false;
 
 		return $this->archive_verified = true;
@@ -1393,7 +1393,7 @@ class HM_Backup {
 	 *
 	 * @access public
 	 */
-	public function errors( $context = null ) {
+	public function get_errors( $context = null ) {
 
 		if ( ! empty( $context ) )
 			return isset( $this->errors[$context] ) ? $this->errors[$context] : array();
@@ -1427,7 +1427,7 @@ class HM_Backup {
 	 */
 	private function errors_to_warnings( $context = null ) {
 
-		$errors = empty( $context ) ? $this->errors() : array( $context => $this->errors( $context ) );
+		$errors = empty( $context ) ? $this->get_errors() : array( $context => $this->get_errors( $context ) );
 
 		if ( empty( $errors ) )
 			return;
@@ -1449,7 +1449,7 @@ class HM_Backup {
 	 *
 	 * @access public
 	 */
-	public function warnings( $context = null ) {
+	public function get_warnings( $context = null ) {
 
 		if ( ! empty( $context ) )
 			return isset( $this->warnings[$context] ) ? $this->warnings[$context] : array();
