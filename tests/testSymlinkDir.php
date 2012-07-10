@@ -83,7 +83,7 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( basename( $this->symlink ) ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 6 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -105,7 +105,7 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( basename( $this->symlink ) ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 6 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -127,7 +127,7 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( basename( $this->symlink ) ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 6 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 

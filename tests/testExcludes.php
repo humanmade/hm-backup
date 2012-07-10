@@ -64,7 +64,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 1 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -78,7 +78,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 1 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -95,7 +95,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 1 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -109,7 +109,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 1 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -126,7 +126,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 1 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -140,7 +140,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 1 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -157,7 +157,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 1 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -171,7 +171,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 1 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -188,7 +188,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -202,7 +202,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -219,7 +219,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -233,7 +233,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -250,7 +250,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -264,7 +264,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -281,7 +281,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -295,7 +295,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -312,7 +312,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -326,7 +326,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -343,7 +343,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -357,7 +357,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -374,7 +374,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -388,7 +388,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -405,7 +405,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -419,7 +419,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -436,7 +436,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -450,7 +450,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -467,7 +467,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -481,7 +481,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveNotContains( $this->backup->get_archive_filepath(), array( 'exclude/exclude.exclude' ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 2 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -498,7 +498,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 0 );
 
 		// Expect an error "Nothing to do"
-		$this->assertNotEmpty( $this->backup->errors() );
+		$this->assertNotEmpty( $this->backup->get_errors() );
 
 	}
 
@@ -514,7 +514,7 @@ class testExcludesTestCase extends WP_UnitTestCase {
 
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 0 );
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 	}
 

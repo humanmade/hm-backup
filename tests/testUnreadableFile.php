@@ -69,9 +69,9 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 
 		$this->backup->zip();
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
-		$this->assertNotEmpty( $this->backup->warnings() );
+		$this->assertNotEmpty( $this->backup->get_warnings() );
 
 		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
@@ -93,7 +93,7 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 
 		$this->backup->zip_archive();
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
@@ -115,7 +115,7 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 
 		$this->backup->pcl_zip();
 
-		$this->assertEmpty( $this->backup->errors() );
+		$this->assertEmpty( $this->backup->get_errors() );
 
 		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
