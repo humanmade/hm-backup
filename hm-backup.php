@@ -45,7 +45,7 @@ class HM_Backup {
 	 * @string
 	 * @access private
 	 */
-	private $zip_command_path = '';
+	private $zip_command_path;
 
 	/**
 	 * The path to the mysqldump command
@@ -53,7 +53,7 @@ class HM_Backup {
 	 * @string
 	 * @access private
 	 */
-	private $mysqldump_command_path = '';
+	private $mysqldump_command_path;
 
 	/**
 	 * An array of exclude rules
