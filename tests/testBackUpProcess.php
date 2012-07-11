@@ -29,11 +29,6 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 		$this->backup->set_root( dirname( __FILE__ ) . '/test-data/' );
 		$this->backup->set_path( dirname( __FILE__ ) . '/tmp' );
 
-		remove_action( 'hmbkp_backup_started', 'hmbkp_set_status', 10, 0 );
-		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
-		remove_action( 'hmbkp_archive_started', 'hmbkp_set_status_archiving' );
-		remove_action( 'hmbkp_backup_complete', 'hmbkp_backup_complete' );
-
 	}
 
 	/**

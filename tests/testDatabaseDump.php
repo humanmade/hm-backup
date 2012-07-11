@@ -28,8 +28,6 @@ class testDatabaseDumpTestCase extends WP_UnitTestCase {
 
 		mkdir( $this->backup->get_path() );
 
-		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
-
 	}
 
 	/**

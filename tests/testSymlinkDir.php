@@ -34,11 +34,7 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 
 		$this->symlink = dirname( __FILE__ ) . '/test-data/tests';
 
-		symlink( HMBKP_PLUGIN_PATH . '/tests/', $this->symlink );
-
-		remove_action( 'hmbkp_backup_started', 'hmbkp_set_status', 10, 0 );
-		remove_action( 'hmbkp_mysqldump_started', 'hmbkp_set_status_dumping_database' );
-		remove_action( 'hmbkp_archive_started', 'hmbkp_set_status_archiving' );
+		symlink( HMBKP_PLUGIN_PATH . 'tests/', $this->symlink );
 
 	}
 
@@ -81,7 +77,7 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( basename( $this->symlink ) ) );
-		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 6 );
+		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 7 );
 
 		$this->assertEmpty( $this->backup->get_errors() );
 
@@ -103,7 +99,7 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( basename( $this->symlink ) ) );
-		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 6 );
+		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 7 );
 
 		$this->assertEmpty( $this->backup->get_errors() );
 
@@ -125,7 +121,7 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( basename( $this->symlink ) ) );
-		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 6 );
+		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 7 );
 
 		$this->assertEmpty( $this->backup->get_errors() );
 
