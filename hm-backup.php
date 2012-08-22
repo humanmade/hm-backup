@@ -179,6 +179,29 @@ class HM_Backup {
 
 	}
 
+
+	/**
+	 * Attempt to work out the root directory of the site, that
+	 * is, the path equivelant of home_url().
+	 *
+	 * @access public
+	 * @static
+	 * @return string $home_path
+	 */
+	public static function get_home_path() {
+
+		$home = get_option( 'home' );
+		$siteurl = get_option( 'siteurl' );
+
+		$home_path = ABSPATH;
+
+		if ( ! empty( $home ) && $home != $siteurl )
+			$home_path = trailingslashit( substr( $_SERVER["SCRIPT_FILENAME"], 0, strrpos( $_SERVER["SCRIPT_FILENAME"], str_replace( $home, '', $siteurl ) ) ) );
+
+		return self::conform_dir( $home_path );
+
+	}
+
 	/**
 	 * Sanitize a directory path
 	 *
@@ -319,7 +342,7 @@ class HM_Backup {
     /**
      * Get the root directory to backup from
      *
-     * Defaults to ABSPATH
+     * Defaults to the root of the path equivalent of your home_url
      *
      * @access public
      * @return string
@@ -327,7 +350,7 @@ class HM_Backup {
     public function get_root() {
 
 		if ( empty( $this->root ) )
-			$this->set_root( $this->conform_dir( ABSPATH ) );
+			$this->set_root( $this->conform_dir( self::get_home_path() ) );
 
         return $this->root;
 
