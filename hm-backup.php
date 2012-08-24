@@ -164,7 +164,7 @@ class HM_Backup {
 	public static function is_shell_exec_available() {
 
 		// Are we in Safe Mode
-		if ( HM_Backup::is_safe_mode_active() )
+		if ( self::is_safe_mode_active() )
 			return false;
 
 		// Is shell_exec disabled?
@@ -470,7 +470,7 @@ class HM_Backup {
 	public function get_mysqldump_command_path() {
 
 		// Check shell_exec is available
-		if ( ! $this->is_shell_exec_available() )
+		if ( ! self::is_shell_exec_available() )
 			return '';
 
 		// Return now if it's already been set
@@ -545,7 +545,7 @@ class HM_Backup {
 	public function get_zip_command_path() {
 
 		// Check shell_exec is available
-		if ( ! $this->is_shell_exec_available() )
+		if ( ! self::is_shell_exec_available() )
 			return '';
 
 		// Return now if it's already been set
