@@ -195,8 +195,8 @@ class HM_Backup {
 
 		$home_path = ABSPATH;
 
-		if ( ! empty( $home ) && $home != $siteurl )
-			$home_path = trailingslashit( substr( $_SERVER["SCRIPT_FILENAME"], 0, strrpos( $_SERVER["SCRIPT_FILENAME"], str_replace( $home, '', $siteurl ) ) ) );
+		if ( ! empty( $home ) && $home !== $siteurl )
+			$home_path = trailingslashit( substr( ABSPATH, 0, strrpos( ABSPATH, str_replace( $home, '', $siteurl ) ) ) );
 
 		return self::conform_dir( $home_path );
 
