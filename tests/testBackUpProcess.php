@@ -23,11 +23,11 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 	 */
 	public function setUp() {
 
-		mkdir( dirname( __FILE__ ) . '/tmp' );
-
 		$this->backup = new HM_Backup();
 		$this->backup->set_root( dirname( __FILE__ ) . '/test-data/' );
 		$this->backup->set_path( dirname( __FILE__ ) . '/tmp' );
+
+		mkdir( dirname( __FILE__ ) . '/tmp' );
 
 	}
 
