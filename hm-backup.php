@@ -781,7 +781,7 @@ class HM_Backup {
 		if ( $this->get_type() != 'file' )
 		    $this->warning( $this->archive_method, shell_exec( 'cd ' . escapeshellarg( $this->get_path() ) . ' && ' . escapeshellarg( $this->get_zip_command_path() ) . ' -uq ' . escapeshellarg( $this->get_archive_filepath() ) . ' ' . escapeshellarg( $this->get_database_dump_filename() ) . ' 2>&1' ) );
 
-		$this->check_archive();
+		$this->verify_archive();
 
 	}
 
@@ -834,7 +834,7 @@ class HM_Backup {
 
 		$zip->close();
 
-		$this->check_archive();
+		$this->verify_archive();
 
 	}
 
@@ -872,7 +872,7 @@ class HM_Backup {
 
 		unset( $GLOBALS['_hmbkp_exclude_string'] );
 
-		$this->check_archive();
+		$this->verify_archive();
 
 	}
 
@@ -882,7 +882,7 @@ class HM_Backup {
 	 * @access public
 	 * @return bool
 	 */
-	public function check_archive() {
+	public function verify_archive() {
 
 		// If we've already passed then no need to check again
 		if ( ! empty( $this->archive_verified ) )
