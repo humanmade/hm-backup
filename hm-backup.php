@@ -629,60 +629,63 @@ class HM_Backup {
 	 *
 	 * @access public
 	 */
-	public function mysqldump() {
+	public function dump_database() {
 
 		$this->do_action( 'hmbkp_mysqldump_started' );
 
-		$this->mysqldump_method = 'mysqldump';
+		if ( $this->get_mysqldump_command_path() )
+			$this->mysqldump();
 
-		// Use mysqldump if we can
-		if ( $this->get_mysqldump_command_path() ) {
-
-			$host = reset( explode( ':', DB_HOST ) );
-			$port = strpos( DB_HOST, ':' ) ? end( explode( ':', DB_HOST ) ) : '';
-
-			// Path to the mysqldump executable
-			$cmd = escapeshellarg( $this->get_mysqldump_command_path() );
-
-			// No Create DB command
-			$cmd .= ' --no-create-db';
-
-			// Make sure binary data is exported properly
-			$cmd .= ' --hex-blob';
-
-			// Username
-			$cmd .= ' -u ' . escapeshellarg( DB_USER );
-
-			// Don't pass the password if it's blank
-			if ( DB_PASSWORD )
-			    $cmd .= ' -p'  . escapeshellarg( DB_PASSWORD );
-
-			// Set the host
-			$cmd .= ' -h ' . escapeshellarg( $host );
-
-			// Set the port if it was set
-			if ( ! empty( $port ) )
-				$cmd .= ' -P ' . $port;
-
-			// The file we're saving too
-			$cmd .= ' -r ' . escapeshellarg( $this->get_database_dump_filepath() );
-
-			// The database we're dumping
-			$cmd .= ' ' . escapeshellarg( DB_NAME );
-
-			// Pipe STDERR to STDOUT
-			$cmd .= ' 2>&1';
-
-			// Store any returned data in warning
-			$this->warning( $this->get_mysqldump_method(), shell_exec( $cmd ) );
-
-		}
-
-		// If not or if the shell mysqldump command failed, use the PHP fallback
-		if ( ! file_exists( $this->get_database_dump_filepath() ) )
+		if ( empty( $this->mysqldump_verified ) )
 			$this->mysqldump_fallback();
 
 		$this->do_action( 'hmbkp_mysqldump_finished' );
+
+	}
+
+	public function mysqldump() {
+
+		$this->mysqldump_method = 'mysqldump';
+
+		$host = reset( explode( ':', DB_HOST ) );
+		$port = strpos( DB_HOST, ':' ) ? end( explode( ':', DB_HOST ) ) : '';
+
+		// Path to the mysqldump executable
+		$cmd = escapeshellarg( $this->get_mysqldump_command_path() );
+
+		// No Create DB command
+		$cmd .= ' --no-create-db';
+
+		// Make sure binary data is exported properly
+		$cmd .= ' --hex-blob';
+
+		// Username
+		$cmd .= ' -u ' . escapeshellarg( DB_USER );
+
+		// Don't pass the password if it's blank
+		if ( DB_PASSWORD )
+		    $cmd .= ' -p'  . escapeshellarg( DB_PASSWORD );
+
+		// Set the host
+		$cmd .= ' -h ' . escapeshellarg( $host );
+
+		// Set the port if it was set
+		if ( ! empty( $port ) )
+		    $cmd .= ' -P ' . $port;
+
+		// The file we're saving too
+		$cmd .= ' -r ' . escapeshellarg( $this->get_database_dump_filepath() );
+
+		// The database we're dumping
+		$cmd .= ' ' . escapeshellarg( DB_NAME );
+
+		// Pipe STDERR to STDOUT
+		$cmd .= ' 2>&1';
+
+		// Store any returned data in warning
+		$this->warning( $this->get_mysqldump_method(), shell_exec( $cmd ) );
+
+		$this->verify_mysqldump();
 
 	}
 
@@ -873,6 +876,23 @@ class HM_Backup {
 		unset( $GLOBALS['_hmbkp_exclude_string'] );
 
 		$this->verify_archive();
+
+	}
+
+	public function verify_mysqldump() {
+
+		// If we've already passed then no need to check again
+		if ( ! empty( $this->mysqldump_verified ) )
+			return true;
+
+		if ( ! file_exists( $this->get_database_dump_filepath() ) )
+			$this->error( $this->get_mysqldump_method(), __( 'The mysqldump file was not created', 'hmbkp' ) );
+
+		if ( $this->get_errors( $this->get_mysqldump_method() ) )
+			return false;
+
+		return $this->mysqldump_verified = true;
+
 
 	}
 
