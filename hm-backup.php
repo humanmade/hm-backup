@@ -934,7 +934,7 @@ class HM_Backup {
 
 	/**
 	 * Generate the array of files to be backed up by looping through
-	 * root, ignored unreadable files and excludes
+	 * root, ignore unreadable files and excludes
 	 *
 	 * @access public
 	 * @return array
@@ -954,20 +954,15 @@ class HM_Backup {
 
 			foreach ( $filesystem as $file ) {
 
-			    if ( ! $file->isReadable() ) {
-			        $this->unreadable_files[] = $file;
+				// Track & skip unreadable files
+			    if ( ! $file->isReadable() && $this->unreadable_files[] = $file )
 			        continue;
-			    }
 
 			    $pathname = str_ireplace( trailingslashit( $this->get_root() ), '', $this->conform_dir( $file->getPathname() ) );
 
 			    // Excludes
 			    if ( $excludes && preg_match( '(' . $excludes . ')', $pathname ) && $this->excluded_files[] = $file )
 			        continue;
-
-			    // Don't include database dump as it's added separately
-			    if ( basename( $pathname ) === $this->get_database_dump_filename() )
-			    	continue;
 
 			    $this->files[] = $file;
 
@@ -993,7 +988,7 @@ class HM_Backup {
 	 * Used if RecursiveDirectoryIterator::FOLLOW_SYMLINKS isn't available
 	 *
 	 * @access private
-	 * @param stromg $dir
+	 * @param string $dir
 	 * @param array $files. (default: array())
 	 * @return array
 	 */
@@ -1012,10 +1007,9 @@ class HM_Backup {
 	    	$filepath = $this->conform_dir( trailingslashit( $dir ) . $file );
 	    	$file = str_ireplace( trailingslashit( $this->get_root() ), '', $filepath );
 
-	    	if ( ! is_readable( $filepath ) ) {
-				$this->unreadable_files[] = new SplFileInfo( $filepath );
+			// Track & skip unreadable files
+	    	if ( ! is_readable( $filepath ) && $this->unreadable_files[] = new SplFileInfo( $filepath ) )
 				continue;
-	    	}
 
 	    	// Skip the backups dir and any excluded paths
 	    	if ( ( $excludes && preg_match( '(' . $excludes . ')', $file ) ) && $this->excluded_files[] = new SplFileInfo( $filepath ) )
