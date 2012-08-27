@@ -954,6 +954,14 @@ class HM_Backup {
 
 			foreach ( $filesystem as $file ) {
 
+		    	/*
+		    	 * Ignore current dir and containing dir
+		    	 *
+		    	 * Required because in PHP 5.2 these aren't skipped automatically by RecursiveDirectoryIterator, they are skipped in PHP > 5.3
+		    	 */
+		    	if ( $file === '.' || $file === '..' )
+		    		continue;
+
 				// Track & skip unreadable files
 			    if ( ! $file->isReadable() && $this->unreadable_files[] = $file )
 			        continue;
