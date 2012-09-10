@@ -270,7 +270,7 @@ class HM_Backup {
 	public function get_archive_filename() {
 
 		if ( empty( $this->archive_filename ) )
-			$this->set_archive_filename( strtolower( sanitize_file_name( implode( '-', array( get_bloginfo( 'name' ), 'backup', date( 'Y-m-d-H-i-s', current_time( 'timestamp' ) ) ) ) ) ) . '.zip' );
+			$this->set_archive_filename( implode( '-', array( get_bloginfo( 'name' ), 'backup', date( 'Y-m-d-H-i-s', current_time( 'timestamp' ) ) ) ) . '.zip' );
 
 		return $this->archive_filename;
 
@@ -315,7 +315,7 @@ class HM_Backup {
 	public function get_database_dump_filename() {
 
 		if ( empty( $this->database_dump_filename ) )
-			$this->set_database_dump_filename( strtolower( sanitize_file_name( remove_accents(  'database_' . DB_NAME . '.sql' ) ) ) );
+			$this->set_database_dump_filename( 'database_' . DB_NAME . '.sql' );
 
 		return $this->database_dump_filename;
 
