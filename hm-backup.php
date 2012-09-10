@@ -1419,7 +1419,7 @@ class HM_Backup {
 	    // Actually write the sql file
 	    if ( is_writable( $sqlname ) || ! file_exists( $sqlname ) ) {
 
-	    	if ( ! $handle = fopen( $sqlname, 'a' ) )
+	    	if ( ! $handle = @fopen( $sqlname, 'a' ) )
 	    		return;
 
 	    	if ( ! fwrite( $handle, $sql ) )
