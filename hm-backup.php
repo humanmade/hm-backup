@@ -1210,7 +1210,7 @@ class HM_Backup {
 	}
 
 	/**
-	 * Add backquotes to tables and db-names inSQL queries. Taken from phpMyAdmin.
+	 * Add backquotes to tables and db-names in SQL queries. Taken from phpMyAdmin.
 	 *
 	 * @access private
 	 * @param mixed $a_name
