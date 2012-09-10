@@ -27,7 +27,9 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->backup->set_root( dirname( __FILE__ ) . '/test-data/' );
 		$this->backup->set_path( dirname( __FILE__ ) . '/tmp' );
 
-		mkdir( $this->backup->get_path() );
+		$this->path = $this->backup->get_path();
+
+		mkdir( $this->path );
 
 	}
 
@@ -42,8 +44,28 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		if ( file_exists( $this->backup->get_archive_filepath() ) )
 			unlink( $this->backup->get_archive_filepath() );
 
-		if ( file_exists( $this->backup->get_path() ) )
-			rmdir( $this->backup->get_path() );
+		if ( file_exists( $this->path ) )
+			rmdir( $this->path );
+
+	}
+
+	public function testBackUpDirIsExcludedWhenBackUpDirIsNotInRoot() {
+
+		$this->assertNotContains( $this->backup->get_root(), $this->backup->get_path() );
+
+		$this->assertEmpty( $this->backup->get_excludes() );
+
+	}
+
+	public function testBackUpDirIsExcludedWhenBackUpDirIsInRoot() {
+
+		$this->backup->set_path( dirname( __FILE__ ) . '/test-data/tmp' );
+
+		$this->assertContains( $this->backup->get_root(), $this->backup->get_path() );
+
+		$this->assertNotEmpty( $this->backup->get_excludes() );
+
+		$this->assertContains( trailingslashit( $this->backup->get_path() ), $this->backup->get_excludes() );
 
 	}
 
