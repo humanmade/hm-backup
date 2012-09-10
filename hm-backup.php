@@ -1447,7 +1447,6 @@ class HM_Backup {
 
 	}
 
-
 	/**
 	 * Add an error to the errors stack
 	 *
@@ -1503,7 +1502,6 @@ class HM_Backup {
 
 	}
 
-
 	/**
 	 * Add an warning to the warnings stack
 	 *
@@ -1519,7 +1517,6 @@ class HM_Backup {
 		$this->warnings[$context][$_key = md5( implode( ':' , (array) $warning ) )] = $warning;
 
 	}
-
 
 	/**
 	 * Custom error handler for catching errors
