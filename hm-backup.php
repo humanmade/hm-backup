@@ -805,11 +805,20 @@ class HM_Backup {
     	if ( ! class_exists( 'ZipArchive' ) || ! $zip->open( $this->get_archive_filepath(), ZIPARCHIVE::CREATE ) )
     	    return;
 
+		$excludes = $this->exclude_string( 'regex' );
+
 		if ( $this->get_type() !== 'database' ) {
 
 			$files_added = 0;
 
 			foreach ( $this->get_files() as $file ) {
+
+		    	if ( $file === '.' || $file === '..' || ! $file->isReadable() )
+			        continue;
+
+			    // Excludes
+			    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', $this->conform_dir( $file->getPathname() ) ) ) )
+			        continue;
 
 			    if ( $file->isDir() )
 					$zip->addEmptyDir( trailingslashit( str_ireplace( trailingslashit( $this->get_root() ), '', $this->conform_dir( $file->getPathname() ) ) ) );
@@ -928,13 +937,15 @@ class HM_Backup {
 		if ( $this->get_errors( $this->get_archive_method() ) )
 			return false;
 
+		if ( $this->get_unreadable_files() )
+			$this->warning( $this->get_archive_method(), __( 'The following files are unreadable and couldn\'t be backed up: ', 'hmbkp' ) . implode( ', ', $this->get_unreadable_files() ) );
+
 		return $this->archive_verified = true;
 
 	}
 
 	/**
-	 * Generate the array of files to be backed up by looping through
-	 * root, ignore unreadable files and excludes
+	 * Return an array of all files in the filesystem
 	 *
 	 * @access public
 	 * @return array
@@ -946,44 +957,11 @@ class HM_Backup {
 
 		$this->files = array();
 
-		if ( defined( 'RecursiveDirectoryIterator::FOLLOW_SYMLINKS' ) ) {
+		if ( defined( 'RecursiveDirectoryIterator::FOLLOW_SYMLINKS' ) )
+			$this->files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->get_root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
 
-			$filesystem = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->get_root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
-
-			$excludes = $this->exclude_string( 'regex' );
-
-			foreach ( $filesystem as $file ) {
-
-		    	/*
-		    	 * Ignore current dir and containing dir
-		    	 *
-		    	 * Required because in PHP 5.2 these aren't skipped automatically by RecursiveDirectoryIterator, they are skipped in PHP > 5.3
-		    	 */
-		    	if ( $file === '.' || $file === '..' )
-		    		continue;
-
-				// Track & skip unreadable files
-			    if ( ! $file->isReadable() && $this->unreadable_files[] = $file )
-			        continue;
-
-			    $pathname = str_ireplace( trailingslashit( $this->get_root() ), '', $this->conform_dir( $file->getPathname() ) );
-
-			    // Excludes
-			    if ( $excludes && preg_match( '(' . $excludes . ')', $pathname ) && $this->excluded_files[] = $file )
-			        continue;
-
-			    $this->files[] = $file;
-
-			}
-
-		} else {
-
-			$this->files = $this->files_fallback( $this->get_root() );
-
-		}
-
-		if ( ! empty( $this->unreadable_files ) )
-			$this->warning( $this->get_archive_method(), __( 'The following files are unreadable and couldn\'t be backed up: ', 'hmbkp' ) . implode( ', ', $this->unreadable_files ) );
+		else
+			$this->files = $this->get_files_fallback( $this->get_root() );
 
 		return $this->files;
 
@@ -1000,7 +978,7 @@ class HM_Backup {
 	 * @param array $files. (default: array())
 	 * @return array
 	 */
-	private function files_fallback( $dir, $files = array() ) {
+	private function get_files_fallback( $dir, $files = array() ) {
 
 	    $handle = opendir( $dir );
 
@@ -1015,22 +993,46 @@ class HM_Backup {
 	    	$filepath = $this->conform_dir( trailingslashit( $dir ) . $file );
 	    	$file = str_ireplace( trailingslashit( $this->get_root() ), '', $filepath );
 
-			// Track & skip unreadable files
-	    	if ( ! is_readable( $filepath ) && $this->unreadable_files[] = new SplFileInfo( $filepath ) )
-				continue;
-
-	    	// Skip the backups dir and any excluded paths
-	    	if ( ( $excludes && preg_match( '(' . $excludes . ')', $file ) ) && $this->excluded_files[] = new SplFileInfo( $filepath ) )
-	    		continue;
-
 	    	$files[] = new SplFileInfo( $filepath );
 
 	    	if ( is_dir( $filepath ) )
-	    		$files = $this->files_fallback( $filepath, $files );
+	    		$files = $this->get_files_fallback( $filepath, $files );
 
 		endwhile;
 
 		return $files;
+
+	}
+
+	/**
+	 * Returns an array of files that will be included in the backup.
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function get_included_files() {
+
+		if ( ! empty( $this->included_files ) )
+			return $this->included_files;
+
+		$this->included_files = array();
+
+		$excludes = $this->exclude_string( 'regex' );
+
+		foreach ( $this->get_files() as $file ) {
+
+	    	if ( $file === '.' || $file === '..' || ! $file->isReadable() )
+		    	continue;
+
+		    // Excludes
+		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', $this->conform_dir( $file->getPathname() ) ) ) )
+		    	continue;
+
+		    $this->included_files[] = $file;
+
+		}
+
+		return $this->included_files;
 
 	}
 
@@ -1042,13 +1044,25 @@ class HM_Backup {
 	 */
 	public function get_excluded_files() {
 
-		if ( empty( $this->files ) )
-			$this->get_files();
-
 		if ( ! empty( $this->excluded_files ) )
 			return $this->excluded_files;
 
-		return array();
+		$this->excluded_files = array();
+
+		$excludes = $this->exclude_string( 'regex' );
+
+		foreach ( $this->get_files() as $file ) {
+
+	    	if ( $file === '.' || $file === '..' || ! $file->isReadable() )
+		    	continue;
+
+		    // Excludes
+		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', $this->conform_dir( $file->getPathname() ) ) ) )
+		    	$this->excluded_files[] = $file;
+
+		}
+
+		return $this->excluded_files;
 
 	}
 
@@ -1060,13 +1074,22 @@ class HM_Backup {
 	 */
 	public function get_unreadable_files() {
 
-		if ( empty( $this->files ) )
-			$this->get_files();
-
 		if ( ! empty( $this->unreadable_files ) )
 			return $this->unreadable_files;
 
-		return array();
+		$this->unreadable_files = array();
+
+		foreach ( $this->get_files() as $file ) {
+
+	    	if ( $file === '.' || $file === '..' )
+	    		continue;
+
+		    if ( ! $file->isReadable() )
+		    	$this->unreadable_files[] = $file;
+
+		}
+
+		return $this->unreadable_files;
 
 	}
 
@@ -1132,7 +1155,7 @@ class HM_Backup {
 	 * @param string $context. (default: 'zip')
 	 * @return string
 	 */
-	private function exclude_string( $context = 'zip' ) {
+	protected function exclude_string( $context = 'zip' ) {
 
 		// Return a comma separated list by default
 		$separator = ', ';
