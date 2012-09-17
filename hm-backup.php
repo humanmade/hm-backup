@@ -1120,7 +1120,7 @@ class HM_Backup {
 
 		// If path() is inside root(), exclude it
 		if ( strpos( $this->get_path(), $this->get_root() ) !== false )
-			$excludes[] = trailingslashit( $this->get_path() );
+			array_unshift( $excludes, trailingslashit( $this->get_path() ) );
 
 		return array_unique( $excludes );
 
