@@ -34,7 +34,10 @@ class testPropertiesTestCase extends WP_UnitTestCase {
 		if ( file_exists( $this->backup->get_archive_filepath() ) )
 			unlink( $this->backup->get_archive_filepath() );
 
-		if ( ! file_exists( WP_CONTENT_DIR . '/custom' ) )
+		if ( file_exists( $this->backup->get_database_dump_filepath() ) )
+			unlink( $this->backup->get_database_dump_filepath() );
+
+		if ( file_exists( WP_CONTENT_DIR . '/custom' ) )
 			unlink( WP_CONTENT_DIR . '/custom' );
 
 		unset( $this->backup );
