@@ -34,7 +34,7 @@ class testSymlinkDirTestCase extends WP_UnitTestCase {
 
 		$this->symlink = dirname( __FILE__ ) . '/test-data/tests';
 
-		symlink( HMBKP_PLUGIN_PATH . 'tests/', $this->symlink );
+		symlink( trailingslashit( HMBKP_PLUGIN_PATH ) . 'tests/', $this->symlink );
 
 	}
 
