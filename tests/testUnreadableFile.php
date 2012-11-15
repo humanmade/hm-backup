@@ -30,7 +30,7 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 		mkdir( $this->backup->get_path() );
 
 		chmod( $this->backup->get_root() . '/test-data.txt', 0220 );
-		
+
 	}
 
 	/**
@@ -41,13 +41,11 @@ class testUnreadableFileTestCase extends WP_UnitTestCase {
 	 */
 	public function tearDown() {
 
-		if ( file_exists( $this->backup->get_archive_filepath() ) )
-			unlink( $this->backup->get_archive_filepath() );
-
-		if ( file_exists( $this->backup->get_path() ) )
-			rmdir( $this->backup->get_path() );
+		hmbkp_rmdirtree( $this->backup->get_path() );
 
 		chmod( $this->backup->get_root() . '/test-data.txt', 0664 );
+
+		unset( $this->backup );
 
 	}
 

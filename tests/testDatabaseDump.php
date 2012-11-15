@@ -38,11 +38,9 @@ class testDatabaseDumpTestCase extends WP_UnitTestCase {
 	 */
 	public function tearDown() {
 
-		if ( file_exists( $this->backup->get_database_dump_filepath() ) )
-			unlink( $this->backup->get_database_dump_filepath() );
+		hmbkp_rmdirtree( $this->backup->get_path() );
 
-		if ( file_exists( $this->backup->get_path() ) )
-			rmdir( $this->backup->get_path() );
+		unset( $this->backup );
 
 	}
 

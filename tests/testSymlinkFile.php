@@ -49,11 +49,9 @@ class testSymlinkFileTestCase extends WP_UnitTestCase {
 		if ( ! function_exists( 'symlink' ) )
 			return;
 
-		if ( file_exists( $this->backup->get_archive_filepath() ) )
-			unlink( $this->backup->get_archive_filepath() );
+		hmbkp_rmdirtree( $this->backup->get_path() );
 
-		if ( file_exists( $this->backup->get_path() ) )
-			rmdir( $this->backup->get_path() );
+		unset( $this->backup );
 
 		if ( file_exists( $this->symlink ) )
 			unlink( $this->symlink );

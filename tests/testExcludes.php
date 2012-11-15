@@ -41,11 +41,9 @@ class testExcludesTestCase extends WP_UnitTestCase {
 	 */
 	public function tearDown() {
 
-		if ( file_exists( $this->backup->get_archive_filepath() ) )
-			unlink( $this->backup->get_archive_filepath() );
+		hmbkp_rmdirtree( $this->backup->get_path() );
 
-		if ( file_exists( $this->path ) )
-			rmdir( $this->path );
+		unset( $this->backup );
 
 	}
 

@@ -23,22 +23,17 @@ class testPropertiesTestCase extends WP_UnitTestCase {
 	public function setUp() {
 
 		$this->backup = new HM_Backup();
+		$this->backup->set_type( 'database' );
 
-		if ( ! file_exists( WP_CONTENT_DIR . '/custom' ) )
-			mkdir( WP_CONTENT_DIR . '/custom' );
+		$this->custom_path = WP_CONTENT_DIR . '/custom';
+
+		mkdir( $this->custom_path );
 
 	}
 
 	public function tearDown() {
 
-		if ( file_exists( $this->backup->get_archive_filepath() ) )
-			unlink( $this->backup->get_archive_filepath() );
-
-		if ( file_exists( $this->backup->get_database_dump_filepath() ) )
-			unlink( $this->backup->get_database_dump_filepath() );
-
-		if ( file_exists( WP_CONTENT_DIR . '/custom' ) )
-			unlink( WP_CONTENT_DIR . '/custom' );
+		hmbkp_rmdirtree( $this->custom_path );
 
 		unset( $this->backup );
 
@@ -51,7 +46,7 @@ class testPropertiesTestCase extends WP_UnitTestCase {
 	 */
 	public function testDefaultBackupPath() {
 
-		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/backups' ), $this->backup->get_path() );
+		$this->assertEquals( $this->backup->conform_dir( hmbkp_path_default() ), $this->backup->get_path() );
 
 	}
 
@@ -102,10 +97,43 @@ class testPropertiesTestCase extends WP_UnitTestCase {
 	 */
 	public function testUTF8BackupPath() {
 
-		$this->backup->set_path( WP_CONTENT_DIR . '/custom' );
-		$this->backup->set_archive_filename( 'sph�renriss.zip' );
+		$this->backup->set_archive_filename( 'sphärenriss.zip' );
 
 		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/custom/spharenriss.zip' ), $this->backup->get_archive_filepath() );
+
+		$this->backup->backup();
+
+		$this->assertFileExists( $this->backup->get_archive_filepath() );
+
+	}
+
+	/**
+	 * Make sure setting a custom path + archive filename correctly sets the archive filepath
+	 *
+	 * @access public
+	 */
+	public function testCrylicBackupPath() {
+
+		$this->backup->set_archive_filename( 'СПС Борски округ.zip' );
+
+		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/custom/СПС Борски округ.zip' ), $this->backup->get_archive_filepath() );
+
+		$this->backup->backup();
+
+		$this->assertFileExists( $this->backup->get_archive_filepath() );
+
+	}
+
+	/**
+	 * Make sure setting a custom path + archive filename correctly sets the archive filepath
+	 *
+	 * @access public
+	 */
+	public function testChineseBackupPath() {
+
+		$this->backup->set_archive_filename( '合自然.zip' );
+
+		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/custom/合自然.zip' ), $this->backup->get_archive_filepath() );
 
 		$this->backup->backup();
 
