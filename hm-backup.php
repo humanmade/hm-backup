@@ -269,11 +269,8 @@ class HM_Backup {
 	 */
 	public function get_archive_filename() {
 
-		if ( defined( 'HBMKP_ARCHIVE_FILENAME' ) && HBMKP_ARCHIVE_FILENAME && ! $this->archive_filename )
-			$this->set_archive_filename( implode( '-', array( HBMKP_ARCHIVE_FILENAME, 'backup', date( 'Y-m-d-H-i-s', current_time( 'timestamp' ) ) ) ) . '.zip' );
-
 		if ( empty( $this->archive_filename ) )
-			$this->set_archive_filename( implode( '-', array( url_shorten( home_url() ), 'backup', date( 'Y-m-d-H-i-s', current_time( 'timestamp' ) ) ) ) . '.zip' );
+			$this->set_archive_filename( implode( '-', array( sanitize_title( url_shorten( home_url() ) ), 'backup', date( 'Y-m-d-H-i-s', current_time( 'timestamp' ) ) ) ) . '.zip' );
 
 		return $this->archive_filename;
 
