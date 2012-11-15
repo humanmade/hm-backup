@@ -631,8 +631,6 @@ class HM_Backup {
 	 */
 	public function dump_database() {
 
-		$this->do_action( 'hmbkp_mysqldump_started' );
-
 		if ( $this->get_mysqldump_command_path() )
 			$this->mysqldump();
 
@@ -646,6 +644,8 @@ class HM_Backup {
 	public function mysqldump() {
 
 		$this->mysqldump_method = 'mysqldump';
+
+		$this->do_action( 'hmbkp_mysqldump_started' );
 
 		$host = reset( explode( ':', DB_HOST ) );
 		$port = strpos( DB_HOST, ':' ) ? end( explode( ':', DB_HOST ) ) : '';
@@ -700,6 +700,8 @@ class HM_Backup {
 
 		$this->mysqldump_method = 'mysqldump_fallback';
 
+		$this->do_action( 'hmbkp_mysqldump_started' );
+
 	    $this->db = mysql_pconnect( DB_HOST, DB_USER, DB_PASSWORD );
 
 	    mysql_select_db( DB_NAME, $this->db );
@@ -741,8 +743,6 @@ class HM_Backup {
 	 */
 	public function archive() {
 
-		$this->do_action( 'hmbkp_archive_started' );
-
 		// Do we have the path to the zip command
 		if ( $this->get_zip_command_path() )
 			$this->zip();
@@ -772,6 +772,8 @@ class HM_Backup {
 
 		$this->archive_method = 'zip';
 
+		$this->do_action( 'hmbkp_archive_started' );
+
 		// Zip up $this->root with excludes
 		if ( $this->get_type() !== 'database' && $this->exclude_string( 'zip' ) )
 		    $this->warning( $this->archive_method, shell_exec( 'cd ' . escapeshellarg( $this->get_root() ) . ' && ' . escapeshellarg( $this->get_zip_command_path() ) . ' -rq ' . escapeshellarg( $this->get_archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2>&1' ) );
@@ -799,6 +801,8 @@ class HM_Backup {
 
 		$this->errors_to_warnings( $this->archive_method );
 		$this->archive_method = 'ziparchive';
+
+		$this->do_action( 'hmbkp_archive_started' );
 
     	$zip = new ZipArchive();
 
@@ -864,6 +868,8 @@ class HM_Backup {
 		$this->errors_to_warnings( $this->archive_method );
 		$this->archive_method = 'pclzip';
 
+		$this->do_action( 'hmbkp_archive_started' );
+
 		global $_hmbkp_exclude_string;
 
 		$_hmbkp_exclude_string = $this->exclude_string( 'regex' );
@@ -890,6 +896,8 @@ class HM_Backup {
 
 	public function verify_mysqldump() {
 
+		$this->do_action( 'hmbkp_mysqldump_verify_started' );
+
 		// If we've already passed then no need to check again
 		if ( ! empty( $this->mysqldump_verified ) )
 			return true;
@@ -912,6 +920,8 @@ class HM_Backup {
 	 * @return bool
 	 */
 	public function verify_archive() {
+
+		$this->do_action( 'hmbkp_archive_verify_started' );
 
 		// If we've already passed then no need to check again
 		if ( ! empty( $this->archive_verified ) )
