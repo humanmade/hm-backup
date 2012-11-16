@@ -190,13 +190,13 @@ class HM_Backup {
 	 */
 	public static function get_home_path() {
 
-		$home = get_option( 'home' );
-		$siteurl = get_option( 'siteurl' );
+		$home_url = home_url();
+		$site_url = site_url();
 
 		$home_path = ABSPATH;
 
-		if ( ! empty( $home ) && $home !== $siteurl )
-			$home_path = trailingslashit( substr( ABSPATH, 0, strrpos( ABSPATH, str_replace( $home, '', $siteurl ) ) ) );
+		if ( $home_url !== $site_url )
+			$home_path = trailingslashit( substr( ABSPATH, 0, strrpos( ABSPATH, str_replace( $home_url, '', $site_url ) ) ) );
 
 		return self::conform_dir( $home_path );
 
