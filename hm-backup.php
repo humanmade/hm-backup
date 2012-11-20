@@ -1047,6 +1047,38 @@ class HM_Backup {
 	}
 
 	/**
+	 * Return the number of files included in the backup
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function get_included_file_count() {
+
+		if ( ! empty( $this->included_file_count ) )
+			return $this->included_file_count;
+
+		$this->included_file_count = 0;
+
+		$excludes = $this->exclude_string( 'regex' );
+
+		foreach ( $this->get_files() as $file ) {
+
+	    	if ( $file === '.' || $file === '..' || ! $file->isReadable() )
+		    	continue;
+
+		    // Excludes
+		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', HM_Backup::conform_dir( $file->getPathname() ) ) ) )
+		    	continue;
+
+		    $this->included_file_count++;
+
+		}
+
+		return $this->included_file_count;
+
+	}
+
+	/**
 	 * Returns an array of files that match the exclude rules.
 	 *
 	 * @access public
@@ -1077,6 +1109,36 @@ class HM_Backup {
 	}
 
 	/**
+	 * Return the number of files excluded from the backup
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function get_excluded_file_count() {
+
+		if ( ! empty( $this->excluded_file_count ) )
+			return $this->excluded_file_count;
+
+		$this->excluded_file_count = 0;
+
+		$excludes = $this->exclude_string( 'regex' );
+
+		foreach ( $this->get_files() as $file ) {
+
+	    	if ( $file === '.' || $file === '..' || ! $file->isReadable() )
+		    	continue;
+
+		    // Excludes
+		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', HM_Backup::conform_dir( $file->getPathname() ) ) ) )
+		    	$this->excluded_file_count++;
+
+		}
+
+		return $this->excluded_file_count;
+
+	}
+
+	/**
 	 * Returns an array of unreadable files.
 	 *
 	 * @access public
@@ -1100,6 +1162,33 @@ class HM_Backup {
 		}
 
 		return $this->unreadable_files;
+
+	}
+
+	/**
+	 * Return the number of unreadable files.
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function get_unreadable_file_count() {
+
+		if ( ! empty( $this->get_unreadable_file_count ) )
+			return $this->get_unreadable_file_count;
+
+		$this->get_unreadable_file_count = 0;
+
+		foreach ( $this->get_files() as $file ) {
+
+	    	if ( $file === '.' || $file === '..' )
+	    		continue;
+
+		    if ( ! $file->isReadable() )
+		    	$this->get_unreadable_file_count++;
+
+		}
+
+		return $this->get_unreadable_file_count;
 
 	}
 
