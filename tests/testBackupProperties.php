@@ -46,7 +46,7 @@ class testPropertiesTestCase extends WP_UnitTestCase {
 	 */
 	public function testDefaultBackupPath() {
 
-		$this->assertEquals( $this->backup->conform_dir( hmbkp_path_default() ), $this->backup->get_path() );
+		$this->assertEquals( HM_Backup::conform_dir( hmbkp_path_default() ), $this->backup->get_path() );
 
 	}
 
@@ -82,7 +82,7 @@ class testPropertiesTestCase extends WP_UnitTestCase {
 		$this->backup->set_path( WP_CONTENT_DIR . '/custom' );
 		$this->backup->set_archive_filename( 'backup.zip' );
 
-		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/custom/backup.zip' ), $this->backup->get_archive_filepath() );
+		$this->assertEquals( HM_Backup::conform_dir( WP_CONTENT_DIR . '/custom/backup.zip' ), $this->backup->get_archive_filepath() );
 
 		$this->backup->backup();
 
@@ -99,7 +99,7 @@ class testPropertiesTestCase extends WP_UnitTestCase {
 
 		$this->backup->set_archive_filename( 'sphärenriss.zip' );
 
-		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/custom/spharenriss.zip' ), $this->backup->get_archive_filepath() );
+		$this->assertEquals( HM_Backup::conform_dir( WP_CONTENT_DIR . '/custom/spharenriss.zip' ), $this->backup->get_archive_filepath() );
 
 		$this->backup->backup();
 
@@ -116,7 +116,7 @@ class testPropertiesTestCase extends WP_UnitTestCase {
 
 		$this->backup->set_archive_filename( 'СПС Борски округ.zip' );
 
-		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/custom/СПС Борски округ.zip' ), $this->backup->get_archive_filepath() );
+		$this->assertEquals( HM_Backup::conform_dir( WP_CONTENT_DIR . '/custom/СПС Борски округ.zip' ), $this->backup->get_archive_filepath() );
 
 		$this->backup->backup();
 
@@ -133,7 +133,7 @@ class testPropertiesTestCase extends WP_UnitTestCase {
 
 		$this->backup->set_archive_filename( '合自然.zip' );
 
-		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/custom/合自然.zip' ), $this->backup->get_archive_filepath() );
+		$this->assertEquals( HM_Backup::conform_dir( WP_CONTENT_DIR . '/custom/合自然.zip' ), $this->backup->get_archive_filepath() );
 
 		$this->backup->backup();
 
@@ -151,7 +151,7 @@ class testPropertiesTestCase extends WP_UnitTestCase {
 		$this->backup->set_path( WP_CONTENT_DIR . '/custom' );
 		$this->backup->set_database_dump_filename( 'dump.sql' );
 
-		$this->assertEquals( $this->backup->conform_dir( WP_CONTENT_DIR . '/custom/dump.sql' ), $this->backup->get_database_dump_filepath() );
+		$this->assertEquals( HM_Backup::conform_dir( WP_CONTENT_DIR . '/custom/dump.sql' ), $this->backup->get_database_dump_filepath() );
 
 		$this->backup->mysqldump();
 

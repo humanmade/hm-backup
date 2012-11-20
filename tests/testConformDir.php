@@ -33,37 +33,37 @@ class testConformDirTestCase extends WP_UnitTestCase {
 
 	public function testBackSlash() {
 
-		$this->assertEquals( $this->backup->conform_dir( $this->dir ), $this->dir );
+		$this->assertEquals( HM_Backup::conform_dir( $this->dir ), $this->dir );
 
 	}
 
 	public function testForwardSlash() {
 
-		$this->assertEquals( $this->backup->conform_dir( '\one\two\three' ), $this->dir );
+		$this->assertEquals( HM_Backup::conform_dir( '\one\two\three' ), $this->dir );
 
 	}
 
 	public function testTrailingSlash() {
 
-		$this->assertEquals( $this->backup->conform_dir( '/one/two/three/' ), $this->dir );
+		$this->assertEquals( HM_Backup::conform_dir( '/one/two/three/' ), $this->dir );
 
 	}
 
 	public function testDoubleBackSlash() {
 
-		$this->assertEquals( $this->backup->conform_dir( '//one//two//three' ), $this->dir );
+		$this->assertEquals( HM_Backup::conform_dir( '//one//two//three' ), $this->dir );
 
 	}
 
 	public function testDoubleForwardSlash() {
 
-		$this->assertEquals( $this->backup->conform_dir( '\\one\\two\\three' ), $this->dir );
+		$this->assertEquals( HM_Backup::conform_dir( '\\one\\two\\three' ), $this->dir );
 
 	}
 
 	public function testMixedSlashes() {
 
-		$this->assertEquals( $this->backup->conform_dir( '\/one\//\two\/\\three' ), $this->dir );
+		$this->assertEquals( HM_Backup::conform_dir( '\/one\//\two\/\\three' ), $this->dir );
 
 	}
 
