@@ -350,7 +350,7 @@ class HM_Backup {
     public function get_root() {
 
 		if ( empty( $this->root ) )
-			$this->set_root( HM_Backup::conform_dir( self::get_home_path() ) );
+			$this->set_root( self::conform_dir( self::get_home_path() ) );
 
         return $this->root;
 
@@ -368,7 +368,7 @@ class HM_Backup {
     	if ( empty( $path ) || ! is_string( $path ) || ! is_dir ( $path ) )
     		throw new Exception( 'Invalid root path <code>' . $path . '</code> must be a valid directory path' );
 
-    	$this->root = HM_Backup::conform_dir( $path );
+    	$this->root = self::conform_dir( $path );
 
     }
 
@@ -381,7 +381,7 @@ class HM_Backup {
     public function get_path() {
 
 		if ( empty( $this->path ) )
-			$this->set_path( HM_Backup::conform_dir( hmbkp_path_default() ) );
+			$this->set_path( self::conform_dir( hmbkp_path_default() ) );
 
         return $this->path;
 
@@ -399,7 +399,7 @@ class HM_Backup {
     	if ( empty( $path ) || ! is_string( $path ) )
     		throw new Exception( 'Invalid backup path <code>' . $path . '</code> must be a non empty (string)' );
 
-    	$this->path = HM_Backup::conform_dir( $path );
+    	$this->path = self::conform_dir( $path );
 
     }
 
@@ -511,7 +511,7 @@ class HM_Backup {
 
 		// Find the one which works
 		foreach ( $mysqldump_locations as $location )
-		    if ( is_executable( HM_Backup::conform_dir( $location ) ) )
+		    if ( is_executable( self::conform_dir( $location ) ) )
 	 	    	$this->set_mysqldump_command_path( $location );
 
 		return $this->mysqldump_command_path;
@@ -572,7 +572,7 @@ class HM_Backup {
 
 		// Find the one which works
 		foreach ( $zip_locations as $location )
-			if ( is_executable( HM_Backup::conform_dir( $location ) ) )
+			if ( is_executable( self::conform_dir( $location ) ) )
 				$this->set_zip_command_path( $location );
 
 		return $this->zip_command_path;
@@ -821,14 +821,14 @@ class HM_Backup {
 			        continue;
 
 			    // Excludes
-			    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', HM_Backup::conform_dir( $file->getPathname() ) ) ) )
+			    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
 			        continue;
 
 			    if ( $file->isDir() )
-					$zip->addEmptyDir( trailingslashit( str_ireplace( trailingslashit( $this->get_root() ), '', HM_Backup::conform_dir( $file->getPathname() ) ) ) );
+					$zip->addEmptyDir( trailingslashit( str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) );
 
 			    elseif ( $file->isFile() )
-					$zip->addFile( $file->getPathname(), str_ireplace( trailingslashit( $this->get_root() ), '', HM_Backup::conform_dir( $file->getPathname() ) ) );
+					$zip->addFile( $file->getPathname(), str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) );
 
 				if ( ++$files_added % 500 === 0 )
 					if ( ! $zip->close() || ! $zip->open( $this->get_archive_filepath(), ZIPARCHIVE::CREATE ) )
@@ -1000,7 +1000,7 @@ class HM_Backup {
 	    	if ( $file === '.' || $file === '..' )
 	    		continue;
 
-	    	$filepath = HM_Backup::conform_dir( trailingslashit( $dir ) . $file );
+	    	$filepath = self::conform_dir( trailingslashit( $dir ) . $file );
 	    	$file = str_ireplace( trailingslashit( $this->get_root() ), '', $filepath );
 
 	    	$files[] = new SplFileInfo( $filepath );
@@ -1035,7 +1035,7 @@ class HM_Backup {
 		    	continue;
 
 		    // Excludes
-		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', HM_Backup::conform_dir( $file->getPathname() ) ) ) )
+		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
 		    	continue;
 
 		    $this->included_files[] = $file;
@@ -1067,7 +1067,7 @@ class HM_Backup {
 		    	continue;
 
 		    // Excludes
-		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', HM_Backup::conform_dir( $file->getPathname() ) ) ) )
+		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
 		    	continue;
 
 		    $this->included_file_count++;
@@ -1099,7 +1099,7 @@ class HM_Backup {
 		    	continue;
 
 		    // Excludes
-		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', HM_Backup::conform_dir( $file->getPathname() ) ) ) )
+		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
 		    	$this->excluded_files[] = $file;
 
 		}
@@ -1129,7 +1129,7 @@ class HM_Backup {
 		    	continue;
 
 		    // Excludes
-		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', HM_Backup::conform_dir( $file->getPathname() ) ) ) )
+		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
 		    	$this->excluded_file_count++;
 
 		}
@@ -1291,7 +1291,7 @@ class HM_Backup {
 				$fragment = true;
 
 			// Strip $this->root and conform
-			$rule = str_ireplace( $this->get_root(), '', untrailingslashit( HM_Backup::conform_dir( $rule ) ) );
+			$rule = str_ireplace( $this->get_root(), '', untrailingslashit( self::conform_dir( $rule ) ) );
 
 			// Strip the preceeding slash
 			if ( in_array( substr( $rule, 0, 1 ), array( '\\', '/' ) ) )
