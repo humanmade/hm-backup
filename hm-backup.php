@@ -947,7 +947,7 @@ class HM_Backup {
 		if ( $this->get_errors( $this->get_archive_method() ) )
 			return false;
 
-		if ( $this->get_unreadable_files() )
+		if ( $this->get_unreadable_file_count() )
 			$this->warning( $this->get_archive_method(), __( 'The following files are unreadable and couldn\'t be backed up: ', 'hmbkp' ) . implode( ', ', $this->get_unreadable_files() ) );
 
 		return $this->archive_verified = true;
