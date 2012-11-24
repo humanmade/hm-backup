@@ -91,57 +91,6 @@ class testPropertiesTestCase extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Make sure setting a custom path + archive filename correctly sets the archive filepath
-	 *
-	 * @access public
-	 */
-	public function testUTF8BackupPath() {
-
-		$this->backup->set_archive_filename( 'sphärenriss.zip' );
-
-		$this->assertEquals( HM_Backup::conform_dir( WP_CONTENT_DIR . '/custom/spharenriss.zip' ), $this->backup->get_archive_filepath() );
-
-		$this->backup->backup();
-
-		$this->assertFileExists( $this->backup->get_archive_filepath() );
-
-	}
-
-	/**
-	 * Make sure setting a custom path + archive filename correctly sets the archive filepath
-	 *
-	 * @access public
-	 */
-	public function testCrylicBackupPath() {
-
-		$this->backup->set_archive_filename( 'СПС Борски округ.zip' );
-
-		$this->assertEquals( HM_Backup::conform_dir( WP_CONTENT_DIR . '/custom/СПС Борски округ.zip' ), $this->backup->get_archive_filepath() );
-
-		$this->backup->backup();
-
-		$this->assertFileExists( $this->backup->get_archive_filepath() );
-
-	}
-
-	/**
-	 * Make sure setting a custom path + archive filename correctly sets the archive filepath
-	 *
-	 * @access public
-	 */
-	public function testChineseBackupPath() {
-
-		$this->backup->set_archive_filename( '合自然.zip' );
-
-		$this->assertEquals( HM_Backup::conform_dir( WP_CONTENT_DIR . '/custom/合自然.zip' ), $this->backup->get_archive_filepath() );
-
-		$this->backup->backup();
-
-		$this->assertFileExists( $this->backup->get_archive_filepath() );
-
-	}
-
-	/**
 	 * Make sure setting a custom path + database dump filename correctly sets the database dump filepath
 	 *
 	 * @access public
