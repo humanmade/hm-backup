@@ -996,7 +996,7 @@ class HM_Backup {
 
 	    while ( $file = readdir( $handle ) ) :
 
-	    	// Ignore current dir and containing dir and any unreadable files or directories
+	    	// Ignore current dir and containing dir
 	    	if ( $file === '.' || $file === '..' )
 	    		continue;
 
