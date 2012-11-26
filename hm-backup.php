@@ -907,7 +907,8 @@ class HM_Backup {
 		if ( ! empty( $this->mysqldump_verified ) )
 			return true;
 
-		if ( ! file_exists( $this->get_database_dump_filepath() ) )
+		// mysqldump can create empty dump files on error so we need to check the filesize
+		if ( ! file_exists( $this->get_database_dump_filepath() ) || filesize( $this->get_database_dump_filepath() ) === 0 )
 			$this->error( $this->get_mysqldump_method(), __( 'The mysqldump file was not created', 'hmbkp' ) );
 
 		if ( $this->get_errors( $this->get_mysqldump_method() ) )
