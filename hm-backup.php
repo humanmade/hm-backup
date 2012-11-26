@@ -270,7 +270,7 @@ class HM_Backup {
 	public function get_archive_filename() {
 
 		if ( empty( $this->archive_filename ) )
-			$this->set_archive_filename( implode( '-', array( sanitize_title( url_shorten( home_url() ) ), 'backup', date( 'Y-m-d-H-i-s', current_time( 'timestamp' ) ) ) ) . '.zip' );
+			$this->set_archive_filename( implode( '-', array( sanitize_title( str_ireplace( array( 'http://', 'https://', 'www' ), '', home_url() ) ), 'backup', date( 'Y-m-d-H-i-s', current_time( 'timestamp' ) ) ) ) . '.zip' );
 
 		return $this->archive_filename;
 
@@ -817,8 +817,13 @@ class HM_Backup {
 
 			foreach ( $this->get_files() as $file ) {
 
-		    	if ( $file === '.' || $file === '..' || ! $file->isReadable() )
-			        continue;
+				// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
+				if ( method_exists( $file, 'isDot' ) && $file->isDot() )
+					continue;
+
+				// Skip unreadable files
+				if ( ! $file->isReadable() )
+					continue;
 
 			    // Excludes
 			    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
@@ -947,7 +952,7 @@ class HM_Backup {
 		if ( $this->get_errors( $this->get_archive_method() ) )
 			return false;
 
-		if ( $this->get_unreadable_files() )
+		if ( $this->get_unreadable_file_count() )
 			$this->warning( $this->get_archive_method(), __( 'The following files are unreadable and couldn\'t be backed up: ', 'hmbkp' ) . implode( ', ', $this->get_unreadable_files() ) );
 
 		return $this->archive_verified = true;
@@ -996,7 +1001,7 @@ class HM_Backup {
 
 	    while ( $file = readdir( $handle ) ) :
 
-	    	// Ignore current dir and containing dir and any unreadable files or directories
+	    	// Ignore current dir and containing dir
 	    	if ( $file === '.' || $file === '..' )
 	    		continue;
 
@@ -1031,8 +1036,13 @@ class HM_Backup {
 
 		foreach ( $this->get_files() as $file ) {
 
-	    	if ( $file === '.' || $file === '..' || ! $file->isReadable() )
-		    	continue;
+			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
+			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
+				continue;
+
+			// Skip unreadable files
+			if ( ! $file->isReadable() )
+				continue;
 
 		    // Excludes
 		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
@@ -1063,8 +1073,13 @@ class HM_Backup {
 
 		foreach ( $this->get_files() as $file ) {
 
-	    	if ( $file === '.' || $file === '..' || ! $file->isReadable() )
-		    	continue;
+			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
+			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
+				continue;
+
+			// Skip unreadable files
+			if ( ! $file->isReadable() )
+				continue;
 
 		    // Excludes
 		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
@@ -1095,8 +1110,13 @@ class HM_Backup {
 
 		foreach ( $this->get_files() as $file ) {
 
-	    	if ( $file === '.' || $file === '..' || ! $file->isReadable() )
-		    	continue;
+			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
+			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
+				continue;
+
+			// Skip unreadable files
+			if ( ! $file->isReadable() )
+				continue;
 
 		    // Excludes
 		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
@@ -1125,8 +1145,13 @@ class HM_Backup {
 
 		foreach ( $this->get_files() as $file ) {
 
-	    	if ( $file === '.' || $file === '..' || ! $file->isReadable() )
-		    	continue;
+			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
+			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
+				continue;
+
+			// Skip unreadable files
+			if ( ! $file->isReadable() )
+				continue;
 
 		    // Excludes
 		    if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
@@ -1153,8 +1178,9 @@ class HM_Backup {
 
 		foreach ( $this->get_files() as $file ) {
 
-	    	if ( $file === '.' || $file === '..' )
-	    		continue;
+			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
+			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
+				continue;
 
 		    if ( ! $file->isReadable() )
 		    	$this->unreadable_files[] = $file;
@@ -1180,8 +1206,9 @@ class HM_Backup {
 
 		foreach ( $this->get_files() as $file ) {
 
-	    	if ( $file === '.' || $file === '..' )
-	    		continue;
+			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
+			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
+				continue;
 
 		    if ( ! $file->isReadable() )
 		    	$this->get_unreadable_file_count++;
