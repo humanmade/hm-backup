@@ -823,7 +823,7 @@ class HM_Backup {
 					continue;
 
 				// Skip unreadable files
-				if ( ! $file->isReadable() )
+				if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
 					continue;
 
 			    // Excludes
@@ -975,7 +975,7 @@ class HM_Backup {
 		$this->files = array();
 
 		if ( defined( 'RecursiveDirectoryIterator::FOLLOW_SYMLINKS' ) )
-			$this->files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->get_root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
+			$this->files = new RecursiveIteratorIterator( new HMBKPRecursiveDirectoryIterator( $this->get_root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
 
 		else
 			$this->files = $this->get_files_fallback( $this->get_root() );
@@ -1043,7 +1043,7 @@ class HM_Backup {
 				continue;
 
 			// Skip unreadable files
-			if ( ! $file->isReadable() )
+			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
 				continue;
 
 		    // Excludes
@@ -1080,7 +1080,7 @@ class HM_Backup {
 				continue;
 
 			// Skip unreadable files
-			if ( ! $file->isReadable() )
+			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
 				continue;
 
 		    // Excludes
@@ -1117,7 +1117,7 @@ class HM_Backup {
 				continue;
 
 			// Skip unreadable files
-			if ( ! $file->isReadable() )
+			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
 				continue;
 
 		    // Excludes
@@ -1152,7 +1152,7 @@ class HM_Backup {
 				continue;
 
 			// Skip unreadable files
-			if ( ! $file->isReadable() )
+			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
 				continue;
 
 		    // Excludes
@@ -1184,8 +1184,8 @@ class HM_Backup {
 			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
 				continue;
 
-		    if ( ! $file->isReadable() )
-		    	$this->unreadable_files[] = $file;
+			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
+			  	$this->unreadable_files[] = $file;
 
 		}
 
@@ -1212,8 +1212,8 @@ class HM_Backup {
 			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
 				continue;
 
-		    if ( ! $file->isReadable() )
-		    	$this->get_unreadable_file_count++;
+			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
+			  	$this->get_unreadable_file_count++;
 
 		}
 
