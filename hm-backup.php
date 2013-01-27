@@ -1718,3 +1718,34 @@ function hmbkp_pclzip_callback( $event, &$file ) {
     return true;
 
 }
+
+
+/**
+ * Custom RecursiveDirectoryIterator that catches exceptions in hasChildren
+ *
+ * @extends RecursiveDirectoryIterator
+ */
+class HMBKPRecursiveDirectoryIterator extends RecursiveDirectoryIterator {
+
+
+	/**
+	 * Replace hasChildren with a version which.
+	 *
+	 * @access public
+	 * @return void
+	 */
+	function hasChildren() {
+
+		try {
+
+			return new HMBKPRecursiveDirectoryIterator( $this->getPathname() );
+
+		} catch( UnexpectedValueException $e ) {
+
+			return new RecursiveArrayIterator( array() );
+
+		}
+
+	}
+
+}
