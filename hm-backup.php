@@ -908,14 +908,19 @@ class HM_Backup {
 		if ( ! empty( $this->mysqldump_verified ) )
 			return true;
 
-		// mysqldump can create empty dump files on error so we need to check the filesize
-		if ( ! file_exists( $this->get_database_dump_filepath() ) || filesize( $this->get_database_dump_filepath() ) === 0 )
-			$this->error( $this->get_mysqldump_method(), __( 'The mysqldump file was not created', 'hmbkp' ) );
+		// If there are mysqldump errors delete the database dump file as mysqldump will still have written one
+		if ( $this->get_errors( $this->get_mysqldump_method() ) && file_exists( $this->get_database_dump_filepath() ) )
+			unlink( $this->get_database_dump_filepath() );
 
-		if ( $this->get_errors( $this->get_mysqldump_method() ) )
-			return false;
+		// If we have an empty file delete it
+		if ( @filesize( $this->get_database_dump_filepath() ) === 0 )
+			unlink( $this->get_database_dump_filepath() );
 
-		return $this->mysqldump_verified = true;
+		// If the file still exists then it must be good
+		if ( file_exists( $this->get_database_dump_filepath() ) )
+			return $this->mysqldump_verified = true;
+
+		return false;
 
 
 	}
@@ -934,9 +939,6 @@ class HM_Backup {
 		if ( ! empty( $this->archive_verified ) )
 			return true;
 
-		if ( ! file_exists( $this->get_archive_filepath() ) )
-			$this->error( $this->get_archive_method(), __( 'The backup file was not created', 'hmbkp' ) );
-
 		// Verify using the zip command if possible
 		if ( $this->get_zip_command_path() && $this->get_archive_method() === 'zip' ) {
 
@@ -951,13 +953,15 @@ class HM_Backup {
 		if ( $this->get_errors( $this->get_archive_method() ) && file_exists( $this->get_archive_filepath() ) )
 			unlink( $this->get_archive_filepath() );
 
-		if ( $this->get_errors( $this->get_archive_method() ) )
-			return false;
-
+		// Warn about unreadable files
 		if ( $this->get_unreadable_file_count() )
 			$this->warning( $this->get_archive_method(), __( 'The following files are unreadable and couldn\'t be backed up: ', 'hmbkp' ) . implode( ', ', $this->get_unreadable_files() ) );
 
-		return $this->archive_verified = true;
+		// If the archive file still exists assume it's good
+		if ( file_exists( $this->get_archive_filepath() ) )
+			return $this->archive_verified = true;
+
+		return false;
 
 	}
 
