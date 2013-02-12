@@ -777,15 +777,15 @@ class HM_Backup {
 
 		// Zip up $this->root with excludes
 		if ( $this->get_type() !== 'database' && $this->exclude_string( 'zip' ) )
-		    $this->warning( $this->archive_method, shell_exec( 'cd ' . escapeshellarg( $this->get_root() ) . ' && ' . escapeshellcmd( $this->get_zip_command_path() ) . ' -rq ' . escapeshellarg( $this->get_archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2>&1' ) );
+		    $this->warning( $this->get_archive_method(), shell_exec( 'cd ' . escapeshellarg( $this->get_root() ) . ' && ' . escapeshellcmd( $this->get_zip_command_path() ) . ' -rq ' . escapeshellarg( $this->get_archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2>&1' ) );
 
 		// Zip up $this->root without excludes
 		elseif ( $this->get_type() !== 'database' )
-		    $this->warning( $this->archive_method, shell_exec( 'cd ' . escapeshellarg( $this->get_root() ) . ' && ' . escapeshellcmd( $this->get_zip_command_path() ) . ' -rq ' . escapeshellarg( $this->get_archive_filepath() ) . ' ./' . ' 2>&1' ) );
+		    $this->warning( $this->get_archive_method(), shell_exec( 'cd ' . escapeshellarg( $this->get_root() ) . ' && ' . escapeshellcmd( $this->get_zip_command_path() ) . ' -rq ' . escapeshellarg( $this->get_archive_filepath() ) . ' ./' . ' 2>&1' ) );
 
 		// Add the database dump to the archive
 		if ( $this->get_type() !== 'file' )
-		    $this->warning( $this->archive_method, shell_exec( 'cd ' . escapeshellarg( $this->get_path() ) . ' && ' . escapeshellcmd( $this->get_zip_command_path() ) . ' -uq ' . escapeshellarg( $this->get_archive_filepath() ) . ' ' . escapeshellarg( $this->get_database_dump_filename() ) . ' 2>&1' ) );
+		    $this->warning( $this->get_archive_method(), shell_exec( 'cd ' . escapeshellarg( $this->get_path() ) . ' && ' . escapeshellcmd( $this->get_zip_command_path() ) . ' -uq ' . escapeshellarg( $this->get_archive_filepath() ) . ' ' . escapeshellarg( $this->get_database_dump_filename() ) . ' 2>&1' ) );
 
 		$this->verify_archive();
 
@@ -800,7 +800,7 @@ class HM_Backup {
 	 */
 	public function zip_archive() {
 
-		$this->errors_to_warnings( $this->archive_method );
+		$this->errors_to_warnings( $this->get_archive_method() );
 		$this->archive_method = 'ziparchive';
 
 		$this->do_action( 'hmbkp_archive_started' );
@@ -849,10 +849,10 @@ class HM_Backup {
 			$zip->addFile( $this->get_database_dump_filepath(), $this->get_database_dump_filename() );
 
 		if ( $zip->status )
-			$this->warning( $this->archive_method, $zip->status );
+			$this->warning( $this->get_archive_method(), $zip->status );
 
 		if ( $zip->statusSys )
-			$this->warning( $this->archive_method, $zip->statusSys );
+			$this->warning( $this->get_archive_method(), $zip->statusSys );
 
 		$zip->close();
 
@@ -871,7 +871,7 @@ class HM_Backup {
 	 */
 	public function pcl_zip() {
 
-		$this->errors_to_warnings( $this->archive_method );
+		$this->errors_to_warnings( $this->get_archive_method() );
 		$this->archive_method = 'pclzip';
 
 		$this->do_action( 'hmbkp_archive_started' );
@@ -887,12 +887,12 @@ class HM_Backup {
 		// Zip up everything
 		if ( $this->get_type() !== 'database' )
 			if ( ! $archive->add( $this->get_root(), PCLZIP_OPT_REMOVE_PATH, $this->get_root(), PCLZIP_CB_PRE_ADD, 'hmbkp_pclzip_callback' ) )
-				$this->warning( $this->archive_method, $archive->errorInfo( true ) );
+				$this->warning( $this->get_archive_method(), $archive->errorInfo( true ) );
 
 		// Add the database
 		if ( $this->get_type() !== 'file' )
 			if ( ! $archive->add( $this->get_database_dump_filepath(), PCLZIP_OPT_REMOVE_PATH, $this->get_path() ) )
-				$this->warning( $this->archive_method, $archive->errorInfo( true ) );
+				$this->warning( $this->get_archive_method(), $archive->errorInfo( true ) );
 
 		unset( $GLOBALS['_hmbkp_exclude_string'] );
 
