@@ -683,8 +683,8 @@ class HM_Backup {
 		// Pipe STDERR to STDOUT
 		$cmd .= ' 2>&1';
 
-		// Store any returned data in warning
-		$this->warning( $this->get_mysqldump_method(), shell_exec( $cmd ) );
+		// Store any returned data in an error
+		$this->error( $this->get_mysqldump_method(), shell_exec( $cmd ) );
 
 		$this->verify_mysqldump();
 
