@@ -27,6 +27,8 @@ class testBackUpProcessTestCase extends WP_UnitTestCase {
 		$this->backup->set_root( dirname( __FILE__ ) . '/test-data/' );
 		$this->backup->set_path( dirname( __FILE__ ) . '/tmp' );
 
+		hmbkp_rmdirtree( dirname( __FILE__ ) . '/tmp' );
+
 		mkdir( dirname( __FILE__ ) . '/tmp' );
 
 	}
