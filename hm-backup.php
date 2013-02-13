@@ -648,7 +648,9 @@ class HM_Backup {
 
 		$this->do_action( 'hmbkp_mysqldump_started' );
 
-		$host = reset( explode( ':', DB_HOST ) );
+		$host = explode( ':', DB_HOST );
+
+		$host = reset( $host );
 		$port = strpos( DB_HOST, ':' ) ? end( explode( ':', DB_HOST ) ) : '';
 
 		// Path to the mysqldump executable
