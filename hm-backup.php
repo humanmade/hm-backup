@@ -1618,6 +1618,8 @@ class HM_Backup {
 		if ( empty( $context ) || empty( $error ) )
 			return;
 
+		$this->do_action( 'hmbkp_error' );
+
 		$this->errors[$context][$_key = md5( implode( ':' , (array) $error ) )] = $error;
 
 	}
@@ -1672,6 +1674,8 @@ class HM_Backup {
 
 		if ( empty( $context ) || empty( $warning ) )
 			return;
+
+		$this->do_action( 'hmbkp_warning' );
 
 		$this->warnings[$context][$_key = md5( implode( ':' , (array) $warning ) )] = $warning;
 
