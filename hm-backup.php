@@ -1697,7 +1697,9 @@ class HM_Backup {
 
 		$args = func_get_args();
 
-		$this->warning( 'php', array_splice( $args, 0, 4 ) );
+		array_shift( $args );
+
+		$this->warning( 'php', implode( ', ', array_splice( $args, 0, 3 ) ) );
 
 		return false;
 
