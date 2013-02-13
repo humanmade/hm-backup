@@ -953,10 +953,6 @@ class HM_Backup {
 		if ( $this->get_errors( $this->get_archive_method() ) && file_exists( $this->get_archive_filepath() ) )
 			unlink( $this->get_archive_filepath() );
 
-		// Warn about unreadable files
-		if ( $this->get_unreadable_file_count() )
-			$this->warning( $this->get_archive_method(), __( 'The following files are unreadable and couldn\'t be backed up: ', 'hmbkp' ) . implode( ', ', $this->get_unreadable_files() ) );
-
 		// If the archive file still exists assume it's good
 		if ( file_exists( $this->get_archive_filepath() ) )
 			return $this->archive_verified = true;
