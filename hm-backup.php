@@ -975,7 +975,7 @@ class HM_Backup {
 		$this->files = array();
 
 		if ( defined( 'RecursiveDirectoryIterator::FOLLOW_SYMLINKS' ) )
-			$this->files = new RecursiveIteratorIterator( new HMBKPRecursiveDirectoryIterator( $this->get_root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
+			$this->files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->get_root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
 
 		else
 			$this->files = $this->get_files_fallback( $this->get_root() );
@@ -1716,36 +1716,5 @@ function hmbkp_pclzip_callback( $event, &$file ) {
     	return false;
 
     return true;
-
-}
-
-
-/**
- * Custom RecursiveDirectoryIterator that catches exceptions in hasChildren
- *
- * @extends RecursiveDirectoryIterator
- */
-class HMBKPRecursiveDirectoryIterator extends RecursiveDirectoryIterator {
-
-
-	/**
-	 * Replace hasChildren with a version which.
-	 *
-	 * @access public
-	 * @return void
-	 */
-	function hasChildren() {
-
-		try {
-
-			return new HMBKPRecursiveDirectoryIterator( $this->getPathname() );
-
-		} catch( UnexpectedValueException $e ) {
-
-			return new RecursiveArrayIterator( array() );
-
-		}
-
-	}
 
 }
