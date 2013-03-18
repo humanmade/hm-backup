@@ -1678,7 +1678,7 @@ class HM_Backup {
 	}
 
 	/**
-	 * Custom error handler for catching errors
+	 * Custom error handler for catching php errors
 	 *
 	 * @access private
 	 * @param string $type
@@ -1688,6 +1688,7 @@ class HM_Backup {
 	 */
 	public function error_handler( $type ) {
 
+		// Skip strict & deprecated warnings
 		if ( ( defined( 'E_DEPRECATED' ) && $type === E_DEPRECATED ) || ( defined( 'E_STRICT' ) && $type === E_STRICT ) || error_reporting() === 0 )
 			return false;
 
