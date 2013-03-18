@@ -656,8 +656,12 @@ class HM_Backup {
 		// Path to the mysqldump executable
 		$cmd = escapeshellarg( $this->get_mysqldump_command_path() );
 
-		// No Create DB command
+		// We don't want to create a new DB
 		$cmd .= ' --no-create-db';
+
+		// Allow lock-tables to be overridden
+		if ( defined( 'HMBKP_MYSQLDUMP_SINGLE_TRANSACTION' ) && HMBKP_MYSQLDUMP_SINGLE_TRANSACTION )
+			$cmd .= '--single-transaction';
 
 		// Make sure binary data is exported properly
 		$cmd .= ' --hex-blob';
