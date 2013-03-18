@@ -673,7 +673,7 @@ class HM_Backup {
 		$cmd .= ' -h ' . escapeshellarg( $host );
 
 		// Set the port if it was set
-		if ( ! empty( $port ) )
+		if ( ! empty( $port ) && is_numeric( $port ) )
 		    $cmd .= ' -P ' . $port;
 
 		// The file we're saving too
