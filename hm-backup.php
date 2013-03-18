@@ -167,8 +167,8 @@ class HM_Backup {
 		if ( self::is_safe_mode_active() )
 			return false;
 
-		// Is shell_exec disabled?
-		if ( in_array( 'shell_exec', array_map( 'trim', explode( ',', @ini_get( 'disable_functions' ) ) ) ) )
+		// Is shell_exec or escapeshellcmd or escapeshellarg disabled?
+		if ( array_intersect( array( 'shell_exec', 'escapeshellarg', 'escapeshellcmd' ), array_map( 'trim', explode( ',', @ini_get( 'disable_functions' ) ) ) ) )
 			return false;
 
 		// Can we issue a simple echo command?
