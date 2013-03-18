@@ -710,6 +710,12 @@ class HM_Backup {
 
 	    $this->db = mysql_pconnect( DB_HOST, DB_USER, DB_PASSWORD );
 
+	    if ( ! $this->db )
+	    	$this->db = mysql_connect( DB_HOST, DB_USER, DB_PASSWORD );
+
+	    if ( ! $this->db )
+	    	return;
+
 	    mysql_select_db( DB_NAME, $this->db );
 	    mysql_set_charset( DB_CHARSET, $this->db );
 
