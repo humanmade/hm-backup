@@ -947,16 +947,6 @@ class HM_Backup {
 		if ( ! empty( $this->archive_verified ) )
 			return true;
 
-		// Verify using the zip command if possible
-		if ( $this->get_zip_command_path() && $this->get_archive_method() === 'zip' ) {
-
-			$verify = shell_exec( escapeshellcmd( $this->get_zip_command_path() ) . ' -T ' . escapeshellarg( $this->get_archive_filepath() ) . ' 2> /dev/null' );
-
-			if ( strpos( $verify, 'OK' ) === false )
-				$this->error( $this->get_archive_method(), $verify );
-
-		}
-
 		// If there are errors delete the backup file.
 		if ( $this->get_errors( $this->get_archive_method() ) && file_exists( $this->get_archive_filepath() ) )
 			unlink( $this->get_archive_filepath() );
