@@ -789,7 +789,7 @@ class HM_Backup {
 		    $stderr = shell_exec( 'cd ' . escapeshellarg( $this->get_root() ) . ' && ' . escapeshellcmd( $this->get_zip_command_path() ) . ' -rq ' . escapeshellarg( $this->get_archive_filepath() ) . ' ./' . ' 2>&1' );
 
 		// Add the database dump to the archive
-		if ( $this->get_type() !== 'file' )
+		if ( $this->get_type() !== 'file' && file_exists( $this->get_database_dump_filepath() ) )
 		    $stderr = shell_exec( 'cd ' . escapeshellarg( $this->get_path() ) . ' && ' . escapeshellcmd( $this->get_zip_command_path() ) . ' -uq ' . escapeshellarg( $this->get_archive_filepath() ) . ' ' . escapeshellarg( $this->get_database_dump_filename() ) . ' 2>&1' );
 
 		if ( $stderr )
@@ -853,7 +853,7 @@ class HM_Backup {
 		}
 
 		// Add the database
-		if ( $this->get_type() !== 'file' )
+		if ( $this->get_type() !== 'file' && file_exists( $this->get_database_dump_filepath() ) )
 			$zip->addFile( $this->get_database_dump_filepath(), $this->get_database_dump_filename() );
 
 		if ( $zip->status )
@@ -898,7 +898,7 @@ class HM_Backup {
 				$this->warning( $this->get_archive_method(), $archive->errorInfo( true ) );
 
 		// Add the database
-		if ( $this->get_type() !== 'file' )
+		if ( $this->get_type() !== 'file' && file_exists( $this->get_database_dump_filepath() ) )
 			if ( ! $archive->add( $this->get_database_dump_filepath(), PCLZIP_OPT_REMOVE_PATH, $this->get_path() ) )
 				$this->warning( $this->get_archive_method(), $archive->errorInfo( true ) );
 
