@@ -145,9 +145,9 @@ class HM_Backup {
 	 * @static
 	 * @return bool
 	 */
-	public static function is_safe_mode_active() {
+	public static function is_safe_mode_active( $ini_get_callback = 'ini_get' ) {
 
-		if ( ( $safe_mode = @ini_get( 'safe_mode' ) ) && strtolower( $safe_mode ) != 'off' )
+		if ( ( $safe_mode = @call_user_func( $ini_get_callback, 'safe_mode' ) ) && strtolower( $safe_mode ) != 'off' )
 			return true;
 
 		return false;
@@ -1672,7 +1672,7 @@ class HM_Backup {
 	}
 
 	/**
-	 * Custom error handler for catching errors
+	 * Custom error handler for catching php errors
 	 *
 	 * @access private
 	 * @param string $type
@@ -1682,6 +1682,7 @@ class HM_Backup {
 	 */
 	public function error_handler( $type ) {
 
+		// Skip strict & deprecated warnings
 		if ( ( defined( 'E_DEPRECATED' ) && $type === E_DEPRECATED ) || ( defined( 'E_STRICT' ) && $type === E_STRICT ) || error_reporting() === 0 )
 			return false;
 
