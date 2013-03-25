@@ -1613,7 +1613,7 @@ class HM_Backup {
 	 * @param string $context
 	 * @param mixed $error
 	 */
-	private function error( $context, $error ) {
+	public function error( $context, $error ) {
 
 		if ( empty( $context ) || empty( $error ) )
 			return;
