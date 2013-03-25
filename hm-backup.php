@@ -656,8 +656,12 @@ class HM_Backup {
 		// Path to the mysqldump executable
 		$cmd = escapeshellarg( $this->get_mysqldump_command_path() );
 
-		// No Create DB command
+		// We don't want to create a new DB
 		$cmd .= ' --no-create-db';
+
+		// Allow lock-tables to be overridden
+		if ( defined( 'HMBKP_MYSQLDUMP_SINGLE_TRANSACTION' ) && HMBKP_MYSQLDUMP_SINGLE_TRANSACTION )
+			$cmd .= '--single-transaction';
 
 		// Make sure binary data is exported properly
 		$cmd .= ' --hex-blob';
@@ -673,7 +677,7 @@ class HM_Backup {
 		$cmd .= ' -h ' . escapeshellarg( $host );
 
 		// Set the port if it was set
-		if ( ! empty( $port ) )
+		if ( ! empty( $port ) && is_numeric( $port ) )
 		    $cmd .= ' -P ' . $port;
 
 		// The file we're saving too
@@ -709,6 +713,12 @@ class HM_Backup {
 		$this->do_action( 'hmbkp_mysqldump_started' );
 
 	    $this->db = mysql_pconnect( DB_HOST, DB_USER, DB_PASSWORD );
+
+	    if ( ! $this->db )
+	    	$this->db = mysql_connect( DB_HOST, DB_USER, DB_PASSWORD );
+
+	    if ( ! $this->db )
+	    	return;
 
 	    mysql_select_db( DB_NAME, $this->db );
 	    mysql_set_charset( DB_CHARSET, $this->db );
