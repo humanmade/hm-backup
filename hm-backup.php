@@ -802,7 +802,7 @@ class HM_Backup {
 		if ( $this->get_type() !== 'file' && file_exists( $this->get_database_dump_filepath() ) )
 		    $stderr = shell_exec( 'cd ' . escapeshellarg( $this->get_path() ) . ' && ' . escapeshellcmd( $this->get_zip_command_path() ) . ' -uq ' . escapeshellarg( $this->get_archive_filepath() ) . ' ' . escapeshellarg( $this->get_database_dump_filename() ) . ' 2>&1' );
 
-		if ( $stderr )
+		if ( ! empty( $stderr ) )
 			$this->warning( $this->get_archive_method(), $stderr );
 
 		$this->verify_archive();
