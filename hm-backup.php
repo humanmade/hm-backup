@@ -1637,8 +1637,8 @@ class HM_Backup {
 		if ( empty( $errors ) )
 			return;
 
-		foreach ( $errors as $error_context => $errors )
-			foreach( $errors as $error )
+		foreach ( $errors as $error_context => $context_errors )
+			foreach( $context_errors as $error )
 				$this->warning( $error_context, $error );
 
 		if ( $context )
