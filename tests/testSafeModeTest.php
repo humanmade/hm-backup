@@ -5,7 +5,7 @@
  *
  * @extends WP_UnitTestCase
  */
-class testSafeModeTestCase extends WP_UnitTestCase {
+class testSafeModeTestCase extends HM_Backup_UnitTestCase {
 
 	function ini_get_mock() {
 

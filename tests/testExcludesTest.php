@@ -6,7 +6,7 @@
  *
  * @extends WP_UnitTestCase
  */
-class testExcludesTestCase extends WP_UnitTestCase {
+class testExcludesTestCase extends HM_Backup_UnitTestCase {
 
 	/**
 	 * Contains the current backup instance
@@ -28,6 +28,9 @@ class testExcludesTestCase extends WP_UnitTestCase {
 		$this->backup->set_path( dirname( __FILE__ ) . '/tmp' );
 
 		$this->path = $this->backup->get_path();
+
+		// Cleanup
+		hmbkp_rmdirtree( $this->backup->get_path() );
 
 		mkdir( $this->path );
 

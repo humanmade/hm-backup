@@ -5,7 +5,7 @@
  *
  * @extends WP_UnitTestCase
  */
-class testSymlinkDirTestCase extends WP_UnitTestCase {
+class testSymlinkDirTestCase extends HM_Backup_UnitTestCase {
 
 	/**
 	 * Contains the current backup instance

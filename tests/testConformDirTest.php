@@ -6,7 +6,7 @@
  *
  * @extends WP_UnitTestCase
  */
-class testConformDirTestCase extends WP_UnitTestCase {
+class testConformDirTestCase extends HM_Backup_UnitTestCase {
 
 	/**
  	 * The correct dir
