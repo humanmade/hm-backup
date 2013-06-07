@@ -712,7 +712,7 @@ class HM_Backup {
 
 		$this->do_action( 'hmbkp_mysqldump_started' );
 
-	    $this->db = mysql_pconnect( DB_HOST, DB_USER, DB_PASSWORD );
+	    $this->db = @mysql_pconnect( DB_HOST, DB_USER, DB_PASSWORD );
 
 	    if ( ! $this->db )
 	    	$this->db = mysql_connect( DB_HOST, DB_USER, DB_PASSWORD );
