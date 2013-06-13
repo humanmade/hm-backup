@@ -995,7 +995,7 @@ class HM_Backup {
 
 			// Skip dot files if the SKIP_Dots flag is available
 			if ( defined( 'RecursiveDirectoryIterator::SKIP_DOTS' ) )
-				$this->files->setFlags( RecursiveDirectoryIterator::SKIP_DOTS );
+				$this->files->setFlags( RecursiveDirectoryIterator::SKIP_DOTS + RecursiveDirectoryIterator::FOLLOW_SYMLINKS );
 
 
 		// If RecursiveDirectoryIterator::FOLLOW_SYMLINKS isn't available then fallback to a less memory efficient method
