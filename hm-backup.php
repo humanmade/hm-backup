@@ -660,7 +660,7 @@ class HM_Backup {
 		$cmd .= ' --no-create-db';
 
 		// Allow lock-tables to be overridden
-		if ( defined( 'HMBKP_MYSQLDUMP_SINGLE_TRANSACTION' ) && HMBKP_MYSQLDUMP_SINGLE_TRANSACTION )
+		if ( ! defined( 'HMBKP_MYSQLDUMP_SINGLE_TRANSACTION' ) || HMBKP_MYSQLDUMP_SINGLE_TRANSACTION !== false )
 			$cmd .= ' --single-transaction';
 
 		// Make sure binary data is exported properly
