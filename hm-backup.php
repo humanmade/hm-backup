@@ -982,11 +982,22 @@ class HM_Backup {
 
 		$this->files = array();
 
-		if ( defined( 'RecursiveDirectoryIterator::FOLLOW_SYMLINKS' ) )
+		// We only want to use the RecursiveDirectoryIterator if the FOLLOW_SYMLINKS flag is available
+		if ( defined( 'RecursiveDirectoryIterator::FOLLOW_SYMLINKS' ) ) {
+
 			$this->files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->get_root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
 
-		else
+			// Skip dot files if the SKIP_Dots flag is available
+			if ( defined( 'RecursiveDirectoryIterator::SKIP_DOTS' ) )
+				$this->files->setFlags( RecursiveDirectoryIterator::SKIP_DOTS );
+
+
+		// If RecursiveDirectoryIterator::FOLLOW_SYMLINKS isn't available then fallback to a less memory efficient method
+		} else {
+
 			$this->files = $this->get_files_fallback( $this->get_root() );
+
+		}
 
 		return $this->files;
 
