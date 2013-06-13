@@ -692,8 +692,14 @@ class HM_Backup {
 		// Store any returned data in an error
 		$stderr = shell_exec( $cmd );
 
-		if ( $stderr )
+		// Skip the new password warning that is output in mysql > 5.6 (@see http://bugs.mysql.com/bug.php?id=66546)
+		if ( trim( $stderr ) === 'Warning: Using a password on the command line interface can be insecure.' ) {
+			$stderr = '';
+		}
+
+		if ( $stderr ) {
 			$this->error( $this->get_mysqldump_method(), $stderr );
+		}
 
 		$this->verify_mysqldump();
 
