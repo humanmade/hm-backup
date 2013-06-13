@@ -62,8 +62,8 @@ class testBackUpProcessTestCase extends HM_Backup_UnitTestCase {
 
 		$this->backup->backup();
 
-		$this->assertEquals( $this->backup->get_archive_method(), 'zip' );
-		$this->assertEquals( $this->backup->get_mysqldump_method(), 'mysqldump' );
+		$this->assertEquals( 'zip', $this->backup->get_archive_method() );
+		$this->assertEquals( 'mysqldump', $this->backup->get_mysqldump_method() );
 
 		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
