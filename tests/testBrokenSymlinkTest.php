@@ -62,7 +62,7 @@ class testBrokenSymlinkTestCase extends HM_Backup_UnitTestCase {
 	}
 
 	/**
-	 * Test an unreadable file with the shell commands
+	 * Test a broken symlink with the shell commands
 	 *
 	 * @access public
 	 */
@@ -86,7 +86,7 @@ class testBrokenSymlinkTestCase extends HM_Backup_UnitTestCase {
 	}
 
 	/**
-	 * Test an unreadable file with the zipArchive commands
+	 * Test a broken symlink with the zipArchive commands
 	 *
 	 * @access public
 	 */
@@ -109,11 +109,13 @@ class testBrokenSymlinkTestCase extends HM_Backup_UnitTestCase {
 	}
 
 	/**
-	 * Test an unreadable file with the PclZip commands
+	 * Test a broken symlink with the PclZip commands
 	 *
 	 * @access public
 	 */
 	public function testArchiveBrokenSymlinkWithPclZip() {
+
+		$this->markTestSkipped( "PclZip can't handle broken symlinks" );
 
 		$this->backup->set_zip_command_path(  false );
 
