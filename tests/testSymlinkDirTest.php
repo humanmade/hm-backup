@@ -34,7 +34,7 @@ class testSymlinkDirTestCase extends HM_Backup_UnitTestCase {
 
 		$this->symlink = dirname( __FILE__ ) . '/test-data/tests';
 
-		symlink( trailingslashit( HMBKP_PLUGIN_PATH ) . 'tests/', $this->symlink );
+		symlink( dirname( __FILE__ ) . '/test-data-symlink/', $this->symlink );
 
 	}
 
@@ -66,16 +66,17 @@ class testSymlinkDirTestCase extends HM_Backup_UnitTestCase {
 	public function testArchiveSymlinkDirWithZip() {
 
 		if ( ! $this->backup->get_zip_command_path() )
-            $this->markTestSkipped( "Empty zip command path" );
+			$this->markTestSkipped( "Empty zip command path" );
 
 		$this->assertFileExists( $this->symlink );
 
 		$this->backup->zip();
+		$this->assertEquals( 'zip', $this->backup->get_archive_method() );
 
 		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( basename( $this->symlink ) ) );
-		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 8 );
+		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 5 );
 
 		$this->assertEmpty( $this->backup->get_errors() );
 
@@ -95,9 +96,10 @@ class testSymlinkDirTestCase extends HM_Backup_UnitTestCase {
 		$this->backup->zip_archive();
 
 		$this->assertFileExists( $this->backup->get_archive_filepath() );
+		$this->assertEquals( 'ziparchive', $this->backup->get_archive_method() );
 
 		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( basename( $this->symlink ) ) );
-		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 8 );
+		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 5 );
 
 		$this->assertEmpty( $this->backup->get_errors() );
 
@@ -115,11 +117,12 @@ class testSymlinkDirTestCase extends HM_Backup_UnitTestCase {
 		$this->assertFileExists( $this->symlink );
 
 		$this->backup->pcl_zip();
+		$this->assertEquals( 'pclzip', $this->backup->get_archive_method() );
 
 		$this->assertFileExists( $this->backup->get_archive_filepath() );
 
 		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( basename( $this->symlink ) ) );
-		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 8 );
+		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 5 );
 
 		$this->assertEmpty( $this->backup->get_errors() );
 
