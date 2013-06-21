@@ -727,7 +727,9 @@ class HM_Backup {
 	    	return;
 
 	    mysql_select_db( DB_NAME, $this->db );
-	    mysql_set_charset( DB_CHARSET, $this->db );
+
+	    if ( function_exists( 'mysql_set_charset') )
+	    	mysql_set_charset( DB_CHARSET, $this->db );
 
 	    // Begin new backup of MySql
 	    $tables = mysql_query( 'SHOW TABLES' );
