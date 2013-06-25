@@ -50,6 +50,10 @@ class testSymlinkDirTestCase extends HM_Backup_UnitTestCase {
 			return;
 
 		hmbkp_rmdirtree( $this->backup->get_path() );
+		hmbkp_rmdirtree( hmbkp_path() );
+
+		delete_option( 'hmbkp_path' );
+		delete_option( 'hmbkp_default_path' );
 
 		unset( $this->backup );
 

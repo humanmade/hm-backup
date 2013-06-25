@@ -27,12 +27,8 @@ class testExcludesTestCase extends HM_Backup_UnitTestCase {
 		$this->backup->set_root( dirname( __FILE__ ) . '/test-data/' );
 		$this->backup->set_path( dirname( __FILE__ ) . '/tmp' );
 
-		$this->path = $this->backup->get_path();
-
-		// Cleanup
 		hmbkp_rmdirtree( $this->backup->get_path() );
-
-		mkdir( $this->path );
+		mkdir( $this->backup->get_path() );
 
 	}
 
@@ -45,6 +41,10 @@ class testExcludesTestCase extends HM_Backup_UnitTestCase {
 	public function tearDown() {
 
 		hmbkp_rmdirtree( $this->backup->get_path() );
+		hmbkp_rmdirtree( hmbkp_path() );
+
+		delete_option( 'hmbkp_path' );
+		delete_option( 'hmbkp_default_path' );
 
 		unset( $this->backup );
 
