@@ -36,9 +36,12 @@ class testBrokenSymlinkTestCase extends HM_Backup_UnitTestCase {
 
 		file_put_contents( dirname( __FILE__ ) . '/test-data/symlink', '' );
 
-		symlink( dirname( __FILE__ ) . '/test-data/symlink', $this->symlink );
-
+		$symlink_created = @symlink( dirname( __FILE__ ) . '/test-data/symlink', $this->symlink );
+		
 		unlink( dirname( __FILE__ ) . '/test-data/symlink' );
+		
+		if ( ! $symlink_created )		
+			$this->markTestSkipped( 'Couldn\'t create symlink to test with' );
 
 	}
 
@@ -61,7 +64,7 @@ class testBrokenSymlinkTestCase extends HM_Backup_UnitTestCase {
 
 		unset( $this->backup );
 
-		unlink( $this->symlink );
+		@unlink( $this->symlink );
 
 	}
 

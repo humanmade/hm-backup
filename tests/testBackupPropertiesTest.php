@@ -106,7 +106,7 @@ class testPropertiesTestCase extends HM_Backup_UnitTestCase {
 
 		$this->assertEquals( HM_Backup::conform_dir( WP_CONTENT_DIR . '/custom/dump.sql' ), $this->backup->get_database_dump_filepath() );
 
-		$this->backup->mysqldump();
+		$this->backup->dump_database();
 
 		$this->assertFileExists( $this->backup->get_database_dump_filepath() );
 

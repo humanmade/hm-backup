@@ -31,6 +31,9 @@ class testUnreadableFileTestCase extends HM_Backup_UnitTestCase {
 
 		chmod( $this->backup->get_root() . '/test-data.txt', 0220 );
 
+		if ( is_readable( $this->backup->get_root() . '/test-data.txt' ) )
+			$this->markTestSkipped( "File was readable." );
+
 	}
 
 	/**
@@ -63,8 +66,6 @@ class testUnreadableFileTestCase extends HM_Backup_UnitTestCase {
 		if ( ! $this->backup->get_zip_command_path() )
             $this->markTestSkipped( "Empty zip command path" );
 
-		$this->assertFalse( is_readable( $this->backup->get_root() . '/test-data.txt' ) );
-
 		$this->backup->zip();
 
 		$this->assertEmpty( $this->backup->get_errors() );
@@ -87,8 +88,6 @@ class testUnreadableFileTestCase extends HM_Backup_UnitTestCase {
 
 		$this->backup->set_zip_command_path( false );
 
-		$this->assertFalse( is_readable( $this->backup->get_root() . '/test-data.txt' ) );
-
 		$this->backup->zip_archive();
 
 		$this->assertEmpty( $this->backup->get_errors() );
@@ -108,8 +107,6 @@ class testUnreadableFileTestCase extends HM_Backup_UnitTestCase {
 	public function testArchiveUnreadableFileWithPclZip() {
 
 		$this->backup->set_zip_command_path( false );
-
-		$this->assertFalse( is_readable( $this->backup->get_root() . '/test-data.txt' ) );
 
 		$this->backup->pcl_zip();
 

@@ -34,7 +34,8 @@ class testSymlinkFileTestCase extends HM_Backup_UnitTestCase {
 
 		$this->symlink = dirname( __FILE__ ) . '/test-data/' . basename( __FILE__ );
 
-		symlink( __FILE__, $this->symlink );
+		if ( ! @symlink( __FILE__, $this->symlink ) )
+			$this->markTestSkipped( 'Couldn\'t create symlink to test with' );
 
 	}
 
