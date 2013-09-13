@@ -123,6 +123,36 @@ class HM_Backup {
 	private $mysqldump_method = '';
 
 	/**
+	 * @var bool
+	 */
+	protected $mysqldump_verified = false;
+
+	/**
+	 * @var bool
+	 */
+	protected $archive_verified = false;
+
+	/**
+	 * @var array
+	 */
+	protected $included_files = array();
+
+	/**
+	 * @var int
+	 */
+	protected $included_file_count = 0;
+
+	/**
+	 * @var int
+	 */
+	protected $excluded_file_count = 0;
+
+	/**
+	 * @var int
+	 */
+	protected $get_unreadable_file_count = 0;
+
+	/**
 	 * Check whether safe mode is active or not
 	 *
 	 * @param string $ini_get_callback
