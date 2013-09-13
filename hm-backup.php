@@ -11,7 +11,6 @@ class HM_Backup {
 	 * The path where the backup file should be saved
 	 *
 	 * @string
-	 * @access private
 	 */
 	private $path = '';
 
@@ -19,7 +18,6 @@ class HM_Backup {
 	 * The backup type, must be either complete, file or database
 	 *
 	 * @string
-	 * @access private
 	 */
 	private $type = '';
 
@@ -27,7 +25,6 @@ class HM_Backup {
 	 * The filename of the backup file
 	 *
 	 * @string
-	 * @access private
 	 */
 	private $archive_filename = '';
 
@@ -35,7 +32,6 @@ class HM_Backup {
 	 * The filename of the database dump
 	 *
 	 * @string
-	 * @access private
 	 */
 	private $database_dump_filename = '';
 
@@ -43,7 +39,6 @@ class HM_Backup {
 	 * The path to the zip command
 	 *
 	 * @string
-	 * @access private
 	 */
 	private $zip_command_path;
 
@@ -51,7 +46,6 @@ class HM_Backup {
 	 * The path to the mysqldump command
 	 *
 	 * @string
-	 * @access private
 	 */
 	private $mysqldump_command_path;
 
@@ -59,7 +53,6 @@ class HM_Backup {
 	 * An array of exclude rules
 	 *
 	 * @array
-	 * @access private
 	 */
 	private $excludes = array();
 
@@ -67,7 +60,6 @@ class HM_Backup {
 	 * The path that should be backed up
 	 *
 	 * @var string
-	 * @access private
 	 */
 	private $root = '';
 
@@ -75,7 +67,6 @@ class HM_Backup {
 	 * Holds the current db connection
 	 *
 	 * @var resource
-	 * @access private
 	 */
 	private $db;
 
@@ -84,7 +75,6 @@ class HM_Backup {
 	 * excluding excludes and unreadable files
 	 *
 	 * @var array
-	 * @access private
 	 */
 	private $files = array();
 
@@ -93,7 +83,6 @@ class HM_Backup {
 	 * that match the exclude rules
 	 *
 	 * @var array
-	 * @access private
 	 */
 	private $excluded_files = array();
 
@@ -102,7 +91,6 @@ class HM_Backup {
 	 * that are unreadable
 	 *
 	 * @var array
-	 * @access private
 	 */
 	private $unreadable_files = array();
 
@@ -110,7 +98,6 @@ class HM_Backup {
 	 * Contains an array of errors
 	 *
 	 * @var mixed
-	 * @access private
 	 */
 	private $errors = array();
 
@@ -118,7 +105,6 @@ class HM_Backup {
 	 * Contains an array of warnings
 	 *
 	 * @var mixed
-	 * @access private
 	 */
 	private $warnings = array();
 
@@ -126,7 +112,6 @@ class HM_Backup {
 	 * The archive method used
 	 *
 	 * @var string
-	 * @access private
 	 */
 	private $archive_method = '';
 
@@ -134,15 +119,12 @@ class HM_Backup {
 	 * The mysqldump method used
 	 *
 	 * @var string
-	 * @access private
 	 */
 	private $mysqldump_method = '';
 
 	/**
 	 * Check whether safe mode is active or not
 	 *
-	 * @access public
-	 * @static
 	 * @return bool
 	 */
 	public static function is_safe_mode_active( $ini_get_callback = 'ini_get' ) {
@@ -157,8 +139,6 @@ class HM_Backup {
 	/**
 	 * Check whether shell_exec has been disabled.
 	 *
-	 * @access public
-	 * @static
 	 * @return bool
 	 */
 	public static function is_shell_exec_available() {
@@ -184,8 +164,6 @@ class HM_Backup {
 	 * Attempt to work out the root directory of the site, that
 	 * is, the path equivelant of home_url().
 	 *
-	 * @access public
-	 * @static
 	 * @return string $home_path
 	 */
 	public static function get_home_path() {
@@ -206,8 +184,6 @@ class HM_Backup {
 	/**
 	 * Sanitize a directory path
 	 *
-	 * @access public
-	 * @static
 	 * @param string $dir
 	 * @param bool $rel. (default: false)
 	 * @return string $dir
@@ -236,8 +212,6 @@ class HM_Backup {
 
 	/**
 	 * Sets up the default properties
-	 *
-	 * @access public
 	 */
 	public function __construct() {
 
@@ -253,7 +227,6 @@ class HM_Backup {
 	/**
 	 * Get the full filepath to the archive file
 	 *
-	 * @access public
 	 * @return string
 	 */
 	public function get_archive_filepath() {
@@ -265,7 +238,6 @@ class HM_Backup {
 	/**
 	 * Get the filename of the archive file
 	 *
-	 * @access public
 	 * @return string
 	 */
 	public function get_archive_filename() {
@@ -280,7 +252,6 @@ class HM_Backup {
 	/**
 	 * Set the filename of the archive file
 	 *
-	 * @access public
 	 * @param string $filename
 	 */
 	public function set_archive_filename( $filename ) {
@@ -298,7 +269,6 @@ class HM_Backup {
 	/**
 	 * Get the full filepath to the database dump file.
 	 *
-	 * @access public
 	 * @return string
 	 */
 	public function get_database_dump_filepath() {
@@ -310,7 +280,6 @@ class HM_Backup {
 	/**
 	 * Get the filename of the database dump file
 	 *
-	 * @access public
 	 * @return string
 	 */
 	public function get_database_dump_filename() {
@@ -325,7 +294,6 @@ class HM_Backup {
 	/**
 	 * Set the filename of the database dump file
 	 *
-	 * @access public
 	 * @param string $filename
 	 */
 	public function set_database_dump_filename( $filename ) {
@@ -409,7 +377,6 @@ class HM_Backup {
 	 *
 	 * Will be either zip, ZipArchive or PclZip
 	 *
-	 * @access public
 	 */
 	public function get_archive_method() {
 		return $this->archive_method;
@@ -420,7 +387,6 @@ class HM_Backup {
 	 *
 	 * Will be either mysqldump or mysqldump_fallback
 	 *
-	 * @access public
 	 */
 	public function get_mysqldump_method() {
 		return $this->mysqldump_method;
@@ -431,7 +397,6 @@ class HM_Backup {
 	 *
 	 * Defaults to complete
 	 *
-	 * @access public
 	 */
 	public function get_type() {
 
@@ -447,7 +412,6 @@ class HM_Backup {
 	 *
 	 * $type must be one of complete, database or file
 	 *
-	 * @access public
 	 * @param string $type
 	 */
 	public function set_type( $type ) {
@@ -465,7 +429,6 @@ class HM_Backup {
 	 * If not explicitly set will attempt to work
 	 * it out by checking common locations
 	 *
-	 * @access public
 	 * @return string
 	 */
 	public function get_mysqldump_command_path() {
@@ -525,7 +488,6 @@ class HM_Backup {
 	 * Setting the path to false will cause the database
 	 * dump to use the php fallback
 	 *
-	 * @access public
 	 * @param mixed $path
 	 */
 	public function set_mysqldump_command_path( $path ) {
@@ -540,7 +502,6 @@ class HM_Backup {
 	 * If not explicitly set will attempt to work
 	 * it out by checking common locations
 	 *
-	 * @access public
 	 * @return string
 	 */
 	public function get_zip_command_path() {
@@ -586,7 +547,6 @@ class HM_Backup {
 	 * Setting the path to false will cause the database
 	 * dump to use the php fallback
 	 *
-	 * @access public
 	 * @param mixed $path
 	 */
 	public function set_zip_command_path( $path ) {
@@ -604,7 +564,6 @@ class HM_Backup {
 	/**
 	 * Kick off a backup
 	 *
-	 * @access public
 	 * @return bool
 	 */
 	public function backup() {
@@ -628,7 +587,6 @@ class HM_Backup {
 	 * Uses mysqldump if available, falls back to PHP
 	 * if not.
 	 *
-	 * @access public
 	 */
 	public function dump_database() {
 
@@ -708,7 +666,6 @@ class HM_Backup {
 	/**
 	 * PHP mysqldump fallback functions, exports the database to a .sql file
 	 *
-	 * @access public
 	 */
 	public function mysqldump_fallback() {
 
@@ -763,7 +720,6 @@ class HM_Backup {
 	 * thats not available then it falls back to
 	 * PHP ZipArchive and finally PclZip.
 	 *
-	 * @access public
 	 */
 	public function archive() {
 
@@ -789,8 +745,6 @@ class HM_Backup {
 
 	/**
 	 * Zip using the native zip command
-	 *
-	 * @access public
 	 */
 	public function zip() {
 
@@ -820,9 +774,6 @@ class HM_Backup {
 	/**
 	 * Fallback for creating zip archives if zip command is
 	 * unavailable.
-	 *
-	 * @access public
-	 * @param string $path
 	 */
 	public function zip_archive() {
 
@@ -891,9 +842,6 @@ class HM_Backup {
 	 * unavailable.
 	 *
 	 * Uses the PclZip library that ships with WordPress
-	 *
-	 * @access public
-	 * @param string $path
 	 */
 	public function pcl_zip() {
 
@@ -954,7 +902,6 @@ class HM_Backup {
 	/**
 	 * Verify that the archive is valid and contains all the files it should contain.
 	 *
-	 * @access public
 	 * @return bool
 	 */
 	public function verify_archive() {
@@ -980,7 +927,6 @@ class HM_Backup {
 	/**
 	 * Return an array of all files in the filesystem
 	 *
-	 * @access public
 	 * @return array
 	 */
 	public function get_files() {
@@ -1017,7 +963,6 @@ class HM_Backup {
 	 *
 	 * Used if RecursiveDirectoryIterator::FOLLOW_SYMLINKS isn't available
 	 *
-	 * @access private
 	 * @param string $dir
 	 * @param array $files. (default: array())
 	 * @return array
@@ -1051,7 +996,6 @@ class HM_Backup {
 	/**
 	 * Returns an array of files that will be included in the backup.
 	 *
-	 * @access public
 	 * @return array
 	 */
 	public function get_included_files() {
@@ -1088,7 +1032,6 @@ class HM_Backup {
 	/**
 	 * Return the number of files included in the backup
 	 *
-	 * @access public
 	 * @return array
 	 */
 	public function get_included_file_count() {
@@ -1125,7 +1068,6 @@ class HM_Backup {
 	/**
 	 * Returns an array of files that match the exclude rules.
 	 *
-	 * @access public
 	 * @return array
 	 */
 	public function get_excluded_files() {
@@ -1160,7 +1102,6 @@ class HM_Backup {
 	/**
 	 * Return the number of files excluded from the backup
 	 *
-	 * @access public
 	 * @return array
 	 */
 	public function get_excluded_file_count() {
@@ -1195,7 +1136,6 @@ class HM_Backup {
 	/**
 	 * Returns an array of unreadable files.
 	 *
-	 * @access public
 	 * @return array
 	 */
 	public function get_unreadable_files() {
@@ -1223,7 +1163,6 @@ class HM_Backup {
 	/**
 	 * Return the number of unreadable files.
 	 *
-	 * @access public
 	 * @return array
 	 */
 	public function get_unreadable_file_count() {
@@ -1263,7 +1202,6 @@ class HM_Backup {
 	 *
 	 * The backup path is automatically excluded
 	 *
-	 * @access public
 	 * @return array
 	 */
 	public function get_excludes() {
@@ -1284,7 +1222,6 @@ class HM_Backup {
 	/**
 	 * Set the excludes, expects and array
 	 *
-	 * @access public
 	 * @param  Array $excludes
 	 * @param Bool $append
 	 */
@@ -1306,7 +1243,6 @@ class HM_Backup {
 	 * Takes the exclude rules and formats them for use with either
 	 * the shell zip command or pclzip
 	 *
-	 * @access public
 	 * @param string $context. (default: 'zip')
 	 * @return string
 	 */
@@ -1390,7 +1326,6 @@ class HM_Backup {
 	/**
 	 * Add backquotes to tables and db-names in SQL queries. Taken from phpMyAdmin.
 	 *
-	 * @access private
 	 * @param mixed $a_name
 	 */
 	private function sql_backquote( $a_name ) {
@@ -1429,7 +1364,6 @@ class HM_Backup {
 	 * Alain Wolf, Zurich - Switzerland
 	 * Website: http://restkultur.ch/personal/wolf/scripts/db_backup/
 	 *
-	 * @access private
 	 * @param string $sql_file
 	 * @param string $table
 	 */
@@ -1567,7 +1501,6 @@ class HM_Backup {
 	 * Better addslashes for SQL queries.
 	 * Taken from phpMyAdmin.
 	 *
-	 * @access private
 	 * @param string $a_string. (default: '')
 	 * @param bool $is_like. (default: false)
 	 */
@@ -1587,7 +1520,6 @@ class HM_Backup {
 	/**
 	 * Write the SQL file
 	 *
-	 * @access private
 	 * @param string $sql
 	 */
 	private function write_sql( $sql ) {
@@ -1614,7 +1546,6 @@ class HM_Backup {
 	/**
 	 * Get the errors
 	 *
-	 * @access public
 	 */
 	public function get_errors( $context = null ) {
 
@@ -1628,7 +1559,6 @@ class HM_Backup {
 	/**
 	 * Add an error to the errors stack
 	 *
-	 * @access private
 	 * @param string $context
 	 * @param mixed $error
 	 */
@@ -1646,7 +1576,6 @@ class HM_Backup {
 	/**
 	 * Migrate errors to warnings
 	 *
-	 * @access private
 	 * @param string $context. (default: null)
 	 */
 	private function errors_to_warnings( $context = null ) {
@@ -1671,7 +1600,6 @@ class HM_Backup {
 	/**
 	 * Get the warnings
 	 *
-	 * @access public
 	 */
 	public function get_warnings( $context = null ) {
 
@@ -1685,7 +1613,6 @@ class HM_Backup {
 	/**
 	 * Add an warning to the warnings stack
 	 *
-	 * @access private
 	 * @param string $context
 	 * @param mixed $warning
 	 */
@@ -1703,7 +1630,6 @@ class HM_Backup {
 	/**
 	 * Custom error handler for catching php errors
 	 *
-	 * @access private
 	 * @param string $type
 	 * @param string $message
 	 * @param string $file
@@ -1732,7 +1658,6 @@ class HM_Backup {
  * and sets the database dump to be stored in the root
  * of the zip
  *
- * @access private
  * @param string $event
  * @param array &$file
  * @return bool
