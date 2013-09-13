@@ -125,6 +125,7 @@ class HM_Backup {
 	/**
 	 * Check whether safe mode is active or not
 	 *
+	 * @param string $ini_get_callback
 	 * @return bool
 	 */
 	public static function is_safe_mode_active( $ini_get_callback = 'ini_get' ) {
@@ -181,12 +182,13 @@ class HM_Backup {
 
 	}
 
+
 	/**
 	 * Sanitize a directory path
 	 *
 	 * @param string $dir
-	 * @param bool $rel. (default: false)
-	 * @return string $dir
+	 * @param bool   $recursive
+	 * @return string
 	 */
 	public static function conform_dir( $dir, $recursive = false ) {
 
@@ -308,15 +310,14 @@ class HM_Backup {
 
 	}
 
-    /**
-     * Get the root directory to backup from
-     *
-     * Defaults to the root of the path equivalent of your home_url
-     *
-     * @access public
-     * @return string
-     */
-    public function get_root() {
+	/**
+	 * Get the root directory to backup from
+	 *
+	 * Defaults to the root of the path equivalent of your home_url
+	 *
+	 * @return string
+	 */
+	public function get_root() {
 
 		if ( empty( $this->root ) )
 			$this->set_root( self::conform_dir( self::get_home_path() ) );
@@ -325,14 +326,13 @@ class HM_Backup {
 
     }
 
-    /**
-     * Set the root directory to backup from
-     *
-     * @access public
-     * @param string $path
-     * @return null
-     */
-    public function set_root( $path ) {
+	/**
+	 * Set the root directory to backup from
+	 *
+	 * @param string $path
+	 * @return WP_Error
+	 */
+	public function set_root( $path ) {
 
     	if ( empty( $path ) || ! is_string( $path ) || ! is_dir ( $path ) )
     		throw new Exception( 'Invalid root path <code>' . $path . '</code> must be a valid directory path' );
@@ -341,13 +341,12 @@ class HM_Backup {
 
     }
 
-    /**
-     * Get the directory backups are saved to
-     *
-     * @access public
-     * @return string
-     */
-    public function get_path() {
+	/**
+	 * Get the directory backups are saved to
+	 *
+	 * @return string
+	 */
+	public function get_path() {
 
 		if ( empty( $this->path ) )
 			$this->set_path( self::conform_dir( hmbkp_path_default() ) );
@@ -356,14 +355,13 @@ class HM_Backup {
 
     }
 
-    /**
-     * Set the directory backups are saved to
-     *
-     * @access public
-     * @param string $path
-     * @return null
-     */
-    public function set_path( $path ) {
+	/**
+	 * Set the directory backups are saved to
+	 *
+	 * @param string $path
+	 * @return null
+	 */
+	public function set_path( $path ) {
 
     	if ( empty( $path ) || ! is_string( $path ) )
     		throw new Exception( 'Invalid backup path <code>' . $path . '</code> must be a non empty (string)' );
@@ -1327,6 +1325,7 @@ class HM_Backup {
 	 * Add backquotes to tables and db-names in SQL queries. Taken from phpMyAdmin.
 	 *
 	 * @param mixed $a_name
+	 * @return array|string
 	 */
 	private function sql_backquote( $a_name ) {
 
@@ -1501,8 +1500,9 @@ class HM_Backup {
 	 * Better addslashes for SQL queries.
 	 * Taken from phpMyAdmin.
 	 *
-	 * @param string $a_string. (default: '')
-	 * @param bool $is_like. (default: false)
+	 * @param string $a_string (default: '')
+	 * @param bool   $is_like (default: false)
+	 * @return mixed
 	 */
 	private function sql_addslashes( $a_string = '', $is_like = false ) {
 
@@ -1521,6 +1521,7 @@ class HM_Backup {
 	 * Write the SQL file
 	 *
 	 * @param string $sql
+	 * @return bool
 	 */
 	private function write_sql( $sql ) {
 
@@ -1560,7 +1561,7 @@ class HM_Backup {
 	 * Add an error to the errors stack
 	 *
 	 * @param string $context
-	 * @param mixed $error
+	 * @param mixed  $error
 	 */
 	public function error( $context, $error ) {
 
@@ -1614,7 +1615,7 @@ class HM_Backup {
 	 * Add an warning to the warnings stack
 	 *
 	 * @param string $context
-	 * @param mixed $warning
+	 * @param mixed  $warning
 	 */
 	private function warning( $context, $warning ) {
 
@@ -1630,10 +1631,8 @@ class HM_Backup {
 	/**
 	 * Custom error handler for catching php errors
 	 *
-	 * @param string $type
-	 * @param string $message
-	 * @param string $file
-	 * @param string $line
+	 * @param $type
+	 * @return bool
 	 */
 	public function error_handler( $type ) {
 
@@ -1659,7 +1658,7 @@ class HM_Backup {
  * of the zip
  *
  * @param string $event
- * @param array &$file
+ * @param array  &$file
  * @return bool
  */
 function hmbkp_pclzip_callback( $event, &$file ) {
