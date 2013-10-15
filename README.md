@@ -3,14 +3,6 @@ hm-backup
 
 The core backup engine that powers BackUpWordPress &amp; WP Remote
 
-## primary-contact  
- 
-Tom Willmot   
+## Contribution guidelines ##
 
-@willmot  
-
-## secondary-contact 
-
--
-
--
+see https://github.com/humanmade/hm-backup/blob/master/CONTRIBUTING.md
