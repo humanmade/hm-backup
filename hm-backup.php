@@ -511,7 +511,8 @@ class HM_Backup {
 			'/Program Files/MySQL/MySQL Server 5.4/bin/mysqldump',
 			'/Program Files/MySQL/MySQL Server 5.1/bin/mysqldump',
 			'/Program Files/MySQL/MySQL Server 5.0/bin/mysqldump',
-			'/Program Files/MySQL/MySQL Server 4.1/bin/mysqldump'
+			'/Program Files/MySQL/MySQL Server 4.1/bin/mysqldump',
+			'/opt/local/bin/mysqldump'
 		);
 
 		// Find the one which works
@@ -572,7 +573,8 @@ class HM_Backup {
 
 		// List of possible zip locations
 		$zip_locations = array(
-			'/usr/bin/zip'
+			'/usr/bin/zip',
+			'/opt/local/bin/zip'
 		);
 
 		// Find the one which works
@@ -1498,7 +1500,7 @@ class HM_Backup {
 	    	$field_set[$j] = $this->sql_backquote( mysql_field_name( $result, $j ) );
 	    	$type = mysql_field_type( $result, $j );
 
-	    	if ( $type === 'tinyint' || $type === 'smallint' || $type === 'mediumint' || $type === 'int' || $type === 'bigint'  || $type === 'timestamp')
+	    	if ( $type === 'tinyint' || $type === 'smallint' || $type === 'mediumint' || $type === 'int' || $type === 'bigint' )
 	    		$field_num[$j] = true;
 
 	    	else
