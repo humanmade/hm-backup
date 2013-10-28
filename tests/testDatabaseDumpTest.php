@@ -26,7 +26,7 @@ class testDatabaseDumpTestCase extends HM_Backup_UnitTestCase {
 		$this->backup = new HM_Backup();
 		$this->backup->set_path( dirname( __FILE__ ) . '/tmp' );
 
-		mkdir( $this->backup->get_path() );
+		wp_mkdir_p( $this->backup->get_path() );
 
 	}
 

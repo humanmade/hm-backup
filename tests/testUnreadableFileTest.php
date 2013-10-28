@@ -27,7 +27,7 @@ class testUnreadableFileTestCase extends HM_Backup_UnitTestCase {
 		$this->backup->set_path( dirname( __FILE__ ) . '/tmp' );
 		$this->backup->set_type( 'file' );
 
-		mkdir( $this->backup->get_path() );
+		wp_mkdir_p( $this->backup->get_path() );
 
 		chmod( $this->backup->get_root() . '/test-data.txt', 0220 );
 

@@ -28,7 +28,7 @@ class testExcludesTestCase extends HM_Backup_UnitTestCase {
 		$this->backup->set_path( dirname( __FILE__ ) . '/tmp' );
 
 		hmbkp_rmdirtree( $this->backup->get_path() );
-		mkdir( $this->backup->get_path() );
+		wp_mkdir_p( $this->backup->get_path() );
 
 	}
 

@@ -30,7 +30,7 @@ class testSymlinkDirTestCase extends HM_Backup_UnitTestCase {
 		$this->backup->set_path( dirname( __FILE__ ) . '/tmp' );
 		$this->backup->set_type( 'file' );
 
-		mkdir( $this->backup->get_path() );
+		wp_mkdir_p( $this->backup->get_path() );
 
 		$this->symlink = dirname( __FILE__ ) . '/test-data/tests';
 

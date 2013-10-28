@@ -27,7 +27,7 @@ class testPropertiesTestCase extends HM_Backup_UnitTestCase {
 
 		$this->custom_path = WP_CONTENT_DIR . '/custom';
 
-		mkdir( $this->custom_path );
+		wp_mkdir_p( $this->custom_path );
 
 	}
 
