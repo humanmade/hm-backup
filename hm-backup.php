@@ -1354,15 +1354,15 @@ class HM_Backup {
 
 		$this->do_action( 'hmbkp_archive_started' );
 
-		global $_wprp_hmbkp_exclude_string;
+		global $_hmbkp_exclude_string;
 
-		$_wprp_hmbkp_exclude_string = $this->exclude_string( 'regex' );
+		$_hmbkp_exclude_string = $this->exclude_string( 'regex' );
 
 		$archive = &$this->setup_pclzip();
 
 		// Zip up everything
 		if ( $this->get_type() !== 'database' )
-			if ( ! $archive->add( $this->get_root(), PCLZIP_OPT_REMOVE_PATH, $this->get_root(), PCLZIP_CB_PRE_ADD, 'wprp_hmbkp_pclzip_callback' ) )
+			if ( ! $archive->add( $this->get_root(), PCLZIP_OPT_REMOVE_PATH, $this->get_root(), PCLZIP_CB_PRE_ADD, 'hmbkp_pclzip_callback' ) )
 				$this->warning( $this->get_archive_method(), $archive->errorInfo( true ) );
 
 		// Add the database
@@ -1370,7 +1370,7 @@ class HM_Backup {
 			if ( ! $archive->add( $this->get_database_dump_filepath(), PCLZIP_OPT_REMOVE_PATH, $this->get_path() ) )
 				$this->warning( $this->get_archive_method(), $archive->errorInfo( true ) );
 
-		unset( $GLOBALS['_wprp_hmbkp_exclude_string'] );
+		unset( $GLOBALS['_hmbkp_exclude_string'] );
 
 		$this->verify_archive();
 
@@ -2205,16 +2205,16 @@ class HM_Backup {
  * @param array &$file
  * @return bool
  */
-function wprp_hmbkp_pclzip_callback( $event, &$file ) {
+function hmbkp_pclzip_callback( $event, &$file ) {
 
-	global $_wprp_hmbkp_exclude_string;
+	global $_hmbkp_exclude_string;
 
 	// Don't try to add unreadable files.
 	if ( ! is_readable( $file['filename'] ) || ! file_exists( $file['filename'] ) )
 		return false;
 
 	// Match everything else past the exclude list
-	elseif ( $_wprp_hmbkp_exclude_string && preg_match( '(' . $_wprp_hmbkp_exclude_string . ')', $file['stored_filename'] ) )
+	elseif ( $_hmbkp_exclude_string && preg_match( '(' . $_hmbkp_exclude_string . ')', $file['stored_filename'] ) )
 		return false;
 
 	return true;
