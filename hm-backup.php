@@ -509,10 +509,12 @@ class HM_Backup {
 			'/opt/local/bin/mysqldump'
 		);
 
-		// Find the one which works
+		// Find the first one which works
 		foreach ( $mysqldump_locations as $location ) {
-			if ( @is_executable( self::conform_dir( $location ) ) )
+			if ( @is_executable( self::conform_dir( $location ) ) ) {
 				$this->set_mysqldump_command_path( $location );
+				break;  // Found one
+			}
 		}
 
 		return $this->mysqldump_command_path;
@@ -570,10 +572,12 @@ class HM_Backup {
 			'/opt/local/bin/zip'
 		);
 
-		// Find the one which works
+		// Find the first one which works
 		foreach ( $zip_locations as $location ) {
-			if ( @is_executable( self::conform_dir( $location ) ) )
+			if ( @is_executable( self::conform_dir( $location ) ) ) {
 				$this->set_zip_command_path( $location );
+				break;  // Found one
+			}
 		}
 
 		return $this->zip_command_path;
