@@ -181,7 +181,7 @@ class HM_Backup {
 		// Is shell_exec or escapeshellcmd or escapeshellarg disabled?
 		if ( array_intersect( array( 'shell_exec', 'escapeshellarg', 'escapeshellcmd' ), array_map( 'trim', explode( ',', @ini_get( 'disable_functions' ) ) ) ) )
 			return false;
-
+		
 		// Functions can also be disabled via suhosin
 		if ( array_intersect( array( 'shell_exec', 'escapeshellarg', 'escapeshellcmd' ), array_map( 'trim', explode( ',', @ini_get( 'suhosin.executor.func.blacklist' ) ) ) ) )
 			return false;
@@ -207,11 +207,6 @@ class HM_Backup {
 		$site_url = site_url();
 
 		$home_path = ABSPATH;
-
-		// Attempt to guess the home path based on the location of wp-config.php
-		if ( ! file_exists( ABSPATH . 'wp-config.php' ) ) {
-    		$home_path = trailingslashit( dirname( ABSPATH ) );
-		}
 
 		// If site_url contains home_url and they differ then assume WordPress is installed in a sub directory
 		if ( $home_url !== $site_url && strpos( $site_url, $home_url ) === 0 )
