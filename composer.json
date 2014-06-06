@@ -1,0 +1,20 @@
+{
+	"name"       : "humanmade/hm-backup",
+	"description": "The core backup engine that powers BackUpWordPress & WP Remote",
+	"keywords"   : ["wordpress"],
+	"homepage"   : "https://github.com/humanmade/hm-backup",
+	"license"    : "GPL-2.0+",
+	"authors"    : [
+		{
+			"name"    : "Human Made Limited",
+			"email"   : "hello@humanmade.co.uk",
+			"homepage": "http://humanmade.co.uk"
+		}
+	],
+	"support"    : {
+		"issues": "https://github.com/humanmade/hm-backup/issues"
+	},
+	"autoload"   : {
+		"classmap": ["hm-backup.php"]
+	}
+}
