@@ -261,7 +261,7 @@ class HM_Backup {
 		@set_time_limit( 0 );
 
 		// Set a custom error handler so we can track errors
-		set_error_handler( array( &$this, 'error_handler' ) );
+		set_error_handler( array( $this, 'error_handler' ) );
 
 	}
 
@@ -1121,7 +1121,7 @@ class HM_Backup {
 
 		$excludes = $this->get_excludes();
 
-		foreach ( $excludes as $key => &$rule ) {
+		foreach ( $excludes as $key => $rule ) {
 
 			$file = $absolute = $fragment = false;
 
@@ -1525,10 +1525,10 @@ class HM_Backup {
  * of the zip
  *
  * @param string $event
- * @param array  &$file
+ * @param array  $file
  * @return bool
  */
-function hmbkp_pclzip_callback( $event, &$file ) {
+function hmbkp_pclzip_callback( $event, $file ) {
 
 	global $_hmbkp_exclude_string;
 
