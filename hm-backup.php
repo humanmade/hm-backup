@@ -658,6 +658,7 @@ class HM_Backup {
 
 		$host = reset( $host );
 		$port = strpos( DB_HOST, ':' ) ? end( explode( ':', DB_HOST ) ) : '';
+		$socket = strpos( DB_HOST, ':' ) ? end( explode( ':', DB_HOST ) ) : '';
 
 		// Path to the mysqldump executable
 		$cmd = escapeshellarg( $this->get_mysqldump_command_path() );
@@ -685,6 +686,10 @@ class HM_Backup {
 		// Set the port if it was set
 		if ( ! empty( $port ) && is_numeric( $port ) )
 			$cmd .= ' -P ' . $port;
+			
+		// Set the socket path
+		if ( ! empty( $socket ) && !is_numeric( $socket ) )			
+			$cmd .= ' --protocol=socket -S ' . $socket;	
 
 		// The file we're saving too
 		$cmd .= ' -r ' . escapeshellarg( $this->get_database_dump_filepath() );
