@@ -95,6 +95,14 @@ class HM_Backup {
 	private $unreadable_files = array();
 
 	/**
+	 * An array of all the files in root
+	 * that will be included in the backup
+	 *
+	 * @var array
+	 */
+	protected $included_files = array();
+
+	/**
 	 * Contains an array of errors
 	 *
 	 * @var mixed
@@ -131,26 +139,6 @@ class HM_Backup {
 	 * @var bool
 	 */
 	protected $archive_verified = false;
-
-	/**
-	 * @var array
-	 */
-	protected $included_files = array();
-
-	/**
-	 * @var int
-	 */
-	protected $included_file_count = 0;
-
-	/**
-	 * @var int
-	 */
-	protected $excluded_file_count = 0;
-
-	/**
-	 * @var int
-	 */
-	protected $get_unreadable_file_count = 0;
 
 	/**
 	 * Check whether safe mode is active or not
@@ -1038,6 +1026,103 @@ class HM_Backup {
 		endwhile;
 
 		return $files;
+
+	}
+
+	/**
+	 * Returns an array of files that will be included in the backup.
+	 *
+	 * @return array
+	 */
+	public function get_included_files() {
+
+		if ( ! empty( $this->included_files ) )
+			return $this->included_files;
+
+		$this->included_files = array();
+
+		$excludes = $this->exclude_string( 'regex' );
+
+		foreach ( $this->get_files() as $file ) {
+
+			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
+			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
+				continue;
+
+			// Skip unreadable files
+			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
+				continue;
+
+			// Excludes
+			if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
+				continue;
+
+			$this->included_files[] = $file;
+
+		}
+
+		return $this->included_files;
+
+	}
+
+	/**
+	 * Returns an array of files that match the exclude rules.
+	 *
+	 * @return array
+	 */
+	public function get_excluded_files() {
+
+		if ( ! empty( $this->excluded_files ) )
+			return $this->excluded_files;
+
+		$this->excluded_files = array();
+
+		$excludes = $this->exclude_string( 'regex' );
+
+		foreach ( $this->get_files() as $file ) {
+
+			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
+			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
+				continue;
+
+			// Skip unreadable files
+			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
+				continue;
+
+			// Excludes
+			if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
+				$this->excluded_files[] = $file;
+
+		}
+
+		return $this->excluded_files;
+
+	}
+
+	/**
+	 * Returns an array of unreadable files.
+	 *
+	 * @return array
+	 */
+	public function get_unreadable_files() {
+
+		if ( ! empty( $this->unreadable_files ) )
+			return $this->unreadable_files;
+
+		$this->unreadable_files = array();
+
+		foreach ( $this->get_files() as $file ) {
+
+			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
+			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
+				continue;
+
+			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
+				$this->unreadable_files[] = $file;
+
+		}
+
+		return $this->unreadable_files;
 
 	}
 
