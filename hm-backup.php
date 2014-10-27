@@ -95,6 +95,14 @@ class HM_Backup {
 	private $unreadable_files = array();
 
 	/**
+	 * An array of all the files in root
+	 * that will be included in the backup
+	 *
+	 * @var array
+	 */
+	protected $included_files = array();
+
+	/**
 	 * Contains an array of errors
 	 *
 	 * @var mixed
@@ -131,26 +139,6 @@ class HM_Backup {
 	 * @var bool
 	 */
 	protected $archive_verified = false;
-
-	/**
-	 * @var array
-	 */
-	protected $included_files = array();
-
-	/**
-	 * @var int
-	 */
-	protected $included_file_count = 0;
-
-	/**
-	 * @var int
-	 */
-	protected $excluded_file_count = 0;
-
-	/**
-	 * @var int
-	 */
-	protected $get_unreadable_file_count = 0;
 
 	/**
 	 * Check whether safe mode is active or not
@@ -208,14 +196,10 @@ class HM_Backup {
 
 		$home_path = ABSPATH;
 
-		// Attempt to guess the home path based on the location of wp-config.php
-		if ( ! file_exists( ABSPATH . 'wp-config.php' ) ) {
-    		$home_path = trailingslashit( dirname( ABSPATH ) );
-		}
-
 		// If site_url contains home_url and they differ then assume WordPress is installed in a sub directory
-		if ( $home_url !== $site_url && strpos( $site_url, $home_url ) === 0 )
+		if ( $home_url !== $site_url && strpos( $site_url, $home_url ) === 0 ) {
 			$home_path = trailingslashit( substr( self::conform_dir( ABSPATH ), 0, strrpos( self::conform_dir( ABSPATH ), str_replace( $home_url, '', $site_url ) ) ) );
+		}
 
 		return self::conform_dir( $home_path );
 
@@ -654,11 +638,21 @@ class HM_Backup {
 
 		$this->do_action( 'hmbkp_mysqldump_started' );
 
-		$host = explode( ':', DB_HOST );
-
-		$host = reset( $host );
-		$port = strpos( DB_HOST, ':' ) ? end( explode( ':', DB_HOST ) ) : '';
-		$socket = strpos( DB_HOST, ':' ) ? end( explode( ':', DB_HOST ) ) : '';
+		// Guess port or socket connection type
+		$port_or_socket = strstr( DB_HOST, ':' );
+		if ( ! empty( $port_or_socket ) ) {
+			$host = substr( DB_HOST, 0, strpos( DB_HOST, ':' ) );
+			$port_or_socket = substr( $port_or_socket, 1 );
+			if ( 0 !== strpos( $port_or_socket, '/' ) ) {
+				$port = intval( $port_or_socket );
+				$maybe_socket = strstr( $port_or_socket, ':' );
+				if ( ! empty( $maybe_socket ) ) {
+					$socket = substr( $maybe_socket, 1 );
+				}
+			} else {
+				$socket = $port_or_socket;
+			}
+		}
 
 		// Path to the mysqldump executable
 		$cmd = escapeshellarg( $this->get_mysqldump_command_path() );
@@ -1046,6 +1040,103 @@ class HM_Backup {
 
 	}
 
+	/**
+	 * Returns an array of files that will be included in the backup.
+	 *
+	 * @return array
+	 */
+	public function get_included_files() {
+
+		if ( ! empty( $this->included_files ) )
+			return $this->included_files;
+
+		$this->included_files = array();
+
+		$excludes = $this->exclude_string( 'regex' );
+
+		foreach ( $this->get_files() as $file ) {
+
+			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
+			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
+				continue;
+
+			// Skip unreadable files
+			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
+				continue;
+
+			// Excludes
+			if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
+				continue;
+
+			$this->included_files[] = $file;
+
+		}
+
+		return $this->included_files;
+
+	}
+
+	/**
+	 * Returns an array of files that match the exclude rules.
+	 *
+	 * @return array
+	 */
+	public function get_excluded_files() {
+
+		if ( ! empty( $this->excluded_files ) )
+			return $this->excluded_files;
+
+		$this->excluded_files = array();
+
+		$excludes = $this->exclude_string( 'regex' );
+
+		foreach ( $this->get_files() as $file ) {
+
+			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
+			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
+				continue;
+
+			// Skip unreadable files
+			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
+				continue;
+
+			// Excludes
+			if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
+				$this->excluded_files[] = $file;
+
+		}
+
+		return $this->excluded_files;
+
+	}
+
+	/**
+	 * Returns an array of unreadable files.
+	 *
+	 * @return array
+	 */
+	public function get_unreadable_files() {
+
+		if ( ! empty( $this->unreadable_files ) )
+			return $this->unreadable_files;
+
+		$this->unreadable_files = array();
+
+		foreach ( $this->get_files() as $file ) {
+
+			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
+			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
+				continue;
+
+			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
+				$this->unreadable_files[] = $file;
+
+		}
+
+		return $this->unreadable_files;
+
+	}
+
 	private function load_pclzip() {
 
 		// Load PclZip
@@ -1067,12 +1158,14 @@ class HM_Backup {
 
 		$excludes = array();
 
-		if ( isset( $this->excludes ) )
+		if ( isset( $this->excludes ) ) {
 			$excludes = $this->excludes;
+		}
 
 		// If path() is inside root(), exclude it
-		if ( strpos( $this->get_path(), $this->get_root() ) !== false )
+		if ( strpos( $this->get_path(), $this->get_root() ) !== false ) {
 			array_unshift( $excludes, trailingslashit( $this->get_path() ) );
+		}
 
 		return array_unique( $excludes );
 
@@ -1086,11 +1179,13 @@ class HM_Backup {
 	 */
 	public function set_excludes( $excludes, $append = false ) {
 
-		if ( is_string( $excludes ) )
+		if ( is_string( $excludes ) ) {
 			$excludes = explode( ',', $excludes );
+		}
 
-		if ( $append )
+		if ( $append ) {
 			$excludes = array_merge( $this->excludes, $excludes );
+		}
 
 		$this->excludes = array_filter( array_unique( array_map( 'trim', $excludes ) ) );
 
