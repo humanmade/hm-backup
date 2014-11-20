@@ -1206,58 +1206,71 @@ class HM_Backup {
 
 		$excludes = $this->get_excludes();
 
-		foreach ( $excludes as $key => $rule ) {
+		foreach ( $excludes as $key => &$rule ) {
 
 			$file = $absolute = $fragment = false;
 
 			// Files don't end with /
-			if ( ! in_array( substr( $rule, - 1 ), array( '\\', '/' ) ) )
+			if ( ! in_array( substr( $rule, - 1 ), array( '\\', '/' ) ) ) {
 				$file = true;
+			}
 
 			// If rule starts with a / then treat as absolute path
-			elseif ( in_array( substr( $rule, 0, 1 ), array( '\\', '/' ) ) )
+			elseif ( in_array( substr( $rule, 0, 1 ), array( '\\', '/' ) ) ) {
 				$absolute = true;
+			}
 
 			// Otherwise treat as dir fragment
-			else
+			else {
 				$fragment = true;
+			}
 
 			// Strip $this->root and conform
 			$rule = str_ireplace( $this->get_root(), '', untrailingslashit( self::conform_dir( $rule ) ) );
 
+
 			// Strip the preceeding slash
-			if ( in_array( substr( $rule, 0, 1 ), array( '\\', '/' ) ) )
+			if ( in_array( substr( $rule, 0, 1 ), array( '\\', '/' ) ) ) {
 				$rule = substr( $rule, 1 );
+			}
 
 			// Escape string for regex
-			if ( $context === 'regex' )
+			if ( $context === 'regex' ) {
 				$rule = str_replace( '.', '\.', $rule );
+			}
 
 			// Convert any existing wildcards
-			if ( $wildcard !== '*' && strpos( $rule, '*' ) !== false )
+			if ( $wildcard !== '*' && strpos( $rule, '*' ) !== false ) {
 				$rule = str_replace( '*', $wildcard, $rule );
+			}
 
 			// Wrap directory fragments and files in wildcards for zip
-			if ( $context === 'zip' && ( $fragment || $file ) )
+			if ( $context === 'zip' && ( $fragment || $file ) ) {
 				$rule = $wildcard . $rule . $wildcard;
+			}
 
 			// Add a wildcard to the end of absolute url for zips
-			if ( $context === 'zip' && $absolute )
+			if ( $context === 'zip' && $absolute ) {
 				$rule .= $wildcard;
+			}
 
 			// Add and end carrot to files for pclzip but only if it doesn't end in a wildcard
-			if ( $file && $context === 'regex' )
+			if ( $file && $context === 'regex' ) {
 				$rule .= '$';
+			}
 
 			// Add a start carrot to absolute urls for pclzip
-			if ( $absolute && $context === 'regex' )
+			if ( $absolute && $context === 'regex' ) {
 				$rule = '^' . $rule;
+			}
+
 
 		}
 
 		// Escape shell args for zip command
-		if ( $context === 'zip' )
+		if ( $context === 'zip' ) {
 			$excludes = array_map( 'escapeshellarg', array_unique( $excludes ) );
+		}
 
 		return implode( $separator, $excludes );
 
