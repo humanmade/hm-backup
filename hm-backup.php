@@ -1651,8 +1651,8 @@ class ExcludesFilterIterator extends RecursiveFilterIterator {
 
 	public function accept() {
 
-		$excludes = array( '.git', '.svn', '.idea' );
-		return ! ( $this->isDir() && in_array( $this->getFilename(), $excludes ) );
+		$excludes = array( '.git', '.svn', '.DS_Store' );
+		return ! ( in_array( $this->getFilename(), $excludes ) );
 
 	}
 
