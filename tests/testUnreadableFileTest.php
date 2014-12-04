@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tests for the Archive process with unreadble files
+ * Tests for the Archive process with unreadable files
  *
  * @extends WP_UnitTestCase
  */

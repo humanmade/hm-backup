@@ -283,10 +283,10 @@ class HM_Backup {
 	public function set_archive_filename( $filename ) {
 
 		if ( empty( $filename ) || ! is_string( $filename ) )
-			return new WP_Error( 'invalid_file_name', __( 'archive filename must be a non empty string', 'hmbkp' ) );
+			return new WP_Error( 'invalid_file_name', __( 'archive filename must be a non empty string', 'backupwordpress' ) );
 
 		if ( pathinfo( $filename, PATHINFO_EXTENSION ) !== 'zip' )
-			return new WP_Error( 'invalid_file_extension', sprintf( __( 'invalid file extension for archive filename <code>%s</code>', 'hmbkp' ), $filename ) );
+			return new WP_Error( 'invalid_file_extension', sprintf( __( 'invalid file extension for archive filename <code>%s</code>', 'backupwordpress' ), $filename ) );
 
 		$this->archive_filename = strtolower( sanitize_file_name( remove_accents( $filename ) ) );
 
@@ -326,10 +326,10 @@ class HM_Backup {
 	public function set_database_dump_filename( $filename ) {
 
 		if ( empty( $filename ) || ! is_string( $filename ) )
-			return new WP_Error( 'invalid_file_name', __( 'database dump filename must be a non empty string', 'hmbkp' ) );
+			return new WP_Error( 'invalid_file_name', __( 'database dump filename must be a non empty string', 'backupwordpress' ) );
 
 		if ( pathinfo( $filename, PATHINFO_EXTENSION ) !== 'sql' )
-			return new WP_Error( 'invalid_file_extension', sprintf( __( 'invalid file extension for database dump filename <code>%s</code>', 'hmbkp' ), $filename ) );
+			return new WP_Error( 'invalid_file_extension', sprintf( __( 'invalid file extension for database dump filename <code>%s</code>', 'backupwordpress' ), $filename ) );
 
 		$this->database_dump_filename = strtolower( sanitize_file_name( remove_accents( $filename ) ) );
 
@@ -360,7 +360,7 @@ class HM_Backup {
 	public function set_root( $path ) {
 
 		if ( empty( $path ) || ! is_string( $path ) || ! is_dir( $path ) )
-			return new WP_Error( 'invalid_directory_path', sprintf( __( 'Invalid root path <code>%s</code> must be a valid directory path', 'hmbkp' ), $path ) );
+			return new WP_Error( 'invalid_directory_path', sprintf( __( 'Invalid root path <code>%s</code> must be a valid directory path', 'backupwordpress' ), $path ) );
 
 		$this->root = self::conform_dir( $path );
 
@@ -389,7 +389,7 @@ class HM_Backup {
 	public function set_path( $path ) {
 
 		if ( empty( $path ) || ! is_string( $path ) )
-			return new WP_Error( 'invalid_backup_path', sprintf( __( 'Invalid backup path <code>%s</code> must be a non empty (string)', 'hmbkp' ), $path ) );
+			return new WP_Error( 'invalid_backup_path', sprintf( __( 'Invalid backup path <code>%s</code> must be a non empty (string)', 'backupwordpress' ), $path ) );
 
 		$this->path = self::conform_dir( $path );
 
@@ -441,7 +441,7 @@ class HM_Backup {
 	public function set_type( $type ) {
 
 		if ( ! is_string( $type ) || ! in_array( $type, array( 'file', 'database', 'complete' ) ) )
-			return new WP_Error( 'invalid_backup_type', sprintf( __( 'Invalid backup type <code>%s</code> must be one of (string) file, database or complete', 'hmbkp' ), $type ) );
+			return new WP_Error( 'invalid_backup_type', sprintf( __( 'Invalid backup type <code>%s</code> must be one of (string) file, database or complete', 'backupwordpress' ), $type ) );
 
 		$this->type = $type;
 
