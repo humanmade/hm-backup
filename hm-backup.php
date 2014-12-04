@@ -95,6 +95,14 @@ class HM_Backup {
 	private $unreadable_files = array();
 
 	/**
+	 * An array of all the files in root
+	 * that will be included in the backup
+	 *
+	 * @var array
+	 */
+	protected $included_files = array();
+
+	/**
 	 * Contains an array of errors
 	 *
 	 * @var mixed
@@ -133,26 +141,6 @@ class HM_Backup {
 	protected $archive_verified = false;
 
 	/**
-	 * @var array
-	 */
-	protected $included_files = array();
-
-	/**
-	 * @var int
-	 */
-	protected $included_file_count = 0;
-
-	/**
-	 * @var int
-	 */
-	protected $excluded_file_count = 0;
-
-	/**
-	 * @var int
-	 */
-	protected $get_unreadable_file_count = 0;
-
-	/**
 	 * Check whether safe mode is active or not
 	 *
 	 * @param string $ini_get_callback
@@ -181,7 +169,7 @@ class HM_Backup {
 		// Is shell_exec or escapeshellcmd or escapeshellarg disabled?
 		if ( array_intersect( array( 'shell_exec', 'escapeshellarg', 'escapeshellcmd' ), array_map( 'trim', explode( ',', @ini_get( 'disable_functions' ) ) ) ) )
 			return false;
-		
+
 		// Functions can also be disabled via suhosin
 		if ( array_intersect( array( 'shell_exec', 'escapeshellarg', 'escapeshellcmd' ), array_map( 'trim', explode( ',', @ini_get( 'suhosin.executor.func.blacklist' ) ) ) ) )
 			return false;
@@ -209,8 +197,9 @@ class HM_Backup {
 		$home_path = ABSPATH;
 
 		// If site_url contains home_url and they differ then assume WordPress is installed in a sub directory
-		if ( $home_url !== $site_url && strpos( $site_url, $home_url ) === 0 )
+		if ( $home_url !== $site_url && strpos( $site_url, $home_url ) === 0 ) {
 			$home_path = trailingslashit( substr( self::conform_dir( ABSPATH ), 0, strrpos( self::conform_dir( ABSPATH ), str_replace( $home_url, '', $site_url ) ) ) );
+		}
 
 		return self::conform_dir( $home_path );
 
@@ -256,7 +245,7 @@ class HM_Backup {
 		@set_time_limit( 0 );
 
 		// Set a custom error handler so we can track errors
-		set_error_handler( array( &$this, 'error_handler' ) );
+		set_error_handler( array( $this, 'error_handler' ) );
 
 	}
 
@@ -385,7 +374,7 @@ class HM_Backup {
 	public function get_path() {
 
 		if ( empty( $this->path ) )
-			$this->set_path( self::conform_dir( hmbkp_path_default() ) );
+			$this->set_path( self::conform_dir( hmbkp_path() ) );
 
 		return $this->path;
 
@@ -509,10 +498,12 @@ class HM_Backup {
 			'/opt/local/bin/mysqldump'
 		);
 
-		// Find the one which works
+		// Find the first one which works
 		foreach ( $mysqldump_locations as $location ) {
-			if ( @is_executable( self::conform_dir( $location ) ) )
+			if ( @is_executable( self::conform_dir( $location ) ) ) {
 				$this->set_mysqldump_command_path( $location );
+				break;  // Found one
+			}
 		}
 
 		return $this->mysqldump_command_path;
@@ -570,10 +561,12 @@ class HM_Backup {
 			'/opt/local/bin/zip'
 		);
 
-		// Find the one which works
+		// Find the first one which works
 		foreach ( $zip_locations as $location ) {
-			if ( @is_executable( self::conform_dir( $location ) ) )
+			if ( @is_executable( self::conform_dir( $location ) ) ) {
 				$this->set_zip_command_path( $location );
+				break;  // Found one
+			}
 		}
 
 		return $this->zip_command_path;
@@ -980,14 +973,13 @@ class HM_Backup {
 
 			$this->files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->get_root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
 
-			// Skip dot files if the SKIP_Dots flag is available
-			if ( defined( 'RecursiveDirectoryIterator::SKIP_DOTS' ) )
+			// Skip dot files if the SKIP_DOTS flag is available
+			if ( defined( 'RecursiveDirectoryIterator::SKIP_DOTS' ) ) {
 				$this->files->setFlags( RecursiveDirectoryIterator::SKIP_DOTS + RecursiveDirectoryIterator::FOLLOW_SYMLINKS );
+			}
 
-
-			// If RecursiveDirectoryIterator::FOLLOW_SYMLINKS isn't available then fallback to a less memory efficient method
-		}
-		else {
+		// If RecursiveDirectoryIterator::FOLLOW_SYMLINKS isn't available then fallback to a less memory efficient method
+		} else {
 
 			$this->files = $this->get_files_fallback( $this->get_root() );
 
@@ -1070,42 +1062,6 @@ class HM_Backup {
 	}
 
 	/**
-	 * Return the number of files included in the backup
-	 *
-	 * @return array
-	 */
-	public function get_included_file_count() {
-
-		if ( ! empty( $this->included_file_count ) )
-			return $this->included_file_count;
-
-		$this->included_file_count = 0;
-
-		$excludes = $this->exclude_string( 'regex' );
-
-		foreach ( $this->get_files() as $file ) {
-
-			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
-			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
-				continue;
-
-			// Skip unreadable files
-			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
-				continue;
-
-			// Excludes
-			if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
-				continue;
-
-			$this->included_file_count ++;
-
-		}
-
-		return $this->included_file_count;
-
-	}
-
-	/**
 	 * Returns an array of files that match the exclude rules.
 	 *
 	 * @return array
@@ -1140,40 +1096,6 @@ class HM_Backup {
 	}
 
 	/**
-	 * Return the number of files excluded from the backup
-	 *
-	 * @return array
-	 */
-	public function get_excluded_file_count() {
-
-		if ( ! empty( $this->excluded_file_count ) )
-			return $this->excluded_file_count;
-
-		$this->excluded_file_count = 0;
-
-		$excludes = $this->exclude_string( 'regex' );
-
-		foreach ( $this->get_files() as $file ) {
-
-			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
-			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
-				continue;
-
-			// Skip unreadable files
-			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
-				continue;
-
-			// Excludes
-			if ( $excludes && preg_match( '(' . $excludes . ')', str_ireplace( trailingslashit( $this->get_root() ), '', self::conform_dir( $file->getPathname() ) ) ) )
-				$this->excluded_file_count ++;
-
-		}
-
-		return $this->excluded_file_count;
-
-	}
-
-	/**
 	 * Returns an array of unreadable files.
 	 *
 	 * @return array
@@ -1200,33 +1122,6 @@ class HM_Backup {
 
 	}
 
-	/**
-	 * Return the number of unreadable files.
-	 *
-	 * @return array
-	 */
-	public function get_unreadable_file_count() {
-
-		if ( ! empty( $this->get_unreadable_file_count ) )
-			return $this->get_unreadable_file_count;
-
-		$this->get_unreadable_file_count = 0;
-
-		foreach ( $this->get_files() as $file ) {
-
-			// Skip dot files, they should only exist on versions of PHP between 5.2.11 -> 5.3
-			if ( method_exists( $file, 'isDot' ) && $file->isDot() )
-				continue;
-
-			if ( ! @realpath( $file->getPathname() ) || ! $file->isReadable() )
-				$this->get_unreadable_file_count ++;
-
-		}
-
-		return $this->get_unreadable_file_count;
-
-	}
-
 	private function load_pclzip() {
 
 		// Load PclZip
@@ -1248,12 +1143,14 @@ class HM_Backup {
 
 		$excludes = array();
 
-		if ( isset( $this->excludes ) )
+		if ( isset( $this->excludes ) ) {
 			$excludes = $this->excludes;
+		}
 
 		// If path() is inside root(), exclude it
-		if ( strpos( $this->get_path(), $this->get_root() ) !== false )
+		if ( strpos( $this->get_path(), $this->get_root() ) !== false ) {
 			array_unshift( $excludes, trailingslashit( $this->get_path() ) );
+		}
 
 		return array_unique( $excludes );
 
@@ -1267,11 +1164,13 @@ class HM_Backup {
 	 */
 	public function set_excludes( $excludes, $append = false ) {
 
-		if ( is_string( $excludes ) )
+		if ( is_string( $excludes ) ) {
 			$excludes = explode( ',', $excludes );
+		}
 
-		if ( $append )
+		if ( $append ) {
 			$excludes = array_merge( $this->excludes, $excludes );
+		}
 
 		$this->excludes = array_filter( array_unique( array_map( 'trim', $excludes ) ) );
 
@@ -1312,53 +1211,66 @@ class HM_Backup {
 			$file = $absolute = $fragment = false;
 
 			// Files don't end with /
-			if ( ! in_array( substr( $rule, - 1 ), array( '\\', '/' ) ) )
+			if ( ! in_array( substr( $rule, - 1 ), array( '\\', '/' ) ) ) {
 				$file = true;
+			}
 
 			// If rule starts with a / then treat as absolute path
-			elseif ( in_array( substr( $rule, 0, 1 ), array( '\\', '/' ) ) )
+			elseif ( in_array( substr( $rule, 0, 1 ), array( '\\', '/' ) ) ) {
 				$absolute = true;
+			}
 
 			// Otherwise treat as dir fragment
-			else
+			else {
 				$fragment = true;
+			}
 
 			// Strip $this->root and conform
 			$rule = str_ireplace( $this->get_root(), '', untrailingslashit( self::conform_dir( $rule ) ) );
 
+
 			// Strip the preceeding slash
-			if ( in_array( substr( $rule, 0, 1 ), array( '\\', '/' ) ) )
+			if ( in_array( substr( $rule, 0, 1 ), array( '\\', '/' ) ) ) {
 				$rule = substr( $rule, 1 );
+			}
 
 			// Escape string for regex
-			if ( $context === 'regex' )
+			if ( $context === 'regex' ) {
 				$rule = str_replace( '.', '\.', $rule );
+			}
 
 			// Convert any existing wildcards
-			if ( $wildcard !== '*' && strpos( $rule, '*' ) !== false )
+			if ( $wildcard !== '*' && strpos( $rule, '*' ) !== false ) {
 				$rule = str_replace( '*', $wildcard, $rule );
+			}
 
 			// Wrap directory fragments and files in wildcards for zip
-			if ( $context === 'zip' && ( $fragment || $file ) )
+			if ( $context === 'zip' && ( $fragment || $file ) ) {
 				$rule = $wildcard . $rule . $wildcard;
+			}
 
 			// Add a wildcard to the end of absolute url for zips
-			if ( $context === 'zip' && $absolute )
+			if ( $context === 'zip' && $absolute ) {
 				$rule .= $wildcard;
+			}
 
 			// Add and end carrot to files for pclzip but only if it doesn't end in a wildcard
-			if ( $file && $context === 'regex' )
+			if ( $file && $context === 'regex' ) {
 				$rule .= '$';
+			}
 
 			// Add a start carrot to absolute urls for pclzip
-			if ( $absolute && $context === 'regex' )
+			if ( $absolute && $context === 'regex' ) {
 				$rule = '^' . $rule;
+			}
+
 
 		}
 
 		// Escape shell args for zip command
-		if ( $context === 'zip' )
+		if ( $context === 'zip' ) {
 			$excludes = array_map( 'escapeshellarg', array_unique( $excludes ) );
+		}
 
 		return implode( $separator, $excludes );
 
@@ -1711,10 +1623,10 @@ class HM_Backup {
  * of the zip
  *
  * @param string $event
- * @param array  &$file
+ * @param array  $file
  * @return bool
  */
-function hmbkp_pclzip_callback( $event, &$file ) {
+function hmbkp_pclzip_callback( $event, $file ) {
 
 	global $_hmbkp_exclude_string;
 

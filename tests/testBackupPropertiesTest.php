@@ -50,7 +50,7 @@ class testPropertiesTestCase extends HM_Backup_UnitTestCase {
 	 */
 	public function testDefaultBackupPath() {
 
-		$this->assertEquals( HM_Backup::conform_dir( hmbkp_path_default() ), $this->backup->get_path() );
+		$this->assertEquals( HM_Backup::conform_dir( hmbkp_path() ), $this->backup->get_path() );
 
 	}
 
