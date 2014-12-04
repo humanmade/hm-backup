@@ -374,7 +374,7 @@ class HM_Backup {
 	public function get_path() {
 
 		if ( empty( $this->path ) )
-			$this->set_path( self::conform_dir( hmbkp_path_default() ) );
+			$this->set_path( self::conform_dir( hmbkp_path() ) );
 
 		return $this->path;
 
