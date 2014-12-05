@@ -3,7 +3,7 @@
 /**
  * Generic file and database backup class
  *
- * @version 2.2
+ * @version 2.2.1
  */
 class HM_Backup {
 
@@ -971,7 +971,7 @@ class HM_Backup {
 		// We only want to use the RecursiveDirectoryIterator if the FOLLOW_SYMLINKS flag is available
 		if ( defined( 'RecursiveDirectoryIterator::FOLLOW_SYMLINKS' ) ) {
 
-			$this->files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->get_root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
+			$this->files = new RecursiveIteratorIterator( new ExcludesFilterIterator( new RecursiveDirectoryIterator( $this->get_root(), RecursiveDirectoryIterator::FOLLOW_SYMLINKS ) ), RecursiveIteratorIterator::SELF_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD );
 
 			// Skip dot files if the SKIP_DOTS flag is available
 			if ( defined( 'RecursiveDirectoryIterator::SKIP_DOTS' ) ) {
@@ -1639,5 +1639,21 @@ function hmbkp_pclzip_callback( $event, $file ) {
 		return false;
 
 	return true;
+
+}
+
+/**
+ * Class ExcludesFilterIterator
+ *
+ * Filters out unwanted directories from the RecursiveDirectoryIterator
+ */
+class ExcludesFilterIterator extends RecursiveFilterIterator {
+
+	public function accept() {
+
+		$excludes = array( '.git', '.svn', '.DS_Store' );
+		return ! ( in_array( $this->getFilename(), $excludes ) );
+
+	}
 
 }
