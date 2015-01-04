@@ -637,8 +637,9 @@ class HM_Backup {
 		$this->do_action( 'hmbkp_backup_started' );
 
 		// Backup database
-		if ( $this->get_type() !== 'file' )
+		if ( $this->get_type() !== 'file' ) {
 			$this->dump_database();
+		}
 
 		// Zip everything up
 		$this->archive();
@@ -790,20 +791,24 @@ class HM_Backup {
 	public function archive() {
 
 		// Do we have the path to the zip command
-		if ( $this->get_zip_command_path() )
+		if ( $this->get_zip_command_path() ) {
 			$this->zip();
+		}
 
 		// If not or if the shell zip failed then use ZipArchive
-		if ( empty( $this->archive_verified ) && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) )
+		if ( empty( $this->archive_verified ) && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) ) {
 			$this->zip_archive();
+		}
 
 		// If ZipArchive is unavailable or one of the above failed
-		if ( empty( $this->archive_verified ) )
+		if ( empty( $this->archive_verified ) ) {
 			$this->pcl_zip();
+		}
 
 		// Delete the database dump file
-		if ( file_exists( $this->get_database_dump_filepath() ) )
+		if ( file_exists( $this->get_database_dump_filepath() ) ) {
 			unlink( $this->get_database_dump_filepath() );
+		}
 
 		$this->do_action( 'hmbkp_archive_finished' );
 
