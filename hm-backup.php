@@ -831,8 +831,6 @@ class HM_Backup {
 		// Zip up $this->root
 		if ( $this->get_type() !== 'database' ) {
 
-			$start = time();
-
 			// cd to the site root
 			$command = 'cd ' . escapeshellarg( $this->get_root() );
 
