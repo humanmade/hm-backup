@@ -50,6 +50,13 @@ class HM_Backup {
 	private $mysqldump_command_path;
 
 	/**
+	 * The filename of the existing backup file
+	 *
+	 * @string
+	 */
+	private $existing_archive_filepath = '';
+
+	/**
 	 * An array of exclude rules
 	 *
 	 * @array
@@ -396,6 +403,33 @@ class HM_Backup {
 	}
 
 	/**
+	 * Get the filepath for the existing archive
+	 *
+	 * @return string
+	 */
+	public function get_existing_archive_filepath() {
+
+		return $this->existing_archive_filepath;
+
+	}
+
+	/**
+	 * Set the filepath for the existing archive
+	 *
+	 * @param string $existing_archive_filepath
+	 * @return null
+	 */
+	public function set_existing_archive_filepath( $existing_archive_filepath ) {
+
+		if ( empty( $existing_archive_filepath ) || ! is_string( $existing_archive_filepath ) ) {
+			return new WP_Error( 'invalid_existing_archive_filepath', sprintf( __( 'Invalid existing archive filepath <code>%s</code> must be a non empty (string)', 'backupwordpress' ), $existing_archive_filepath ) );
+		}
+
+		$this->existing_archive_filepath = self::conform_dir( $existing_archive_filepath );
+
+	}
+
+	/**
 	 * Get the archive method that was used for the backup
 	 *
 	 * Will be either zip, ZipArchive or PclZip
@@ -603,8 +637,9 @@ class HM_Backup {
 		$this->do_action( 'hmbkp_backup_started' );
 
 		// Backup database
-		if ( $this->get_type() !== 'file' )
+		if ( $this->get_type() !== 'file' ) {
 			$this->dump_database();
+		}
 
 		// Zip everything up
 		$this->archive();
@@ -756,20 +791,24 @@ class HM_Backup {
 	public function archive() {
 
 		// Do we have the path to the zip command
-		if ( $this->get_zip_command_path() )
+		if ( $this->get_zip_command_path() ) {
 			$this->zip();
+		}
 
 		// If not or if the shell zip failed then use ZipArchive
-		if ( empty( $this->archive_verified ) && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) )
+		if ( empty( $this->archive_verified ) && class_exists( 'ZipArchive' ) && empty( $this->skip_zip_archive ) ) {
 			$this->zip_archive();
+		}
 
 		// If ZipArchive is unavailable or one of the above failed
-		if ( empty( $this->archive_verified ) )
+		if ( empty( $this->archive_verified ) ) {
 			$this->pcl_zip();
+		}
 
 		// Delete the database dump file
-		if ( file_exists( $this->get_database_dump_filepath() ) )
+		if ( file_exists( $this->get_database_dump_filepath() ) ) {
 			unlink( $this->get_database_dump_filepath() );
+		}
 
 		$this->do_action( 'hmbkp_archive_finished' );
 
@@ -780,24 +819,52 @@ class HM_Backup {
 	 */
 	public function zip() {
 
+		// If we have an existing archive let's duplicate it so we can just add changed files to save time
+		if ( $this->get_existing_archive_filepath() ) {
+			copy( $this->get_existing_archive_filepath(), $this->get_archive_filepath() );
+		}
+
 		$this->archive_method = 'zip';
 
 		$this->do_action( 'hmbkp_archive_started' );
 
-		// Zip up $this->root with excludes
-		if ( $this->get_type() !== 'database' && $this->exclude_string( 'zip' ) )
-			$stderr = shell_exec( 'cd ' . escapeshellarg( $this->get_root() ) . ' && ' . escapeshellcmd( $this->get_zip_command_path() ) . ' -rq ' . escapeshellarg( $this->get_archive_filepath() ) . ' ./' . ' -x ' . $this->exclude_string( 'zip' ) . ' 2>&1' );
+		// Zip up $this->root
+		if ( $this->get_type() !== 'database' ) {
 
-		// Zip up $this->root without excludes
-		elseif ( $this->get_type() !== 'database' )
-			$stderr = shell_exec( 'cd ' . escapeshellarg( $this->get_root() ) . ' && ' . escapeshellcmd( $this->get_zip_command_path() ) . ' -rq ' . escapeshellarg( $this->get_archive_filepath() ) . ' ./' . ' 2>&1' );
+			// cd to the site root
+			$command = 'cd ' . escapeshellarg( $this->get_root() );
+
+			// Run the zip command with the recursive and quiet flags
+			$command .= ' && ' . escapeshellcmd( $this->get_zip_command_path() ) . ' -rq ';
+
+			// If the destination zip file already exists then let's just add changed files to save time
+			if ( file_exists( $this->get_archive_filepath() ) && $this->get_existing_archive_filepath() ) {
+				$command .= ' -FS ';
+			}
+
+			// Save the zip file to the correct path
+			$command .= escapeshellarg( $this->get_archive_filepath() ) . ' ./';
+
+			// Pass exclude rules in if we have them
+			if ( $this->exclude_string( 'zip' ) ) {
+				$command .= ' -x ' . $this->exclude_string( 'zip' );
+			}
+
+			// Push all output to STDERR
+			$command .= ' 2>&1';
+
+			$stderr = shell_exec( $command );
+
+		}
 
 		// Add the database dump to the archive
-		if ( $this->get_type() !== 'file' && file_exists( $this->get_database_dump_filepath() ) )
-			$stderr = shell_exec( 'cd ' . escapeshellarg( $this->get_path() ) . ' && ' . escapeshellcmd( $this->get_zip_command_path() ) . ' -uq ' . escapeshellarg( $this->get_archive_filepath() ) . ' ' . escapeshellarg( $this->get_database_dump_filename() ) . ' 2>&1' );
+		if ( $this->get_type() !== 'file' && file_exists( $this->get_database_dump_filepath() ) ) {
+			$stderr = shell_exec( 'cd ' . escapeshellarg( $this->get_path() ) . ' && ' . escapeshellcmd( $this->get_zip_command_path() ) . ' -q ' . escapeshellarg( $this->get_archive_filepath() ) . ' ' . escapeshellarg( $this->get_database_dump_filename() ) . ' 2>&1' );
+		}
 
-		if ( ! empty( $stderr ) )
+		if ( ! empty( $stderr ) ) {
 			$this->warning( $this->get_archive_method(), $stderr );
+		}
 
 		$this->verify_archive();
 

@@ -24,7 +24,7 @@ class testBackUpProcessTestCase extends HM_Backup_UnitTestCase {
 	public function setUp() {
 
 		$this->backup = new HM_Backup();
-		$this->backup->set_root( dirname( __FILE__ ) . '/test-data/' );
+		$this->backup->set_root( dirname( __FILE__ ) . '/test-data' );
 		$this->backup->set_path( dirname( __FILE__ ) . '/tmp' );
 
 		hmbkp_rmdirtree( $this->backup->get_path() );
@@ -46,6 +46,8 @@ class testBackUpProcessTestCase extends HM_Backup_UnitTestCase {
 		delete_option( 'hmbkp_path' );
 		delete_option( 'hmbkp_default_path' );
 
+		@unlink( $this->backup->get_root() . '/new.file' );
+
 		unset( $this->backup );
 
 	}
@@ -57,11 +59,13 @@ class testBackUpProcessTestCase extends HM_Backup_UnitTestCase {
 	 */
 	public function testFullBackupWithCommands() {
 
-		if ( ! $this->backup->get_zip_command_path() )
+		if ( ! $this->backup->get_zip_command_path() ) {
             $this->markTestSkipped( 'Empty zip command path' );
+		}
 
-        if ( ! $this->backup->get_mysqldump_command_path() )
+        if ( ! $this->backup->get_mysqldump_command_path() ) {
             $this->markTestSkipped( 'Empty mysqldump command path' );
+        }
 
 		$this->backup->backup();
 
@@ -72,6 +76,48 @@ class testBackUpProcessTestCase extends HM_Backup_UnitTestCase {
 
 		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( 'test-data.txt', $this->backup->get_database_dump_filename() ) );
 		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 4 );
+
+	}
+
+	public function testDeltaBackupWithCommands() {
+
+		if ( ! $this->backup->get_zip_command_path() ) {
+            $this->markTestSkipped( 'Empty zip command path' );
+		}
+
+        if ( ! $this->backup->get_mysqldump_command_path() ) {
+            $this->markTestSkipped( 'Empty mysqldump command path' );
+        }
+
+		$this->backup->backup();
+
+		$this->assertEquals( 'zip', $this->backup->get_archive_method() );
+		$this->assertEquals( 'mysqldump', $this->backup->get_mysqldump_method() );
+
+		$this->assertFileExists( $this->backup->get_archive_filepath() );
+
+		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( 'test-data.txt', $this->backup->get_database_dump_filename() ) );
+		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 4 );
+
+		if ( ! copy( $this->backup->get_archive_filepath(), $this->backup->get_path() . '/delta.zip' ) ) {
+		    $this->markTestSkipped( 'Unable to copy backup' );
+		}
+
+		// create a new file
+		file_put_contents( $this->backup->get_root() . '/new.file', 'test' );
+
+		if ( ! file_exists( $this->backup->get_root() . '/new.file' ) ) {
+			$this->markTestSkipped( 'new.file couldn\'t be created' );
+		}
+
+		$this->backup->set_archive_filename( 'delta.zip' );
+
+		$this->backup->backup();
+
+		$this->assertFileExists( $this->backup->get_archive_filepath() );
+
+		$this->assertArchiveContains( $this->backup->get_archive_filepath(), array( 'new.file', 'test-data.txt', $this->backup->get_database_dump_filename() ) );
+		$this->assertArchiveFileCount( $this->backup->get_archive_filepath(), 5 );
 
 	}
 
